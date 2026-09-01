@@ -6,7 +6,6 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { supabase } from "@/integrations/supabase/client";
-import { lovable } from "@/integrations/lovable";
 import { Wordmark } from "@/components/layout/wordmark";
 
 export const Route = createFileRoute("/auth")({
@@ -60,10 +59,6 @@ function AuthPage() {
     navigate({ to: "/" });
   }
 
-  async function google() {
-    await lovable.auth.signInWithOAuth("google", { redirect_uri: window.location.origin });
-  }
-
   return (
     <div className="container-page flex min-h-[80vh] items-center justify-center py-16">
       <div className="w-full max-w-md rounded-2xl border border-border bg-card p-8 shadow-card">
@@ -74,16 +69,6 @@ function AuthPage() {
         <p className="mt-1 text-center text-sm text-muted-foreground">
           One account for buying and publishing plugins.
         </p>
-
-        <Button variant="outline" className="mt-6 w-full" onClick={google} type="button">
-          Continue with Google
-        </Button>
-
-        <div className="my-6 flex items-center gap-3 text-xs text-muted-foreground">
-          <span className="h-px flex-1 bg-border" />
-          or
-          <span className="h-px flex-1 bg-border" />
-        </div>
 
         <Tabs defaultValue="signin">
           <TabsList className="grid w-full grid-cols-2">
