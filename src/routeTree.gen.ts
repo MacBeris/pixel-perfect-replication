@@ -10,33 +10,146 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/route'
+import { Route as AuthRouteImport } from './routes/auth'
+import { Route as AuthenticatedFavoritesRouteImport } from './routes/_authenticated/favorites'
+import { Route as AuthenticatedLibraryRouteImport } from './routes/_authenticated/library'
+import { Route as AuthenticatedWishlistRouteImport } from './routes/_authenticated/wishlist'
+import { Route as CategorySlugRouteImport } from './routes/category.$slug'
+import { Route as PlatformSlugRouteImport } from './routes/platform.$slug'
+import { Route as PluginsIndexRouteImport } from './routes/plugins.index'
+import { Route as PluginsSlugRouteImport } from './routes/plugins.$slug'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AuthenticatedRouteRoute = AuthenticatedRouteRouteImport.update({
+  id: '/_authenticated',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AuthRoute = AuthRouteImport.update({
+  id: '/auth',
+  path: '/auth',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AuthenticatedFavoritesRoute = AuthenticatedFavoritesRouteImport.update({
+  id: '/favorites',
+  path: '/favorites',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
+const AuthenticatedLibraryRoute = AuthenticatedLibraryRouteImport.update({
+  id: '/library',
+  path: '/library',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
+const AuthenticatedWishlistRoute = AuthenticatedWishlistRouteImport.update({
+  id: '/wishlist',
+  path: '/wishlist',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
+const CategorySlugRoute = CategorySlugRouteImport.update({
+  id: '/category/$slug',
+  path: '/category/$slug',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const PlatformSlugRoute = PlatformSlugRouteImport.update({
+  id: '/platform/$slug',
+  path: '/platform/$slug',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const PluginsIndexRoute = PluginsIndexRouteImport.update({
+  id: '/plugins/',
+  path: '/plugins/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const PluginsSlugRoute = PluginsSlugRouteImport.update({
+  id: '/plugins/$slug',
+  path: '/plugins/$slug',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/auth': typeof AuthRoute
+  '/favorites': typeof AuthenticatedFavoritesRoute
+  '/library': typeof AuthenticatedLibraryRoute
+  '/wishlist': typeof AuthenticatedWishlistRoute
+  '/category/$slug': typeof CategorySlugRoute
+  '/platform/$slug': typeof PlatformSlugRoute
+  '/plugins/$slug': typeof PluginsSlugRoute
+  '/plugins/': typeof PluginsIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/auth': typeof AuthRoute
+  '/favorites': typeof AuthenticatedFavoritesRoute
+  '/library': typeof AuthenticatedLibraryRoute
+  '/wishlist': typeof AuthenticatedWishlistRoute
+  '/category/$slug': typeof CategorySlugRoute
+  '/platform/$slug': typeof PlatformSlugRoute
+  '/plugins/$slug': typeof PluginsSlugRoute
+  '/plugins': typeof PluginsIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/_authenticated': typeof AuthenticatedRouteRouteWithChildren
+  '/auth': typeof AuthRoute
+  '/_authenticated/favorites': typeof AuthenticatedFavoritesRoute
+  '/_authenticated/library': typeof AuthenticatedLibraryRoute
+  '/_authenticated/wishlist': typeof AuthenticatedWishlistRoute
+  '/category/$slug': typeof CategorySlugRoute
+  '/platform/$slug': typeof PlatformSlugRoute
+  '/plugins/$slug': typeof PluginsSlugRoute
+  '/plugins/': typeof PluginsIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/'
+  fullPaths:
+    | '/'
+    | '/auth'
+    | '/favorites'
+    | '/library'
+    | '/wishlist'
+    | '/category/$slug'
+    | '/platform/$slug'
+    | '/plugins/$slug'
+    | '/plugins/'
   fileRoutesByTo: FileRoutesByTo
-  to: '/'
-  id: '__root__' | '/'
+  to:
+    | '/'
+    | '/auth'
+    | '/favorites'
+    | '/library'
+    | '/wishlist'
+    | '/category/$slug'
+    | '/platform/$slug'
+    | '/plugins/$slug'
+    | '/plugins'
+  id:
+    | '__root__'
+    | '/'
+    | '/_authenticated'
+    | '/auth'
+    | '/_authenticated/favorites'
+    | '/_authenticated/library'
+    | '/_authenticated/wishlist'
+    | '/category/$slug'
+    | '/platform/$slug'
+    | '/plugins/$slug'
+    | '/plugins/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  AuthenticatedRouteRoute: typeof AuthenticatedRouteRouteWithChildren
+  AuthRoute: typeof AuthRoute
+  CategorySlugRoute: typeof CategorySlugRoute
+  PlatformSlugRoute: typeof PlatformSlugRoute
+  PluginsSlugRoute: typeof PluginsSlugRoute
+  PluginsIndexRoute: typeof PluginsIndexRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -48,11 +161,95 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/_authenticated': {
+      id: '/_authenticated'
+      path: ''
+      fullPath: '/'
+      preLoaderRoute: typeof AuthenticatedRouteRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/auth': {
+      id: '/auth'
+      path: '/auth'
+      fullPath: '/auth'
+      preLoaderRoute: typeof AuthRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/_authenticated/favorites': {
+      id: '/_authenticated/favorites'
+      path: '/favorites'
+      fullPath: '/favorites'
+      preLoaderRoute: typeof AuthenticatedFavoritesRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/library': {
+      id: '/_authenticated/library'
+      path: '/library'
+      fullPath: '/library'
+      preLoaderRoute: typeof AuthenticatedLibraryRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/wishlist': {
+      id: '/_authenticated/wishlist'
+      path: '/wishlist'
+      fullPath: '/wishlist'
+      preLoaderRoute: typeof AuthenticatedWishlistRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/category/$slug': {
+      id: '/category/$slug'
+      path: '/category/$slug'
+      fullPath: '/category/$slug'
+      preLoaderRoute: typeof CategorySlugRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/platform/$slug': {
+      id: '/platform/$slug'
+      path: '/platform/$slug'
+      fullPath: '/platform/$slug'
+      preLoaderRoute: typeof PlatformSlugRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/plugins/': {
+      id: '/plugins/'
+      path: '/plugins'
+      fullPath: '/plugins/'
+      preLoaderRoute: typeof PluginsIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/plugins/$slug': {
+      id: '/plugins/$slug'
+      path: '/plugins/$slug'
+      fullPath: '/plugins/$slug'
+      preLoaderRoute: typeof PluginsSlugRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
+interface AuthenticatedRouteRouteChildren {
+  AuthenticatedFavoritesRoute: typeof AuthenticatedFavoritesRoute
+  AuthenticatedLibraryRoute: typeof AuthenticatedLibraryRoute
+  AuthenticatedWishlistRoute: typeof AuthenticatedWishlistRoute
+}
+
+const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
+  AuthenticatedFavoritesRoute: AuthenticatedFavoritesRoute,
+  AuthenticatedLibraryRoute: AuthenticatedLibraryRoute,
+  AuthenticatedWishlistRoute: AuthenticatedWishlistRoute,
+}
+
+const AuthenticatedRouteRouteWithChildren =
+  AuthenticatedRouteRoute._addFileChildren(AuthenticatedRouteRouteChildren)
+
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  AuthenticatedRouteRoute: AuthenticatedRouteRouteWithChildren,
+  AuthRoute: AuthRoute,
+  CategorySlugRoute: CategorySlugRoute,
+  PlatformSlugRoute: PlatformSlugRoute,
+  PluginsSlugRoute: PluginsSlugRoute,
+  PluginsIndexRoute: PluginsIndexRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
