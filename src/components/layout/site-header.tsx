@@ -29,7 +29,7 @@ export function SiteHeader() {
 
   function submitSearch(event: React.FormEvent) {
     event.preventDefault();
-    navigate({ to: "/plugins", search: { q: query || undefined } });
+    navigate({ to: "/plugins", search: query ? { q: query } : {} });
     setMobileOpen(false);
   }
 
