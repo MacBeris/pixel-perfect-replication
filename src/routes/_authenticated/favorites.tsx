@@ -27,7 +27,7 @@ function FavoritesPage() {
     queryFn: async () => {
       const { data, error } = await supabase.from("favorites").select(PLUGIN_SELECT);
       if (error) throw error;
-      return (data ?? []).map((row) => row.plugin).filter(Boolean) as unknown as PluginListItem[];
+      return (data ?? []).map((row: { plugin: unknown }) => row.plugin).filter(Boolean) as unknown as PluginListItem[];
     },
   });
 

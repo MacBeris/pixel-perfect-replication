@@ -25,7 +25,7 @@ export function Hero() {
           className="mx-auto mt-9 flex max-w-2xl flex-col gap-3 sm:flex-row"
           onSubmit={(event) => {
             event.preventDefault();
-            navigate({ to: "/plugins", search: { q: query || undefined } });
+            navigate({ to: "/plugins", search: query ? { q: query } : {} });
           }}
         >
           <div className="relative flex-1">

@@ -17,11 +17,11 @@ import type { PluginSort } from "@/types/catalog";
 import { t } from "@/lib/i18n";
 
 type PluginSearch = {
-  q?: string;
-  platform?: string;
-  pricing?: string;
-  openSource?: string;
-  sort?: PluginSort;
+  q?: string | undefined;
+  platform?: string | undefined;
+  pricing?: string | undefined;
+  openSource?: string | undefined;
+  sort?: PluginSort | undefined;
 };
 
 export const Route = createFileRoute("/plugins/")({

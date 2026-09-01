@@ -27,7 +27,7 @@ function LibraryPage() {
         .select("plugin:plugins(id,name,slug,logo_url,short_description,price,currency,pricing_model,is_open_source,rating_average,reviews_count,downloads_count,updated_at,platform:platforms(name,slug))")
         .eq("status", "paid");
       if (error) throw error;
-      return (data ?? []).map((row) => row.plugin).filter(Boolean) as unknown as PluginListItem[];
+      return (data ?? []).map((row: { plugin: unknown }) => row.plugin).filter(Boolean) as unknown as PluginListItem[];
     },
   });
 
