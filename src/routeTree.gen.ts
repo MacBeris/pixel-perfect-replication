@@ -10,6 +10,7 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as AuthRouteImport } from './routes/auth'
 import { Route as CategorySlugRouteImport } from './routes/category.$slug'
 import { Route as PlatformSlugRouteImport } from './routes/platform.$slug'
 import { Route as PluginsIndexRouteImport } from './routes/plugins.index'
@@ -18,6 +19,11 @@ import { Route as PluginsSlugRouteImport } from './routes/plugins.$slug'
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AuthRoute = AuthRouteImport.update({
+  id: '/auth',
+  path: '/auth',
   getParentRoute: () => rootRouteImport,
 } as any)
 const CategorySlugRoute = CategorySlugRouteImport.update({
@@ -43,6 +49,7 @@ const PluginsSlugRoute = PluginsSlugRouteImport.update({
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/auth': typeof AuthRoute
   '/category/$slug': typeof CategorySlugRoute
   '/platform/$slug': typeof PlatformSlugRoute
   '/plugins/$slug': typeof PluginsSlugRoute
@@ -50,6 +57,7 @@ export interface FileRoutesByFullPath {
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/auth': typeof AuthRoute
   '/category/$slug': typeof CategorySlugRoute
   '/platform/$slug': typeof PlatformSlugRoute
   '/plugins/$slug': typeof PluginsSlugRoute
@@ -58,6 +66,7 @@ export interface FileRoutesByTo {
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/auth': typeof AuthRoute
   '/category/$slug': typeof CategorySlugRoute
   '/platform/$slug': typeof PlatformSlugRoute
   '/plugins/$slug': typeof PluginsSlugRoute
@@ -66,13 +75,24 @@ export interface FileRoutesById {
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
-    '/' | '/category/$slug' | '/platform/$slug' | '/plugins/$slug' | '/plugins/'
+    | '/'
+    | '/auth'
+    | '/category/$slug'
+    | '/platform/$slug'
+    | '/plugins/$slug'
+    | '/plugins/'
   fileRoutesByTo: FileRoutesByTo
   to:
-    '/' | '/category/$slug' | '/platform/$slug' | '/plugins/$slug' | '/plugins'
+    | '/'
+    | '/auth'
+    | '/category/$slug'
+    | '/platform/$slug'
+    | '/plugins/$slug'
+    | '/plugins'
   id:
     | '__root__'
     | '/'
+    | '/auth'
     | '/category/$slug'
     | '/platform/$slug'
     | '/plugins/$slug'
@@ -81,6 +101,7 @@ export interface FileRouteTypes {
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  AuthRoute: typeof AuthRoute
   CategorySlugRoute: typeof CategorySlugRoute
   PlatformSlugRoute: typeof PlatformSlugRoute
   PluginsSlugRoute: typeof PluginsSlugRoute
@@ -94,6 +115,13 @@ declare module '@tanstack/react-router' {
       path: '/'
       fullPath: '/'
       preLoaderRoute: typeof IndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/auth': {
+      id: '/auth'
+      path: '/auth'
+      fullPath: '/auth'
+      preLoaderRoute: typeof AuthRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/category/$slug': {
@@ -129,6 +157,7 @@ declare module '@tanstack/react-router' {
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  AuthRoute: AuthRoute,
   CategorySlugRoute: CategorySlugRoute,
   PlatformSlugRoute: PlatformSlugRoute,
   PluginsSlugRoute: PluginsSlugRoute,
