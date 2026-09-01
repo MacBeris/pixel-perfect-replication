@@ -59,7 +59,7 @@ Każdy etap kończy się działającą aplikacją; wszystkie zmiany schematu zap
 
 - Supabase Auth: Google OAuth i GitHub OAuth (client id/secret + redirect URL) — kod przygotuję wcześniej.
 - Stripe: secret key, webhook secret, Stripe Connect (typ konta, onboarding) — prowizja 10% / 90% dla developera.
-- Ewentualne podpięcie własnej bazy ExtendlyBaza i repozytorium GitHub.
+- Obowiązkowe podpięcie własnej bazy ExtendlyBaza i repozytorium GitHub.
 
 ## 7. Zakres pierwszej implementacji (po akceptacji)
 
