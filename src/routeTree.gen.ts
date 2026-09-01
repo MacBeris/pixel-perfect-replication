@@ -14,6 +14,7 @@ import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/
 import { Route as AuthRouteImport } from './routes/auth'
 import { Route as AuthenticatedFavoritesRouteImport } from './routes/_authenticated/favorites'
 import { Route as AuthenticatedLibraryRouteImport } from './routes/_authenticated/library'
+import { Route as AuthenticatedWishlistRouteImport } from './routes/_authenticated/wishlist'
 import { Route as CategorySlugRouteImport } from './routes/category.$slug'
 import { Route as PlatformSlugRouteImport } from './routes/platform.$slug'
 import { Route as PluginsIndexRouteImport } from './routes/plugins.index'
@@ -43,6 +44,11 @@ const AuthenticatedLibraryRoute = AuthenticatedLibraryRouteImport.update({
   path: '/library',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
+const AuthenticatedWishlistRoute = AuthenticatedWishlistRouteImport.update({
+  id: '/wishlist',
+  path: '/wishlist',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
 const CategorySlugRoute = CategorySlugRouteImport.update({
   id: '/category/$slug',
   path: '/category/$slug',
@@ -69,6 +75,7 @@ export interface FileRoutesByFullPath {
   '/auth': typeof AuthRoute
   '/favorites': typeof AuthenticatedFavoritesRoute
   '/library': typeof AuthenticatedLibraryRoute
+  '/wishlist': typeof AuthenticatedWishlistRoute
   '/category/$slug': typeof CategorySlugRoute
   '/platform/$slug': typeof PlatformSlugRoute
   '/plugins/$slug': typeof PluginsSlugRoute
@@ -79,6 +86,7 @@ export interface FileRoutesByTo {
   '/auth': typeof AuthRoute
   '/favorites': typeof AuthenticatedFavoritesRoute
   '/library': typeof AuthenticatedLibraryRoute
+  '/wishlist': typeof AuthenticatedWishlistRoute
   '/category/$slug': typeof CategorySlugRoute
   '/platform/$slug': typeof PlatformSlugRoute
   '/plugins/$slug': typeof PluginsSlugRoute
@@ -91,6 +99,7 @@ export interface FileRoutesById {
   '/auth': typeof AuthRoute
   '/_authenticated/favorites': typeof AuthenticatedFavoritesRoute
   '/_authenticated/library': typeof AuthenticatedLibraryRoute
+  '/_authenticated/wishlist': typeof AuthenticatedWishlistRoute
   '/category/$slug': typeof CategorySlugRoute
   '/platform/$slug': typeof PlatformSlugRoute
   '/plugins/$slug': typeof PluginsSlugRoute
@@ -103,6 +112,7 @@ export interface FileRouteTypes {
     | '/auth'
     | '/favorites'
     | '/library'
+    | '/wishlist'
     | '/category/$slug'
     | '/platform/$slug'
     | '/plugins/$slug'
@@ -113,6 +123,7 @@ export interface FileRouteTypes {
     | '/auth'
     | '/favorites'
     | '/library'
+    | '/wishlist'
     | '/category/$slug'
     | '/platform/$slug'
     | '/plugins/$slug'
@@ -124,6 +135,7 @@ export interface FileRouteTypes {
     | '/auth'
     | '/_authenticated/favorites'
     | '/_authenticated/library'
+    | '/_authenticated/wishlist'
     | '/category/$slug'
     | '/platform/$slug'
     | '/plugins/$slug'
@@ -177,6 +189,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedLibraryRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/wishlist': {
+      id: '/_authenticated/wishlist'
+      path: '/wishlist'
+      fullPath: '/wishlist'
+      preLoaderRoute: typeof AuthenticatedWishlistRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/category/$slug': {
       id: '/category/$slug'
       path: '/category/$slug'
@@ -211,11 +230,13 @@ declare module '@tanstack/react-router' {
 interface AuthenticatedRouteRouteChildren {
   AuthenticatedFavoritesRoute: typeof AuthenticatedFavoritesRoute
   AuthenticatedLibraryRoute: typeof AuthenticatedLibraryRoute
+  AuthenticatedWishlistRoute: typeof AuthenticatedWishlistRoute
 }
 
 const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedFavoritesRoute: AuthenticatedFavoritesRoute,
   AuthenticatedLibraryRoute: AuthenticatedLibraryRoute,
+  AuthenticatedWishlistRoute: AuthenticatedWishlistRoute,
 }
 
 const AuthenticatedRouteRouteWithChildren =
