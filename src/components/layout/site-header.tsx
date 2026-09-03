@@ -1,6 +1,6 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Link, useNavigate } from "@tanstack/react-router";
-import { LibraryBig, Heart, ListPlus, LogOut, Menu, Search, User2 } from "lucide-react";
+import { LibraryBig, Heart, ListPlus, LogOut, Menu, Search, ShieldCheck, User2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Sheet, SheetContent, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
@@ -25,7 +25,29 @@ export function SiteHeader() {
   const [query, setQuery] = useState("");
   const [mobileOpen, setMobileOpen] = useState(false);
   const navigate = useNavigate();
-  const { isAuthenticated, user } = useAuth();
+  const { isAuthenticated, user, session } = useAuth();
+  const [isAdmin, setIsAdmin] = useState(false);
+  const userId = session?.user.id;
+
+  useEffect(() => {
+    let active = true;
+    if (!userId) {
+      setIsAdmin(false);
+      return;
+    }
+    supabase
+      .from("user_roles")
+      .select("id")
+      .eq("user_id", userId)
+      .eq("role", "admin")
+      .maybeSingle()
+      .then(({ data }) => {
+        if (active) setIsAdmin(Boolean(data));
+      });
+    return () => {
+      active = false;
+    };
+  }, [userId]);
 
   function submitSearch(event: React.FormEvent) {
     event.preventDefault();
@@ -94,6 +116,13 @@ export function SiteHeader() {
                     <ListPlus className="size-4" /> {t("nav.wishlist")}
                   </Link>
                 </DropdownMenuItem>
+                {isAdmin && (
+                  <DropdownMenuItem asChild>
+                    <Link to="/admin" className="gap-2">
+                      <ShieldCheck className="size-4" /> Admin
+                    </Link>
+                  </DropdownMenuItem>
+                )}
                 <DropdownMenuSeparator />
                 <DropdownMenuItem
                   className="gap-2"
