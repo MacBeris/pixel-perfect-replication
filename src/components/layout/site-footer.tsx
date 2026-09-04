@@ -12,7 +12,7 @@ const columns = [
   {
     title: "Developers",
     links: [
-      { label: "Sell on Extendly", to: "/auth" },
+      { label: "Developer dashboard", to: "/developer/dashboard" },
       { label: "My Library", to: "/library" },
     ],
   },
@@ -34,7 +34,10 @@ export function SiteFooter() {
             <ul className="mt-3 space-y-2">
               {column.links.map((link) => (
                 <li key={link.label}>
-                  <Link to={link.to} className="text-sm text-muted-foreground hover:text-foreground">
+                  <Link
+                    to={link.to}
+                    className="text-sm text-muted-foreground hover:text-foreground"
+                  >
                     {link.label}
                   </Link>
                 </li>

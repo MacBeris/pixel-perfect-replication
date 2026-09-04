@@ -13,13 +13,18 @@ import { Route as IndexRouteImport } from './routes/index'
 import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/route'
 import { Route as AdminRouteImport } from './routes/admin'
 import { Route as AuthRouteImport } from './routes/auth'
+import { Route as PublishingRequirementsRouteImport } from './routes/publishing-requirements'
+import { Route as AuthenticatedDashboardRouteImport } from './routes/_authenticated/dashboard'
 import { Route as AuthenticatedFavoritesRouteImport } from './routes/_authenticated/favorites'
 import { Route as AuthenticatedLibraryRouteImport } from './routes/_authenticated/library'
 import { Route as AuthenticatedWishlistRouteImport } from './routes/_authenticated/wishlist'
 import { Route as CategorySlugRouteImport } from './routes/category.$slug'
+import { Route as DeveloperDashboardRouteImport } from './routes/developer.dashboard'
+import { Route as DevelopersSlugRouteImport } from './routes/developers.$slug'
 import { Route as PlatformSlugRouteImport } from './routes/platform.$slug'
 import { Route as PluginsIndexRouteImport } from './routes/plugins.index'
 import { Route as PluginsSlugRouteImport } from './routes/plugins.$slug'
+import { Route as DeveloperPluginsIdAnalyticsRouteImport } from './routes/developer.plugins.$id.analytics'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
@@ -39,6 +44,16 @@ const AuthRoute = AuthRouteImport.update({
   id: '/auth',
   path: '/auth',
   getParentRoute: () => rootRouteImport,
+} as any)
+const PublishingRequirementsRoute = PublishingRequirementsRouteImport.update({
+  id: '/publishing-requirements',
+  path: '/publishing-requirements',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AuthenticatedDashboardRoute = AuthenticatedDashboardRouteImport.update({
+  id: '/dashboard',
+  path: '/dashboard',
+  getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
 const AuthenticatedFavoritesRoute = AuthenticatedFavoritesRouteImport.update({
   id: '/favorites',
@@ -60,6 +75,16 @@ const CategorySlugRoute = CategorySlugRouteImport.update({
   path: '/category/$slug',
   getParentRoute: () => rootRouteImport,
 } as any)
+const DeveloperDashboardRoute = DeveloperDashboardRouteImport.update({
+  id: '/developer/dashboard',
+  path: '/developer/dashboard',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const DevelopersSlugRoute = DevelopersSlugRouteImport.update({
+  id: '/developers/$slug',
+  path: '/developers/$slug',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const PlatformSlugRoute = PlatformSlugRouteImport.update({
   id: '/platform/$slug',
   path: '/platform/$slug',
@@ -75,30 +100,46 @@ const PluginsSlugRoute = PluginsSlugRouteImport.update({
   path: '/plugins/$slug',
   getParentRoute: () => rootRouteImport,
 } as any)
+const DeveloperPluginsIdAnalyticsRoute =
+  DeveloperPluginsIdAnalyticsRouteImport.update({
+    id: '/developer/plugins/$id/analytics',
+    path: '/developer/plugins/$id/analytics',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/admin': typeof AdminRoute
   '/auth': typeof AuthRoute
+  '/publishing-requirements': typeof PublishingRequirementsRoute
+  '/dashboard': typeof AuthenticatedDashboardRoute
   '/favorites': typeof AuthenticatedFavoritesRoute
   '/library': typeof AuthenticatedLibraryRoute
   '/wishlist': typeof AuthenticatedWishlistRoute
   '/category/$slug': typeof CategorySlugRoute
+  '/developer/dashboard': typeof DeveloperDashboardRoute
+  '/developers/$slug': typeof DevelopersSlugRoute
   '/platform/$slug': typeof PlatformSlugRoute
   '/plugins/$slug': typeof PluginsSlugRoute
   '/plugins/': typeof PluginsIndexRoute
+  '/developer/plugins/$id/analytics': typeof DeveloperPluginsIdAnalyticsRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/admin': typeof AdminRoute
   '/auth': typeof AuthRoute
+  '/publishing-requirements': typeof PublishingRequirementsRoute
+  '/dashboard': typeof AuthenticatedDashboardRoute
   '/favorites': typeof AuthenticatedFavoritesRoute
   '/library': typeof AuthenticatedLibraryRoute
   '/wishlist': typeof AuthenticatedWishlistRoute
   '/category/$slug': typeof CategorySlugRoute
+  '/developer/dashboard': typeof DeveloperDashboardRoute
+  '/developers/$slug': typeof DevelopersSlugRoute
   '/platform/$slug': typeof PlatformSlugRoute
   '/plugins/$slug': typeof PluginsSlugRoute
   '/plugins': typeof PluginsIndexRoute
+  '/developer/plugins/$id/analytics': typeof DeveloperPluginsIdAnalyticsRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -106,13 +147,18 @@ export interface FileRoutesById {
   '/_authenticated': typeof AuthenticatedRouteRouteWithChildren
   '/admin': typeof AdminRoute
   '/auth': typeof AuthRoute
+  '/publishing-requirements': typeof PublishingRequirementsRoute
+  '/_authenticated/dashboard': typeof AuthenticatedDashboardRoute
   '/_authenticated/favorites': typeof AuthenticatedFavoritesRoute
   '/_authenticated/library': typeof AuthenticatedLibraryRoute
   '/_authenticated/wishlist': typeof AuthenticatedWishlistRoute
   '/category/$slug': typeof CategorySlugRoute
+  '/developer/dashboard': typeof DeveloperDashboardRoute
+  '/developers/$slug': typeof DevelopersSlugRoute
   '/platform/$slug': typeof PlatformSlugRoute
   '/plugins/$slug': typeof PluginsSlugRoute
   '/plugins/': typeof PluginsIndexRoute
+  '/developer/plugins/$id/analytics': typeof DeveloperPluginsIdAnalyticsRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -120,38 +166,53 @@ export interface FileRouteTypes {
     | '/'
     | '/admin'
     | '/auth'
+    | '/publishing-requirements'
+    | '/dashboard'
     | '/favorites'
     | '/library'
     | '/wishlist'
     | '/category/$slug'
+    | '/developer/dashboard'
+    | '/developers/$slug'
     | '/platform/$slug'
     | '/plugins/$slug'
     | '/plugins/'
+    | '/developer/plugins/$id/analytics'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
     | '/admin'
     | '/auth'
+    | '/publishing-requirements'
+    | '/dashboard'
     | '/favorites'
     | '/library'
     | '/wishlist'
     | '/category/$slug'
+    | '/developer/dashboard'
+    | '/developers/$slug'
     | '/platform/$slug'
     | '/plugins/$slug'
     | '/plugins'
+    | '/developer/plugins/$id/analytics'
   id:
     | '__root__'
     | '/'
     | '/_authenticated'
     | '/admin'
     | '/auth'
+    | '/publishing-requirements'
+    | '/_authenticated/dashboard'
     | '/_authenticated/favorites'
     | '/_authenticated/library'
     | '/_authenticated/wishlist'
     | '/category/$slug'
+    | '/developer/dashboard'
+    | '/developers/$slug'
     | '/platform/$slug'
     | '/plugins/$slug'
     | '/plugins/'
+    | '/developer/plugins/$id/analytics'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -159,10 +220,14 @@ export interface RootRouteChildren {
   AuthenticatedRouteRoute: typeof AuthenticatedRouteRouteWithChildren
   AdminRoute: typeof AdminRoute
   AuthRoute: typeof AuthRoute
+  PublishingRequirementsRoute: typeof PublishingRequirementsRoute
   CategorySlugRoute: typeof CategorySlugRoute
+  DeveloperDashboardRoute: typeof DeveloperDashboardRoute
+  DevelopersSlugRoute: typeof DevelopersSlugRoute
   PlatformSlugRoute: typeof PlatformSlugRoute
   PluginsSlugRoute: typeof PluginsSlugRoute
   PluginsIndexRoute: typeof PluginsIndexRoute
+  DeveloperPluginsIdAnalyticsRoute: typeof DeveloperPluginsIdAnalyticsRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -195,6 +260,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/publishing-requirements': {
+      id: '/publishing-requirements'
+      path: '/publishing-requirements'
+      fullPath: '/publishing-requirements'
+      preLoaderRoute: typeof PublishingRequirementsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/_authenticated/dashboard': {
+      id: '/_authenticated/dashboard'
+      path: '/dashboard'
+      fullPath: '/dashboard'
+      preLoaderRoute: typeof AuthenticatedDashboardRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/favorites': {
       id: '/_authenticated/favorites'
       path: '/favorites'
@@ -223,6 +302,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof CategorySlugRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/developer/dashboard': {
+      id: '/developer/dashboard'
+      path: '/developer/dashboard'
+      fullPath: '/developer/dashboard'
+      preLoaderRoute: typeof DeveloperDashboardRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/developers/$slug': {
+      id: '/developers/$slug'
+      path: '/developers/$slug'
+      fullPath: '/developers/$slug'
+      preLoaderRoute: typeof DevelopersSlugRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/platform/$slug': {
       id: '/platform/$slug'
       path: '/platform/$slug'
@@ -244,16 +337,25 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof PluginsSlugRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/developer/plugins/$id/analytics': {
+      id: '/developer/plugins/$id/analytics'
+      path: '/developer/plugins/$id/analytics'
+      fullPath: '/developer/plugins/$id/analytics'
+      preLoaderRoute: typeof DeveloperPluginsIdAnalyticsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
 interface AuthenticatedRouteRouteChildren {
+  AuthenticatedDashboardRoute: typeof AuthenticatedDashboardRoute
   AuthenticatedFavoritesRoute: typeof AuthenticatedFavoritesRoute
   AuthenticatedLibraryRoute: typeof AuthenticatedLibraryRoute
   AuthenticatedWishlistRoute: typeof AuthenticatedWishlistRoute
 }
 
 const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
+  AuthenticatedDashboardRoute: AuthenticatedDashboardRoute,
   AuthenticatedFavoritesRoute: AuthenticatedFavoritesRoute,
   AuthenticatedLibraryRoute: AuthenticatedLibraryRoute,
   AuthenticatedWishlistRoute: AuthenticatedWishlistRoute,
@@ -267,10 +369,14 @@ const rootRouteChildren: RootRouteChildren = {
   AuthenticatedRouteRoute: AuthenticatedRouteRouteWithChildren,
   AdminRoute: AdminRoute,
   AuthRoute: AuthRoute,
+  PublishingRequirementsRoute: PublishingRequirementsRoute,
   CategorySlugRoute: CategorySlugRoute,
+  DeveloperDashboardRoute: DeveloperDashboardRoute,
+  DevelopersSlugRoute: DevelopersSlugRoute,
   PlatformSlugRoute: PlatformSlugRoute,
   PluginsSlugRoute: PluginsSlugRoute,
   PluginsIndexRoute: PluginsIndexRoute,
+  DeveloperPluginsIdAnalyticsRoute: DeveloperPluginsIdAnalyticsRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

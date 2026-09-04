@@ -85,7 +85,8 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       { title: "Extendly — Plugin & extension marketplace" },
       {
         name: "description",
-        content: "Discover, buy and sell plugins, extensions and add-ons for the tools you already use.",
+        content:
+          "Discover, buy and sell plugins, extensions and add-ons for the tools you already use.",
       },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
@@ -132,7 +133,8 @@ function RootComponent() {
     const { data } = supabase.auth.onAuthStateChange((event: string) => {
       if (event !== "SIGNED_IN" && event !== "SIGNED_OUT" && event !== "USER_UPDATED") return;
       router.invalidate();
-      if (event !== "SIGNED_OUT") queryClient.invalidateQueries();
+      if (event === "SIGNED_OUT" || event === "SIGNED_IN") queryClient.clear();
+      else queryClient.invalidateQueries();
     });
     return () => data.subscription.unsubscribe();
   }, [router, queryClient]);

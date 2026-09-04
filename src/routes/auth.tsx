@@ -7,17 +7,26 @@ import { Label } from "@/components/ui/label";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { supabase } from "@/integrations/supabase/client";
 import { Wordmark } from "@/components/layout/wordmark";
+import { safeDashboardReturn } from "@/features/dashboard/data";
 
 export const Route = createFileRoute("/auth")({
+  ssr: false,
+  validateSearch: (search: Record<string, unknown>): { next?: string } => ({
+    next: safeDashboardReturn(search["next"]),
+  }),
   head: () => ({
     meta: [
       { title: "Sign in or create an account — Extendly" },
       {
         name: "description",
-        content: "Sign in to Extendly to buy plugins, manage your library, or publish extensions as a developer.",
+        content:
+          "Sign in to Extendly to buy plugins, manage your library, or publish extensions as a developer.",
       },
       { property: "og:title", content: "Sign in or create an account — Extendly" },
-      { property: "og:description", content: "Access your Extendly library, favorites and developer dashboard." },
+      {
+        property: "og:description",
+        content: "Access your Extendly library, favorites and developer dashboard.",
+      },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
     ],
@@ -27,6 +36,7 @@ export const Route = createFileRoute("/auth")({
 
 function AuthPage() {
   const navigate = useNavigate();
+  const { next } = Route.useSearch();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [displayName, setDisplayName] = useState("");
@@ -42,17 +52,17 @@ function AuthPage() {
       return;
     }
     toast.success("Welcome back");
-    navigate({ to: "/" });
+    window.location.assign(safeDashboardReturn(next));
   }
 
   async function signUp(event: React.FormEvent) {
     event.preventDefault();
     setLoading(true);
-    const { error } = await supabase.auth.signUp({
+    const { data, error } = await supabase.auth.signUp({
       email,
       password,
       options: {
-        emailRedirectTo: `${window.location.origin}/`,
+        emailRedirectTo: `${window.location.origin}${safeDashboardReturn(next)}`,
         data: { full_name: displayName },
       },
     });
@@ -62,7 +72,8 @@ function AuthPage() {
       return;
     }
     toast.success("Account created. Check your inbox if confirmation is required.");
-    navigate({ to: "/" });
+    if (data.session) window.location.assign(safeDashboardReturn(next));
+    else navigate({ to: "/auth", search: { next: safeDashboardReturn(next) } });
   }
 
   return (

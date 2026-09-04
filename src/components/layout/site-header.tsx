@@ -1,6 +1,17 @@
 import { useEffect, useState } from "react";
 import { Link, useNavigate } from "@tanstack/react-router";
-import { LibraryBig, Heart, ListPlus, LogOut, Menu, Search, ShieldCheck, User2 } from "lucide-react";
+import {
+  LibraryBig,
+  Heart,
+  ListPlus,
+  LogOut,
+  Menu,
+  Search,
+  ShieldCheck,
+  User2,
+  LayoutDashboard,
+  Code2,
+} from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Sheet, SheetContent, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
@@ -17,9 +28,7 @@ import { useAuth } from "@/hooks/use-auth";
 import { supabase } from "@/integrations/supabase/client";
 import { t } from "@/lib/i18n";
 
-const navLinks = [
-  { to: "/plugins", label: t("nav.explore") },
-];
+const navLinks = [{ to: "/plugins", label: t("nav.explore") }];
 
 export function SiteHeader() {
   const [query, setQuery] = useState("");
@@ -86,7 +95,11 @@ export function SiteHeader() {
         </form>
 
         <div className="ml-auto flex items-center gap-2 lg:ml-0">
-          <Link to="/plugins" className="hidden text-sm text-muted-foreground hover:text-foreground sm:block">
+          <Link
+            to="/dashboard"
+            search={{ tab: "developer" }}
+            className="hidden text-sm text-muted-foreground hover:text-foreground sm:block"
+          >
             {t("nav.sell")}
           </Link>
           <ThemeToggle />
@@ -102,17 +115,29 @@ export function SiteHeader() {
                 <div className="px-2 py-1.5 text-xs text-muted-foreground">{user?.email}</div>
                 <DropdownMenuSeparator />
                 <DropdownMenuItem asChild>
-                  <Link to="/library" className="gap-2">
+                  <Link to="/dashboard" search={{ tab: "overview" }} className="gap-2">
+                    <LayoutDashboard className="size-4" />
+                    Dashboard
+                  </Link>
+                </DropdownMenuItem>
+                <DropdownMenuItem asChild>
+                  <Link to="/dashboard" search={{ tab: "developer" }} className="gap-2">
+                    <Code2 className="size-4" />
+                    Developer
+                  </Link>
+                </DropdownMenuItem>
+                <DropdownMenuItem asChild>
+                  <Link to="/dashboard" search={{ tab: "library" }} className="gap-2">
                     <LibraryBig className="size-4" /> {t("nav.library")}
                   </Link>
                 </DropdownMenuItem>
                 <DropdownMenuItem asChild>
-                  <Link to="/favorites" className="gap-2">
+                  <Link to="/dashboard" search={{ tab: "favorites" }} className="gap-2">
                     <Heart className="size-4" /> {t("nav.favorites")}
                   </Link>
                 </DropdownMenuItem>
                 <DropdownMenuItem asChild>
-                  <Link to="/wishlist" className="gap-2">
+                  <Link to="/dashboard" search={{ tab: "wishlist" }} className="gap-2">
                     <ListPlus className="size-4" /> {t("nav.wishlist")}
                   </Link>
                 </DropdownMenuItem>
