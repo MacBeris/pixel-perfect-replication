@@ -8,6 +8,14 @@ import { Input } from "@/components/ui/input";
 import { type DeveloperProfile, message } from "./data";
 import { Busy, Failure, Panel, fieldClass } from "./ui";
 
+import {
+  readDeveloperDraft,
+  saveDeveloperDraft,
+  clearDeveloperDraft,
+  developerDraftAvatar,
+  saveDeveloperDraftAvatar,
+} from "./developer-draft";
+
 const url = z
   .string()
   .trim()
@@ -40,6 +48,9 @@ export function DeveloperProfileForm({
   onSaved: (id: string) => void;
   onCancel: () => void;
 }) {
+  const [draft, setDraft] = useState<Record<string, string>>(() =>
+    profile ? {} : readDeveloperDraft(userId),
+  );
   const evidence = useQuery({
     queryKey: ["account", userId, "evidence", profile?.id],
     enabled: !!profile,
@@ -55,7 +66,9 @@ export function DeveloperProfileForm({
   });
   const [busy, setBusy] = useState(false);
   const [avatar, setAvatar] = useState(profile?.avatar_url ?? "");
-  const [file, setFile] = useState<File | null>(null);
+  const [file, setFile] = useState<File | null>(() =>
+    profile ? null : developerDraftAvatar(userId),
+  );
   const [error, setError] = useState<string | null>(null);
   async function save(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -103,6 +116,7 @@ export function DeveloperProfileForm({
             : saveError.message,
         );
       setAvatar(values.avatar_url);
+      clearDeveloperDraft(userId);
       toast.success(profile ? "Developer profile saved" : "Your developer profile is ready");
       onSaved(data);
     } catch (e) {
@@ -124,7 +138,24 @@ export function DeveloperProfileForm({
       title={profile ? "Edit developer profile" : "Become a Developer"}
       description="One account. A public identity for the extensions you create."
     >
-      <form onSubmit={save} className="space-y-5">
+      <form
+        onSubmit={save}
+        onInput={(event) => {
+          if (!profile) {
+            const el = event.target as HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement;
+            if (el.name && el.type !== "file") {
+              const next = {
+                ...draft,
+                [el.name]:
+                  el.type === "checkbox" ? String((el as HTMLInputElement).checked) : el.value,
+              };
+              setDraft(next);
+              saveDeveloperDraft(userId, next);
+            }
+          }
+        }}
+        className="space-y-5"
+      >
         <fieldset disabled={busy} className="space-y-5">
           <div className="grid gap-4 sm:grid-cols-2">
             <label className="space-y-2 text-sm">
@@ -134,7 +165,7 @@ export function DeveloperProfileForm({
                 required
                 minLength={2}
                 maxLength={100}
-                defaultValue={profile?.name}
+                defaultValue={profile?.name ?? draft["name"]}
               />
             </label>
             <label className="space-y-2 text-sm">
@@ -142,7 +173,7 @@ export function DeveloperProfileForm({
               <select
                 name="account_type"
                 className={fieldClass}
-                defaultValue={profile?.account_type ?? "individual"}
+                defaultValue={profile?.account_type ?? draft["account_type"] ?? "individual"}
               >
                 <option value="individual">Individual</option>
                 <option value="company">Company</option>
@@ -159,7 +190,7 @@ export function DeveloperProfileForm({
               maxLength={80}
               pattern="[a-z0-9]+(-[a-z0-9]+)*"
               placeholder="your-studio"
-              defaultValue={profile?.slug}
+              defaultValue={profile?.slug ?? draft["slug"]}
             />
             <span className="text-xs text-muted-foreground">
               Your public address: /developers/your-studio
@@ -173,7 +204,7 @@ export function DeveloperProfileForm({
               rows={4}
               maxLength={3000}
               className={fieldClass}
-              defaultValue={profile?.description ?? ""}
+              defaultValue={profile?.description ?? draft["description"] ?? ""}
             />
           </label>
           <div className="grid gap-4 sm:grid-cols-3">
@@ -184,7 +215,7 @@ export function DeveloperProfileForm({
                   name={key}
                   type="url"
                   placeholder="https://"
-                  defaultValue={profile?.[key] ?? ""}
+                  defaultValue={profile?.[key] ?? draft[key] ?? ""}
                 />
               </label>
             ))}
@@ -201,9 +232,15 @@ export function DeveloperProfileForm({
             <Input
               type="file"
               accept="image/jpeg,image/png,image/webp"
-              onChange={(e) => setFile(e.target.files?.[0] ?? null)}
+              onChange={(e) => {
+                const selected = e.target.files?.[0] ?? null;
+                setFile(selected);
+                if (!profile) saveDeveloperDraftAvatar(userId, selected);
+              }}
             />
-            <span className="text-xs text-muted-foreground">JPEG, PNG or WebP, up to 2 MB.</span>
+            <span className="text-xs text-muted-foreground">
+              {file ? `${file.name} selected. ` : ""}JPEG, PNG or WebP, up to 2 MB.
+            </span>
           </label>
           <label className="block space-y-2 text-sm">
             Optional evidence of your work
@@ -211,7 +248,7 @@ export function DeveloperProfileForm({
               name="evidence"
               className={fieldClass}
               rows={3}
-              defaultValue={evidence.data?.join("\n") ?? ""}
+              defaultValue={evidence.data?.join("\n") ?? draft["evidence"] ?? ""}
               placeholder="https://example.com/my-work"
             />
             <span className="text-xs text-muted-foreground">
@@ -220,7 +257,11 @@ export function DeveloperProfileForm({
             </span>
           </label>
           <label className="flex items-center gap-2 text-sm">
-            <input name="is_public" type="checkbox" defaultChecked={profile?.is_public ?? true} />
+            <input
+              name="is_public"
+              type="checkbox"
+              defaultChecked={profile?.is_public ?? draft["is_public"] !== "false"}
+            />
             Show my developer profile publicly
           </label>
           {error && (
@@ -232,7 +273,14 @@ export function DeveloperProfileForm({
             <Button type="submit">
               {busy ? "Saving…" : profile ? "Save profile" : "Activate developer profile"}
             </Button>
-            <Button type="button" variant="outline" onClick={onCancel}>
+            <Button
+              type="button"
+              variant="outline"
+              onClick={() => {
+                clearDeveloperDraft(userId);
+                onCancel();
+              }}
+            >
               Cancel
             </Button>
           </div>

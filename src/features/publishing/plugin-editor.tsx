@@ -172,6 +172,15 @@ function EditorForm({
   async function upload(kind: string, file?: File) {
     if (!file) return;
     await run(async () => {
+      if (
+        kind === "zip"
+          ? file.size > 50 * 1024 * 1024 || !file.name.toLowerCase().endsWith(".zip")
+          : file.size > 5 * 1024 * 1024 ||
+            !["image/jpeg", "image/png", "image/webp"].includes(file.type)
+      )
+        throw new Error(
+          kind === "zip" ? "Choose a ZIP up to 50 MB." : "Choose a JPEG, PNG or WebP up to 5 MB.",
+        );
       await save();
       if (kind === "zip") await saveVersion();
       if (kind !== "zip") {
@@ -289,6 +298,58 @@ function EditorForm({
       </fieldset>
     );
   }
+  const preview = (
+    <div className="space-y-4">
+      {" "}
+      <p className="text-sm text-muted-foreground">
+        Publishing preview — this is how the important information will be presented after approval.
+      </p>
+      <div className="rounded-xl bg-muted/40 p-5">
+        {assets.find((a) => a.asset_type === "cover")?.public_url && (
+          <img
+            src={assets.find((a) => a.asset_type === "cover")?.public_url ?? ""}
+            alt="Plugin card cover preview"
+            className="mb-4 h-40 w-full rounded-lg object-cover"
+          />
+        )}
+        <div className="flex items-center gap-3">
+          {assets.find((a) => a.asset_type === "logo")?.public_url && (
+            <img
+              src={assets.find((a) => a.asset_type === "logo")!.public_url!}
+              alt="Plugin logo"
+              className="size-14 rounded-xl object-contain"
+            />
+          )}
+          <h3 className="break-words text-xl font-semibold">{form.name || "Plugin name"}</h3>
+        </div>
+        <p className="mt-2 text-sm">{form.short_description}</p>
+        <p className="mt-3 text-xs text-muted-foreground">
+          {platforms.find((p) => p.id === form.platform_id)?.name ?? "Platform not selected"} · v
+          {version.version_number} ·{" "}
+          {version.compatibility || form.compatibility || "Compatibility not supplied"}
+        </p>
+        <p className="mt-4 whitespace-pre-wrap text-sm text-muted-foreground">
+          {form.full_description}
+        </p>
+      </div>
+      {assets.filter((a) => a.asset_type === "screenshot" && a.public_url).length > 0 && (
+        <div className="grid grid-cols-2 gap-3">
+          <>
+            {assets
+              .filter((a) => a.asset_type === "screenshot" && a.public_url)
+              .map((a) => (
+                <img
+                  key={a.id}
+                  src={a.public_url ?? ""}
+                  alt="Plugin screenshot preview"
+                  className="aspect-video rounded-lg border object-cover"
+                />
+              ))}
+          </>
+        </div>
+      )}
+    </div>
+  );
   return (
     <div className="space-y-5">
       <div className="flex flex-wrap items-center justify-between gap-3">
@@ -300,6 +361,12 @@ function EditorForm({
           Back to Developer
         </Button>
       </div>
+      {step !== 5 && (
+        <details className="rounded-xl border p-4">
+          <summary className="cursor-pointer text-sm font-medium">Preview current plugin</summary>
+          <div className="mt-4">{preview}</div>
+        </details>
+      )}
       {!editable && (
         <Panel
           title={status === "pending_review" ? "Submission received" : "Read-only submission"}
@@ -419,12 +486,22 @@ function EditorForm({
                 JPEG, PNG or WebP, up to 5 MB each. Up to 10 screenshots. Media URLs are public,
                 including draft media.
               </p>
-              {["logo", "screenshot", "banner"].map((kind) => (
-                <label key={kind} className="grid gap-2 text-sm capitalize">
-                  {kind}
-                  {kind === "banner" ? " (optional)" : ""}
+              {["logo", "cover", "screenshot", "banner"].map((kind) => (
+                <label
+                  key={kind}
+                  className="group relative grid cursor-pointer gap-1 rounded-xl border border-dashed border-border p-4 text-sm transition hover:border-primary hover:bg-primary/5 focus-within:ring-2 focus-within:ring-primary"
+                >
+                  <span className="font-medium capitalize">
+                    {kind === "cover" ? "Card cover image" : kind}
+                  </span>
+                  <span className="text-xs text-muted-foreground">
+                    Click to choose JPEG, PNG or WebP · max 5 MB
+                    {kind === "screenshot" ? " · up to 10" : ""}
+                  </span>
                   <input
+                    className="sr-only"
                     type="file"
+                    aria-label={kind}
                     accept="image/jpeg,image/png,image/webp"
                     onChange={(e) => {
                       const file = e.target.files?.[0];
@@ -432,6 +509,7 @@ function EditorForm({
                       void upload(kind, file);
                     }}
                   />
+                  <span className="mt-1 text-xs font-medium text-primary">Choose image</span>
                 </label>
               ))}
               <div className="grid grid-cols-2 gap-3 sm:grid-cols-3">
@@ -444,7 +522,9 @@ function EditorForm({
                         className="h-24 w-full rounded object-contain"
                       />
                     )}
-                    <p className="text-xs">{asset.asset_type}</p>
+                    <p className="text-xs capitalize">
+                      {asset.asset_type === "cover" ? "Card cover" : asset.asset_type} · uploaded
+                    </p>
                     <Button
                       size="sm"
                       variant="ghost"
@@ -509,10 +589,15 @@ function EditorForm({
                     />
                   </label>
                 ))}
-                <label className="grid gap-2 text-sm">
-                  ZIP package — up to 50 MB
+                <label className="grid cursor-pointer gap-1 rounded-xl border border-dashed border-border p-4 text-sm transition hover:border-primary hover:bg-primary/5 focus-within:ring-2 focus-within:ring-primary">
+                  <span className="font-medium">ZIP package</span>
+                  <span className="text-xs text-muted-foreground">
+                    Click to choose a .zip package · max 50 MB
+                  </span>
                   <input
+                    className="sr-only"
                     type="file"
+                    aria-label="ZIP package"
                     accept=".zip,application/zip"
                     onChange={(e) => {
                       const file = e.target.files?.[0];
@@ -520,6 +605,7 @@ function EditorForm({
                       void upload("zip", file);
                     }}
                   />
+                  <span className="mt-1 text-xs font-medium text-primary">Choose ZIP file</span>
                 </label>
                 <p className="text-sm">
                   {verified
@@ -531,13 +617,7 @@ function EditorForm({
         </fieldset>
         {step === 5 && (
           <div className="space-y-5">
-            <div className="rounded-xl bg-muted/40 p-5">
-              <h3 className="text-xl font-semibold">{form.name}</h3>
-              <p className="mt-2 text-sm">{form.short_description}</p>
-              <p className="mt-4 whitespace-pre-wrap text-sm text-muted-foreground">
-                {form.full_description}
-              </p>
-            </div>
+            {preview}
             <ul className="grid gap-2 text-sm sm:grid-cols-2">
               {checks.map(([label, ok]) => (
                 <li key={label} className={ok ? "text-foreground" : "text-destructive"}>

@@ -5,6 +5,8 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { Badge } from "@/components/ui/badge";
 import { useAuth } from "@/hooks/use-auth";
 import { PluginDistribution } from "@/features/publishing/plugin-download";
+import { PluginReviews } from "@/features/reviews/plugin-reviews";
+import { Download, Star } from "lucide-react";
 
 export const Route = createFileRoute("/plugins/$slug")({
   head: ({ params }) => ({
@@ -29,7 +31,7 @@ export const Route = createFileRoute("/plugins/$slug")({
 function PluginDetail() {
   const { slug } = Route.useParams();
   const { user, loading } = useAuth();
-  const { data, isLoading } = useQuery({
+  const { data, isLoading, error } = useQuery({
     queryKey: ["account", user?.id ?? "public", "plugin", slug],
     enabled: !loading,
     queryFn: async () => {
@@ -51,6 +53,13 @@ function PluginDetail() {
       </div>
     );
   }
+
+  if (error)
+    return (
+      <div role="alert" className="container-page py-14">
+        Could not load this plugin. Please reload the page.
+      </div>
+    );
 
   if (!data) {
     return (
@@ -75,7 +84,16 @@ function PluginDetail() {
         <span>/</span>
         <span>{data.platform?.name}</span>
       </div>
-      <h1 className="mt-3 text-3xl font-semibold md:text-4xl">{data.name}</h1>
+      <div className="mt-5 flex items-center gap-4">
+        {data.logo_url && (
+          <img
+            src={data.logo_url}
+            alt=""
+            className="size-16 shrink-0 rounded-2xl border object-contain md:size-20"
+          />
+        )}
+        <h1 className="min-w-0 break-words text-3xl font-semibold md:text-4xl">{data.name}</h1>
+      </div>
       {data.moderation_status !== "approved" && (
         <p className="mt-2 text-sm text-primary">
           Private preview · {data.moderation_status.replaceAll("_", " ")}
@@ -87,12 +105,56 @@ function PluginDetail() {
         {data.is_open_source ? <Badge variant="secondary">Open source</Badge> : null}
         {data.current_version ? <Badge variant="outline">v{data.current_version}</Badge> : null}
       </div>
+      <div className="mt-7 flex flex-wrap gap-3 text-sm">
+        <a
+          href="#reviews"
+          className="inline-flex items-center gap-2 rounded-lg border bg-card px-3 py-2 transition hover:border-primary"
+        >
+          <Star className="size-4 fill-warning text-warning" />
+          {data.reviews_count ? data.rating_average.toFixed(1) : "No ratings"}
+          <span className="text-muted-foreground">
+            · {data.reviews_count} {data.reviews_count === 1 ? "review" : "reviews"}
+          </span>
+        </a>
+        <span className="inline-flex items-center gap-2 rounded-lg border bg-card px-3 py-2">
+          <Download className="size-4" />
+          {data.downloads_count.toLocaleString("en-US")} downloads
+        </span>
+      </div>
+      <PluginDistribution plugin={data} />
       {data.full_description ? (
         <div className="mt-10 max-w-3xl whitespace-pre-line text-sm leading-7 text-foreground/90">
+          <h2 className="mb-4 text-2xl font-semibold">Overview</h2>
           {data.full_description}
         </div>
       ) : null}
-      <PluginDistribution plugin={data} />
+      <PluginReviews
+        key={data.id}
+        pluginId={data.id}
+        rating={Number(data.rating_average)}
+        count={data.reviews_count}
+      />
+      <section className="mt-12 border-t pt-8">
+        <h2 className="text-2xl font-semibold">Details</h2>
+        <dl className="mt-5 grid gap-5 text-sm sm:grid-cols-2 lg:grid-cols-4">
+          <div>
+            <dt className="text-muted-foreground">Version</dt>
+            <dd className="mt-1">{data.current_version || "Not published"}</dd>
+          </div>
+          <div>
+            <dt className="text-muted-foreground">Updated</dt>
+            <dd className="mt-1">{new Date(data.updated_at).toLocaleDateString("en-US")}</dd>
+          </div>
+          <div>
+            <dt className="text-muted-foreground">Platform</dt>
+            <dd className="mt-1">{data.platform?.name}</dd>
+          </div>
+          <div>
+            <dt className="text-muted-foreground">Compatibility</dt>
+            <dd className="mt-1 whitespace-pre-wrap">{data.compatibility || "Not specified"}</dd>
+          </div>
+        </dl>
+      </section>
     </article>
   );
 }

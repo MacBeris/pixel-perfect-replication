@@ -1300,9 +1300,23 @@ export type Database = {
         Args: { _action: string; _actor: string; _input: Json }
         Returns: Json
       }
+      review_download_eligibility: {
+        Args: { _plugin_id: string; _user_id: string }
+        Returns: boolean
+      }
       save_developer_profile: {
         Args: { _input: Json; _profile_id?: string }
         Returns: string
+      }
+      save_plugin_review: {
+        Args: {
+          _actor: string
+          _body: string
+          _plugin_id: string
+          _rating: number
+          _title: string
+        }
+        Returns: Json
       }
     }
     Enums: {
@@ -1314,7 +1328,7 @@ export type Database = {
         | "favorite"
         | "wishlist_add"
       app_role: "user" | "developer" | "admin"
-      asset_type: "logo" | "screenshot" | "banner"
+      asset_type: "logo" | "screenshot" | "banner" | "cover"
       change_request_status: "pending" | "approved" | "rejected"
       claim_status: "pending" | "approved" | "rejected"
       developer_account_type: "individual" | "company" | "organization"
@@ -1484,7 +1498,7 @@ export const Constants = {
         "wishlist_add",
       ],
       app_role: ["user", "developer", "admin"],
-      asset_type: ["logo", "screenshot", "banner"],
+      asset_type: ["logo", "screenshot", "banner", "cover"],
       change_request_status: ["pending", "approved", "rejected"],
       claim_status: ["pending", "approved", "rejected"],
       developer_account_type: ["individual", "company", "organization"],

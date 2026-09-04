@@ -96,6 +96,10 @@ try {
       .setInputFiles({ name: "logo.png", mimeType: "image/png", buffer: png });
     await page.getByText("File uploaded and verified.", { exact: true }).waitFor();
     await page
+      .getByLabel("cover", { exact: true })
+      .setInputFiles({ name: "cover.png", mimeType: "image/png", buffer: png });
+    await page.locator('img[alt="cover"]').waitFor();
+    await page
       .getByLabel("screenshot", { exact: true })
       .setInputFiles({ name: "screen.png", mimeType: "image/png", buffer: png });
     await page.locator('img[alt="screenshot"]').waitFor();
@@ -142,6 +146,10 @@ try {
   } else {
     await page.goto(`${base}/plugins/${fixture.slug}`);
     await page.getByRole("button", { name: "Download ZIP", exact: true }).waitFor();
+    assert.equal(
+      await page.getByRole("button", { name: "Publish review", exact: true }).count(),
+      0,
+    );
     const [file] = await Promise.all([
       page.waitForEvent("download"),
       page.getByRole("button", { name: "Download ZIP", exact: true }).click(),
@@ -158,6 +166,32 @@ try {
       .single();
     assert.equal(error, null);
     assert.equal(plugin.downloads_count, 1);
+    await page.getByRole("button", { name: "4 stars", exact: true }).click();
+    await page.getByLabel("Title (optional)", { exact: true }).fill("Useful test plugin");
+    await page
+      .getByLabel("Review (optional)", { exact: true })
+      .fill("Download and review flow works.");
+    await page.getByRole("button", { name: "Publish review", exact: true }).click();
+    await page.getByRole("button", { name: "Update review", exact: true }).waitFor();
+    assert.equal(
+      await page.getByLabel("Review (optional)", { exact: true }).inputValue(),
+      "Download and review flow works.",
+    );
+    await page.getByRole("button", { name: "5 stars", exact: true }).click();
+    await page.getByRole("button", { name: "Update review", exact: true }).click();
+    await page.getByText("5.0 average from 1 review", { exact: true }).waitFor();
+    const reviews = await db
+      .from("reviews")
+      .select("id,rating,body")
+      .eq("plugin_id", plugin.id)
+      .eq("user_id", account.id);
+    assert.equal(reviews.data?.length, 1);
+    assert.equal(reviews.data[0].rating, 5);
+    assert.equal(reviews.data[0].body, "Download and review flow works.");
+    await page.screenshot({ path: ".wrangler/plugin-detail-desktop.png", fullPage: true });
+    await page.setViewportSize({ width: 390, height: 844 });
+    await page.screenshot({ path: ".wrangler/plugin-detail-mobile.png", fullPage: true });
+    assert.ok(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth));
     await page.goto(
       `${base}/dashboard?tab=developer&view=edit&plugin=${plugin.id}&profile=${fixture.profileId}`,
     );

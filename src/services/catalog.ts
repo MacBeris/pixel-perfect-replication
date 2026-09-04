@@ -2,7 +2,7 @@ import { supabase } from "@/integrations/supabase/client";
 import type { Category, Platform, PluginListItem, PluginSort } from "@/types/catalog";
 
 const PLUGIN_LIST_SELECT =
-  "id,name,slug,logo_url,short_description,price,currency,pricing_model,is_open_source,rating_average,reviews_count,downloads_count,updated_at,platform:platforms(name,slug)";
+  "id,name,slug,logo_url,short_description,price,currency,pricing_model,is_open_source,rating_average,reviews_count,downloads_count,updated_at,platform:platforms(name,slug),plugin_assets(asset_type,public_url)";
 
 export async function fetchPlatforms(): Promise<Platform[]> {
   const { data, error } = await supabase

@@ -61,3 +61,20 @@ viewer download and deduplication. Live testing also repaired the pre-existing s
 
 Deferred: subsequent release uploads, paid authoring, checkout, antivirus scanning, global janitor,
 one-time downloads and per-version analytics. Public plugin counters retain their historic source.
+
+## Covers, onboarding drafts and reviews
+
+Cover uses the existing plugin_assets table (asset_type=cover) and the same signed image upload,
+signature and 5 MiB limits. It is independent of logo/screenshots and replaces the previous cover.
+Listing cards use it when available. Publishing preview shows current unsaved text and verified assets.
+Onboarding text is stored locally per account; the selected avatar survives dashboard navigation in
+memory (reselect it after a full page reload). Cancel or successful activation clears the draft.
+Profile creation remains idempotent in the existing database RPC.
+
+Review creation uses a server-only save_plugin_review RPC after validating the Auth user. Hosted
+eligibility uses the existing server-recorded download access grant, not a client flag or an external
+click. It does not prove a completed file transfer. External listings retain paid/partially_refunded
+purchase eligibility. One review per account/plugin is enforced by the existing unique constraint.
+Updates never alter moderation status; hidden/removed reviews cannot be revived. Authenticated
+clients cannot insert reviews or call the privileged RPC. Existing column-scoped owner edits remain.
+The review list is paginated by 20 and the edit form retains existing text and rating.

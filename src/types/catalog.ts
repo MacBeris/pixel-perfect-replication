@@ -22,13 +22,8 @@ export type PluginListItem = Pick<
   | "updated_at"
 > & {
   platform: Pick<Platform, "name" | "slug"> | null;
+  plugin_assets?: { asset_type: string; public_url: string | null }[];
 };
 
 export type PluginSort =
-  | "popular"
-  | "trending"
-  | "top_rated"
-  | "newest"
-  | "most_downloaded"
-  | "price_asc"
-  | "price_desc";
+  "popular" | "trending" | "top_rated" | "newest" | "most_downloaded" | "price_asc" | "price_desc";

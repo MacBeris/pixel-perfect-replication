@@ -24,7 +24,7 @@ export const searchSchema = z.object({
 export type DashboardSearch = z.infer<typeof searchSchema>;
 export type Developer = Tables<"developer_profiles">;
 export const pluginSelect =
-  "id,name,slug,logo_url,short_description,price,currency,pricing_model,is_open_source,rating_average,reviews_count,downloads_count,updated_at,platform:platforms(name,slug)" as const;
+  "id,name,slug,logo_url,short_description,price,currency,pricing_model,is_open_source,rating_average,reviews_count,downloads_count,updated_at,platform:platforms(name,slug),plugin_assets(asset_type,public_url)" as const;
 export const developerFields =
   "id,owner_id,name,slug,account_type,description,avatar_url,website_url,github_url,twitter_url,is_public,created_at,updated_at" as const;
 export type DeveloperProfile = Pick<

@@ -22,11 +22,14 @@ import {
   type DeveloperProfile,
 } from "./data";
 import { DeveloperProfileForm } from "./developer-profile";
+import { readDeveloperDraft, saveDeveloperDraft } from "./developer-draft";
 import { PluginEditor } from "@/features/publishing/plugin-editor";
 import { Busy, Empty, Failure, Metrics, Panel, fieldClass } from "./ui";
 
 export function DeveloperSection({ userId, search }: { userId: string; search: DashboardSearch }) {
-  const [onboarding, setOnboarding] = useState(false);
+  const [onboarding, setOnboarding] = useState(
+    () => Object.keys(readDeveloperDraft(userId)).length > 0,
+  );
   const cache = useQueryClient();
   const navigate = useNavigate();
   const q = useQuery({
@@ -89,7 +92,13 @@ export function DeveloperSection({ userId, search }: { userId: string; search: D
               <li>Sell extensions when marketplace payments launch</li>
               <li>Build your public developer identity</li>
             </ul>
-            <Button className="mt-6" onClick={() => setOnboarding(true)}>
+            <Button
+              className="mt-6"
+              onClick={() => {
+                saveDeveloperDraft(userId, { ...readDeveloperDraft(userId), started: "true" });
+                setOnboarding(true);
+              }}
+            >
               <Code2 className="mr-2 size-4" />
               Become a Developer
             </Button>
