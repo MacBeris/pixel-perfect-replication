@@ -61,13 +61,13 @@ export const getAdminDashboard = createServerFn({ method: "POST" })
       admin.from("tags").select("id,name,slug,created_at").order("name"),
       admin.from("admin_audit_logs").select("id,actor_id,action,resource_type,resource_id,reason,created_at").order("created_at", { ascending: false }).limit(100),
       admin.auth.admin.listUsers({ page: 1, perPage: 200 }),
-      admin.from("developer_profiles").select("id,name,slug,owner_id,is_public,verified,created_at").order("created_at", { ascending: false }).limit(200),
+      admin.from("developer_profiles").select("id,name,slug,owner_id,is_public,created_at").order("created_at", { ascending: false }).limit(200),
     ]);
 
-    const errors = [metrics, plugins, claims, reports, purchases, transactions, payouts, platforms, categories, tags, audit, developerProfiles]
-      .map((result: any) => result.error)
-      .filter(Boolean);
-    if (errors.length) throw new Error(errors[0].message);
+    const results = { metrics, plugins, claims, reports, purchases, transactions, payouts, platforms, categories, tags, audit, users, developerProfiles };
+    for (const [resource, result] of Object.entries(results)) {
+      if (result.error) throw new Error(`Unable to load ${resource}: ${result.error.message}`);
+    }
 
     return {
       metrics: metrics.data,

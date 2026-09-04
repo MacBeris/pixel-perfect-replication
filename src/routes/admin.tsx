@@ -153,9 +153,11 @@ function AdminPage() {
       <div className="container-page flex min-h-[70vh] items-center justify-center py-12">
         <div className="max-w-xl rounded-xl border border-border bg-card p-7 text-center shadow-sm">
           <ShieldCheck className="mx-auto size-7 text-primary" />
-          <h1 className="mt-4 text-xl font-semibold">Admin access is configured, but data is unavailable</h1>
+          <h1 className="mt-4 text-xl font-semibold">{loadError ? "Unable to load the admin dashboard" : "Loading admin dashboard…"}</h1>
           <p className="mt-2 text-sm text-muted-foreground">{loadError ?? "Loading admin data…"}</p>
-          <p className="mt-4 text-sm text-muted-foreground">Set <code>SUPABASE_URL</code> and <code>SUPABASE_SERVICE_ROLE_KEY</code> as server-only Cloudflare secrets, then reload this page.</p>
+          {loadError?.startsWith("Missing Supabase environment variable(s):") && (
+            <p className="mt-4 text-sm text-muted-foreground">Check the server-only runtime variables named in the error above, then deploy the updated configuration.</p>
+          )}
           <Button className="mt-5" onClick={() => void load()} disabled={refreshing}>{refreshing ? "Retrying…" : "Retry"}</Button>
         </div>
       </div>
@@ -276,7 +278,7 @@ function Catalog({ dashboard, accessToken, onRun }: { dashboard: DashboardData; 
 }
 
 function UsersAndDevelopers({ dashboard }: { dashboard: DashboardData }) {
-  return <div className="space-y-8"><div><h2 className="text-xl font-semibold">Users & developers</h2><p className="text-sm text-muted-foreground">Role management is intentionally restricted to technical owners outside this panel.</p></div><section><h3 className="mb-3 font-semibold">Users</h3><div className="overflow-hidden rounded-xl border border-border bg-card"><div className="divide-y divide-border">{dashboard.users.map((user: any) => <div key={user.id} className="flex flex-wrap items-center justify-between gap-3 p-4"><div><p className="font-medium">{user.email ?? "Email unavailable"}</p><p className="text-xs text-muted-foreground">Joined {date(user.created_at)} · Last sign-in {date(user.last_sign_in_at)}</p></div><Badge variant="secondary">Managed externally</Badge></div>)}{!dashboard.users.length && <Empty>No users found.</Empty>}</div></div></section><section><h3 className="mb-3 font-semibold">Developer profiles</h3><div className="grid gap-3 sm:grid-cols-2">{dashboard.developerProfiles.map((developer: any) => <div key={developer.id} className="rounded-xl border border-border bg-card p-4"><div className="flex items-center justify-between gap-2"><p className="font-medium">{developer.name}</p>{developer.verified && <Badge>Verified</Badge>}</div><p className="text-xs text-muted-foreground">/{developer.slug} · {developer.is_public ? "Public" : "Private"}</p></div>)}{!dashboard.developerProfiles.length && <Empty>No developer profiles yet.</Empty>}</div></section></div>;
+  return <div className="space-y-8"><div><h2 className="text-xl font-semibold">Users & developers</h2><p className="text-sm text-muted-foreground">Role management is intentionally restricted to technical owners outside this panel.</p></div><section><h3 className="mb-3 font-semibold">Users</h3><div className="overflow-hidden rounded-xl border border-border bg-card"><div className="divide-y divide-border">{dashboard.users.map((user: any) => <div key={user.id} className="flex flex-wrap items-center justify-between gap-3 p-4"><div><p className="font-medium">{user.email ?? "Email unavailable"}</p><p className="text-xs text-muted-foreground">Joined {date(user.created_at)} · Last sign-in {date(user.last_sign_in_at)}</p></div><Badge variant="secondary">Managed externally</Badge></div>)}{!dashboard.users.length && <Empty>No users found.</Empty>}</div></div></section><section><h3 className="mb-3 font-semibold">Developer profiles</h3><div className="grid gap-3 sm:grid-cols-2">{dashboard.developerProfiles.map((developer: any) => <div key={developer.id} className="rounded-xl border border-border bg-card p-4"><div className="flex items-center justify-between gap-2"><p className="font-medium">{developer.name}</p></div><p className="text-xs text-muted-foreground">/{developer.slug} · {developer.is_public ? "Public" : "Private"}</p></div>)}{!dashboard.developerProfiles.length && <Empty>No developer profiles yet.</Empty>}</div></section></div>;
 }
 
 function Marketplace({ dashboard }: { dashboard: DashboardData }) {
