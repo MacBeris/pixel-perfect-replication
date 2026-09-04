@@ -22,6 +22,7 @@ import {
   type DeveloperProfile,
 } from "./data";
 import { DeveloperProfileForm } from "./developer-profile";
+import { PluginEditor } from "@/features/publishing/plugin-editor";
 import { Busy, Empty, Failure, Metrics, Panel, fieldClass } from "./ui";
 
 export function DeveloperSection({ userId, search }: { userId: string; search: DashboardSearch }) {
@@ -82,8 +83,8 @@ export function DeveloperSection({ userId, search }: { userId: string; search: D
               for your plugins and their performance.
             </p>
             <ul className="mt-5 space-y-2 text-sm">
-              <li>Publish your own plugins — coming soon</li>
-              <li>Manage releases and versions — coming soon</li>
+              <li>Create plugins and submit them for review</li>
+              <li>Upload your first release or link to an external platform</li>
               <li>See statistics for plugins linked to your profile</li>
               <li>Sell extensions when marketplace payments launch</li>
               <li>Build your public developer identity</li>
@@ -120,7 +121,14 @@ export function DeveloperSection({ userId, search }: { userId: string; search: D
           </select>
         </label>
       )}
-      {search.view === "profile" ? (
+      {search.view === "create" || search.view === "edit" ? (
+        <PluginEditor
+          userId={userId}
+          profileId={profile.id}
+          pluginId={search.view === "edit" ? search.plugin : undefined}
+          onClose={() => change({ view: undefined, plugin: undefined, page: 1 })}
+        />
+      ) : search.view === "profile" ? (
         <DeveloperProfileForm
           key={profile.id}
           userId={userId}
@@ -208,12 +216,12 @@ function DeveloperAnalytics({
       {d.totals.plugins === 0 && !search.plugin ? (
         <Panel
           title="Your developer profile is ready"
-          description="Your profile is active. Plugin publishing will be available in a future update."
+          description="Your profile is active. Create your first plugin and submit it for review."
         >
           <div className="flex flex-wrap gap-3">
-            <Button disabled>
+            <Button onClick={() => change({ view: "create", plugin: undefined })}>
               <Plus className="mr-2 size-4" />
-              Create your first plugin — Coming soon
+              Create your first plugin
             </Button>
             <Button variant="outline" onClick={() => change({ view: "profile" })}>
               Complete developer profile
@@ -285,9 +293,9 @@ function DeveloperAnalytics({
               description="Publishing and editing will be available in a future update."
             >
               <div className="mb-4">
-                <Button disabled>
+                <Button onClick={() => change({ view: "create", plugin: undefined })}>
                   <Plus className="mr-2 size-4" />
-                  Create plugin — Coming soon
+                  Create plugin
                 </Button>
               </div>
               <div className="overflow-x-auto">
@@ -298,6 +306,7 @@ function DeveloperAnalytics({
                         "Plugin",
                         "Status",
                         "Platform",
+                        "Distribution",
                         "Version",
                         "Downloads",
                         "Views",
@@ -340,6 +349,9 @@ function DeveloperAnalytics({
                           )}
                         </td>
                         <td className="px-3">{p.platform ?? "—"}</td>
+                        <td className="px-3">
+                          {p.listing_type === "external_listing" ? "External" : "Hosted"}
+                        </td>
                         <td className="px-3">{p.current_version ?? "Not set"}</td>
                         <td className="px-3">{p.downloads_count}</td>
                         <td className="px-3">{p.views_count}</td>
@@ -372,16 +384,19 @@ function DeveloperAnalytics({
                             <Button
                               size="sm"
                               variant="ghost"
-                              disabled
-                              title="Plugin editing is coming soon"
+                              onClick={() => change({ plugin: p.id, view: "edit", page: 1 })}
                             >
-                              Edit
+                              {p.moderation_status === "draft"
+                                ? "Resume draft"
+                                : p.moderation_status === "rejected"
+                                  ? "Revise submission"
+                                  : "Submission"}
                             </Button>
                             <Button
                               size="sm"
                               variant="ghost"
-                              disabled
-                              title="Publishing is coming soon"
+                              disabled={p.moderation_status !== "draft"}
+                              onClick={() => change({ plugin: p.id, view: "edit", page: 1 })}
                             >
                               Submit for review
                             </Button>

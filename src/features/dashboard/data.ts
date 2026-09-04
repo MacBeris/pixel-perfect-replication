@@ -17,7 +17,7 @@ export const searchSchema = z.object({
   tab: z.enum(tabs).catch("overview").default("overview"),
   profile: z.string().uuid().optional().catch(undefined),
   plugin: z.string().uuid().optional().catch(undefined),
-  view: z.enum(["analytics", "versions", "profile"]).optional().catch(undefined),
+  view: z.enum(["analytics", "versions", "profile", "create", "edit"]).optional().catch(undefined),
   range: z.enum(["7", "30", "90", "365", "all"]).catch("30").default("30"),
   page: z.coerce.number().int().min(1).max(100000).catch(1).default(1),
 });

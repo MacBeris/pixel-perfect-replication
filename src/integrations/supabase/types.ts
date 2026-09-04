@@ -681,6 +681,69 @@ export type Database = {
           },
         ]
       }
+      plugin_uploads: {
+        Row: {
+          actor_id: string
+          bucket: string
+          completed_at: string | null
+          created_at: string
+          final_path: string
+          id: string
+          kind: string
+          mime: string
+          original_name: string
+          plugin_id: string
+          size: number
+          staging_path: string
+          version_id: string | null
+        }
+        Insert: {
+          actor_id: string
+          bucket: string
+          completed_at?: string | null
+          created_at?: string
+          final_path: string
+          id?: string
+          kind: string
+          mime: string
+          original_name: string
+          plugin_id: string
+          size: number
+          staging_path: string
+          version_id?: string | null
+        }
+        Update: {
+          actor_id?: string
+          bucket?: string
+          completed_at?: string | null
+          created_at?: string
+          final_path?: string
+          id?: string
+          kind?: string
+          mime?: string
+          original_name?: string
+          plugin_id?: string
+          size?: number
+          staging_path?: string
+          version_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "plugin_uploads_plugin_id_fkey"
+            columns: ["plugin_id"]
+            isOneToOne: false
+            referencedRelation: "plugins"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "plugin_uploads_version_id_fkey"
+            columns: ["version_id"]
+            isOneToOne: false
+            referencedRelation: "plugin_versions"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       plugin_versions: {
         Row: {
           changelog: string | null
@@ -688,6 +751,7 @@ export type Database = {
           created_at: string
           file_path: string | null
           file_size: number | null
+          file_verified_at: string | null
           id: string
           is_current: boolean
           plugin_id: string
@@ -703,6 +767,7 @@ export type Database = {
           created_at?: string
           file_path?: string | null
           file_size?: number | null
+          file_verified_at?: string | null
           id?: string
           is_current?: boolean
           plugin_id: string
@@ -718,6 +783,7 @@ export type Database = {
           created_at?: string
           file_path?: string | null
           file_size?: number | null
+          file_verified_at?: string | null
           id?: string
           is_current?: boolean
           plugin_id?: string
@@ -1228,6 +1294,10 @@ export type Database = {
           _plugin_id?: string
           _range?: string
         }
+        Returns: Json
+      }
+      publishing_action: {
+        Args: { _action: string; _actor: string; _input: Json }
         Returns: Json
       }
       save_developer_profile: {

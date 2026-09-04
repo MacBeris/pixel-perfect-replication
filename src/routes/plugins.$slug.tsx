@@ -4,6 +4,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Badge } from "@/components/ui/badge";
 import { useAuth } from "@/hooks/use-auth";
+import { PluginDistribution } from "@/features/publishing/plugin-download";
 
 export const Route = createFileRoute("/plugins/$slug")({
   head: ({ params }) => ({
@@ -91,6 +92,7 @@ function PluginDetail() {
           {data.full_description}
         </div>
       ) : null}
+      <PluginDistribution plugin={data} />
     </article>
   );
 }

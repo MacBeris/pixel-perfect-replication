@@ -51,7 +51,7 @@ export function AccountOverview({ userId }: { userId: string }) {
           .from("purchases")
           .select("id", { count: "exact", head: true })
           .eq("user_id", userId)
-          .eq("status", "paid"),
+          .in("status", ["paid", "partially_refunded"]),
         supabase
           .from("favorites")
           .select("plugin_id", { count: "exact", head: true })
@@ -127,7 +127,7 @@ export function SavedPlugins({
               .from("purchases")
               .select(savedSelect)
               .eq("user_id", userId)
-              .eq("status", "paid")
+              .in("status", ["paid", "partially_refunded"])
           : supabase
               .from(tab === "wishlist" ? "wishlists" : "favorites")
               .select(savedSelect)

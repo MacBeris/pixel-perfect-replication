@@ -7,7 +7,7 @@ export const Route = createFileRoute("/publishing-requirements")({
     <div className="container-page max-w-3xl py-12">
       <Panel
         title="Prepare your first plugin"
-        description="Publishing is coming soon. You can prepare your developer profile today."
+        description="Create a developer profile, prepare your plugin and submit it for review."
       >
         <ul className="space-y-4 text-sm leading-relaxed text-muted-foreground">
           <li>
@@ -25,7 +25,8 @@ export const Route = createFileRoute("/publishing-requirements")({
           </li>
           <li>
             New plugin submissions will require moderation before appearing in the public catalog.
-            Payments and file uploads are not available yet.
+            Hosted ZIP packages must be free, non-empty and at most 50 MB. Images must be JPEG, PNG
+            or WebP up to 5 MB. Payments are not available yet.
           </li>
         </ul>
         <Button asChild className="mt-6">
