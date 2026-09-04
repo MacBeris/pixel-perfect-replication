@@ -66,7 +66,14 @@ do $$ declare f record; begin
  begin perform count(*) from public.plugin_uploads; raise exception 'Upload records leaked'; exception when insufficient_privilege then null; end;
 end; $$;
 set local role anon;
+select set_config('request.jwt.claim.sub','',true);
 do $$ begin
  begin perform public.publishing_action(null,'create','{}'); raise exception 'Anonymous RPC allowed'; exception when insufficient_privilege then null; end;
+end; $$;
+set local role authenticated;
+select set_config('request.jwt.claim.sub',(select a::text from publishing_fixture),true);
+do $$ begin
+ if (select count(*) from public.plugin_versions where plugin_id=(select p from publishing_fixture))<>1 then raise exception 'Owner version visibility failed'; end if;
+ if (select count(*) from public.plugin_assets where plugin_id=(select p from publishing_fixture))<>2 then raise exception 'Owner media visibility failed'; end if;
 end; $$;
 rollback;

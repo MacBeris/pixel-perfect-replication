@@ -72,7 +72,7 @@ try {
     await page
       .getByLabel("Short description", { exact: true })
       .fill("A temporary plugin to verify secure publishing.");
-    await page.getByLabel("Platform", { exact: true }).selectOption({ index: 1 });
+    await page.getByRole("combobox").selectOption({ index: 1 });
     await page
       .locator("fieldset")
       .filter({ has: page.locator("legend").filter({ hasText: "categories" }) })
@@ -111,6 +111,8 @@ try {
     await page.getByRole("button", { name: "Test download ZIP", exact: true }).click();
     assert.equal((await download).suggestedFilename(), `${fixture.slug}-1.0.0.zip`);
     await page.getByRole("button", { name: "Save and continue", exact: true }).click();
+    await page.getByRole("heading", { name: "Review", exact: true }).waitFor();
+    await page.evaluate(() => window.scrollTo(0, 0));
     await page.screenshot({ path: ".wrangler/publishing-review.png", fullPage: true });
     await page.getByRole("button", { name: "Submit for review", exact: true }).click();
     await page.getByRole("heading", { name: "Submission received", exact: true }).waitFor();
@@ -139,9 +141,11 @@ try {
     console.log(JSON.stringify({ stage, pluginId: plugin.id, status: plugin.moderation_status }));
   } else {
     await page.goto(`${base}/plugins/${fixture.slug}`);
-    const download = page.waitForEvent("download");
-    await page.getByRole("button", { name: "Download ZIP", exact: true }).click();
-    const file = await download;
+    await page.getByRole("button", { name: "Download ZIP", exact: true }).waitFor();
+    const [file] = await Promise.all([
+      page.waitForEvent("download"),
+      page.getByRole("button", { name: "Download ZIP", exact: true }).click(),
+    ]);
     assert.equal(file.suggestedFilename(), `${fixture.slug}-1.0.0.zip`);
     assert.equal(await file.failure(), null);
     const second = page.waitForEvent("download");

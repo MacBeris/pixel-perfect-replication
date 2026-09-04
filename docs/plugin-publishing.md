@@ -52,6 +52,12 @@ Uses existing server-only SUPABASE_URL / SUPABASE_SERVICE_ROLE_KEY on Cloudflare
 `supabase/tests/plugin_publishing.sql`: transactional fixtures rolled back; ownership, direct API
 grants, age limit, state transitions, moderation, purchases/refunds and deduplication.
 `scripts/publishing-smoke.mjs`: browser workflow against disposable accounts, never real customer accounts.
+`scripts/publishing-api-smoke.mjs`: live cross-account denial, path injection, private Storage,
+direct signing denial and signed URL expiry. Tests use an ephemeral browser, not the user's session.
+
+Validated on Cloudflare: creator upload (logo/screenshot/ZIP), submit, existing admin approval,
+viewer download and deduplication. Live testing also repaired the pre-existing stale
+`public.owns_developer` reference in the private plugin-ownership RLS helper.
 
 Deferred: subsequent release uploads, paid authoring, checkout, antivirus scanning, global janitor,
 one-time downloads and per-version analytics. Public plugin counters retain their historic source.
