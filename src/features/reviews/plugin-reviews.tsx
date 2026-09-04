@@ -206,6 +206,7 @@ function ReviewForm({ pluginId, own }: { pluginId: string; own: OwnReview | null
           <input
             className="w-full rounded-md border bg-background p-2"
             maxLength={160}
+            aria-label="Title (optional)"
             value={title}
             onChange={(e) => setTitle(e.target.value)}
           />
@@ -216,6 +217,7 @@ function ReviewForm({ pluginId, own }: { pluginId: string; own: OwnReview | null
             className="w-full rounded-md border bg-background p-2"
             rows={3}
             maxLength={5000}
+            aria-label="Review (optional)"
             value={body}
             onChange={(e) => setBody(e.target.value)}
           />

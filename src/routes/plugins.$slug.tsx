@@ -118,7 +118,8 @@ function PluginDetail() {
         </a>
         <span className="inline-flex items-center gap-2 rounded-lg border bg-card px-3 py-2">
           <Download className="size-4" />
-          {data.downloads_count.toLocaleString("en-US")} downloads
+          {data.downloads_count.toLocaleString("en-US")}{" "}
+          {data.downloads_count === 1 ? "download" : "downloads"}
         </span>
       </div>
       <PluginDistribution plugin={data} />
