@@ -57,7 +57,11 @@ try {
   await page.getByRole("tab", { name: "Create account", exact: true }).click();
   await password.fill("short");
   await page.getByRole("button", { name: "Create account", exact: true }).click();
+  await page.getByText(/Choose a username with 3/).waitFor();
   await page.getByText("Use at least 8 characters for your password.", { exact: true }).waitFor();
+  await page.goto(process.argv[2] + "/auth/callback?error_description=Expired%20link");
+  await page.getByRole("heading", { name: "Confirmation failed", exact: true }).waitFor();
+  await page.getByRole("button", { name: "Return to sign in", exact: true }).waitFor();
   assert.deepEqual(errors, []);
   console.log(
     "Auth UX passed: invalid email sends no request; four failed attempts remain retryable; rate-limit recovery; retained fields; password toggle; mobile; signup validation.",

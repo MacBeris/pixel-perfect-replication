@@ -22,6 +22,7 @@ export type PluginListItem = Pick<
   | "updated_at"
 > & {
   platform: Pick<Platform, "name" | "slug"> | null;
+  developer: { name: string; slug: string } | null;
   plugin_assets?: { asset_type: string; public_url: string | null }[];
 };
 

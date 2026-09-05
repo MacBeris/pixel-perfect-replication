@@ -40,11 +40,13 @@ function AuthPage() {
   const [mode, setMode] = useState<"signin" | "signup">("signin");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [displayName, setDisplayName] = useState("");
+  const [username, setUsername] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
   const pending = useRef(false);
-  const [fields, setFields] = useState<{ email?: string; password?: string }>({});
+  const [fields, setFields] = useState<{ username?: string; email?: string; password?: string }>(
+    {},
+  );
   const [error, setError] = useState("");
   const [confirmation, setConfirmation] = useState("");
   const errorRef = useRef<HTMLDivElement>(null);
@@ -61,22 +63,38 @@ function AuthPage() {
     setEmail(normalizedEmail);
     setError("");
     setConfirmation("");
-    const invalid = validateAuthForm(normalizedEmail, password, signup);
+    const invalid = validateAuthForm(normalizedEmail, password, signup, username);
     setFields(invalid);
-    if (invalid.email || invalid.password) {
-      document.getElementById(invalid.email ? "auth-email" : "auth-password")?.focus();
+    if (invalid.username || invalid.email || invalid.password) {
+      document
+        .getElementById(
+          invalid.username ? "auth-username" : invalid.email ? "auth-email" : "auth-password",
+        )
+        ?.focus();
       return;
     }
     pending.current = true;
     setLoading(true);
     try {
       if (signup) {
+        const normalizedUsername = username.trim().toLowerCase();
+        const { data: existing, error: usernameError } = await supabase
+          .from("profiles")
+          .select("id")
+          .eq("username", normalizedUsername)
+          .limit(1);
+        if (usernameError) throw usernameError;
+        if (existing.length) {
+          setFields({ username: "This username is already taken. Choose another." });
+          document.getElementById("auth-username")?.focus();
+          return;
+        }
         const { data, error } = await supabase.auth.signUp({
           email: normalizedEmail,
           password,
           options: {
-            emailRedirectTo: `${window.location.origin}${safeDashboardReturn(next)}`,
-            data: { full_name: displayName.trim() },
+            emailRedirectTo: `${window.location.origin}/auth/callback?next=${encodeURIComponent(safeDashboardReturn(next))}`,
+            data: { username: normalizedUsername, full_name: normalizedUsername },
           },
         });
         if (error) throw error;
@@ -84,6 +102,7 @@ function AuthPage() {
         else {
           setConfirmation(normalizedEmail);
           setPassword("");
+          setUsername("");
         }
       } else {
         const { error } = await supabase.auth.signInWithPassword({
@@ -166,17 +185,36 @@ function AuthPage() {
             )}
             {signup && (
               <div className="space-y-2">
-                <Label htmlFor="auth-name">
-                  Display name <span className="font-normal text-muted-foreground">(optional)</span>
-                </Label>
+                <Label htmlFor="auth-username">Username</Label>
                 <Input
-                  id="auth-name"
-                  autoComplete="nickname"
-                  maxLength={100}
+                  id="auth-username"
+                  autoComplete="username"
+                  autoCapitalize="none"
+                  spellCheck={false}
+                  minLength={3}
+                  maxLength={30}
+                  pattern="[a-z0-9][a-z0-9_-]{2,29}"
+                  placeholder="your_name"
+                  required
                   disabled={loading}
-                  value={displayName}
-                  onChange={(e) => setDisplayName(e.target.value)}
+                  value={username}
+                  aria-invalid={Boolean(fields.username)}
+                  aria-describedby="username-hint"
+                  onChange={(e) => {
+                    setUsername(e.target.value.toLowerCase().replace(/[^a-z0-9_-]/g, ""));
+                    setFields((v) => ({ ...v, username: "" }));
+                    edited();
+                  }}
                 />
+                <p
+                  id="username-hint"
+                  className={
+                    fields.username ? "text-sm text-destructive" : "text-xs text-muted-foreground"
+                  }
+                >
+                  {fields.username ||
+                    "3–30 characters: lowercase letters, numbers, _ or -. This public name must be unique."}
+                </p>
               </div>
             )}
             <div className="space-y-2">

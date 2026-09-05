@@ -583,30 +583,47 @@ export function Settings({ userId }: { userId: string }) {
             const f = new FormData(e.currentTarget);
             action.mutate(async () => {
               const avatar = String(f.get("avatar_url")).trim();
+              const username = String(f.get("username")).trim().toLowerCase();
+              if (!/^[a-z0-9][a-z0-9_-]{2,29}$/.test(username))
+                throw new Error("Use 3–30 lowercase letters, numbers, _ or - for your username.");
               if (avatar && (!URL.canParse(avatar) || new URL(avatar).protocol !== "https:"))
                 throw new Error("Use an HTTPS avatar URL.");
+              const { data: taken, error: lookupError } = await supabase
+                .from("profiles")
+                .select("id")
+                .eq("username", username)
+                .neq("id", userId)
+                .limit(1);
+              if (lookupError) throw lookupError;
+              if (taken.length) throw new Error("This username is already taken.");
               const { error } = await supabase
                 .from("profiles")
                 .update({
-                  username: String(f.get("username")).trim() || null,
-                  display_name: String(f.get("display_name")).trim(),
+                  username,
+                  display_name: username,
                   bio: String(f.get("bio")).trim(),
                   avatar_url: avatar || null,
                 })
                 .eq("id", userId)
                 .select("id")
                 .single();
-              if (error) throw error;
+              if (error)
+                throw new Error(
+                  error.code === "23505" ? "This username is already taken." : error.message,
+                );
             });
           }}
         >
-          {(["display_name", "username", "avatar_url"] as const).map((name, i) => (
+          {(["username", "avatar_url"] as const).map((name, i) => (
             <label key={name} className="block text-sm">
-              {["Display name", "Username", "Avatar URL"][i]}
+              {["Username", "Avatar URL"][i]}
               <Input
                 name={name}
+                required={name === "username"}
+                minLength={name === "username" ? 3 : undefined}
+                pattern={name === "username" ? "[a-z0-9][a-z0-9_-]{2,29}" : undefined}
                 defaultValue={q.data[name] ?? ""}
-                maxLength={name === "avatar_url" ? 2048 : 100}
+                maxLength={name === "avatar_url" ? 2048 : name === "username" ? 30 : 100}
               />
             </label>
           ))}

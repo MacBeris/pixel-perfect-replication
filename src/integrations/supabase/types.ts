@@ -937,7 +937,7 @@ export type Database = {
           display_name: string | null
           id: string
           updated_at: string
-          username: string | null
+          username: string
         }
         Insert: {
           avatar_url?: string | null
@@ -946,7 +946,7 @@ export type Database = {
           display_name?: string | null
           id: string
           updated_at?: string
-          username?: string | null
+          username: string
         }
         Update: {
           avatar_url?: string | null
@@ -955,7 +955,7 @@ export type Database = {
           display_name?: string | null
           id?: string
           updated_at?: string
-          username?: string | null
+          username?: string
         }
         Relationships: []
       }
@@ -1122,6 +1122,13 @@ export type Database = {
             columns: ["plugin_id"]
             isOneToOne: false
             referencedRelation: "plugins"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "reviews_user_profile_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
             referencedColumns: ["id"]
           },
         ]

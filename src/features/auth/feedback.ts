@@ -2,8 +2,11 @@ export function validateAuthForm(
   email: string,
   password: string,
   signup: boolean,
-): { email?: string; password?: string } {
-  const fields: { email?: string; password?: string } = {};
+  username = "",
+): { username?: string; email?: string; password?: string } {
+  const fields: { username?: string; email?: string; password?: string } = {};
+  if (signup && !/^[a-z0-9][a-z0-9_-]{2,29}$/.test(username.trim().toLowerCase()))
+    fields.username = "Choose a username with 3–30 lowercase letters, numbers, _ or -.";
   if (!email) fields.email = "Enter your email address.";
   else if (email.length > 254 || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email))
     fields.email = "Enter a valid email address, such as you@gmail.com.";
@@ -37,6 +40,8 @@ export function authErrorMessage(error: unknown): string {
     case "user_already_exists":
     case "email_exists":
       return "An account may already use this email. Try signing in instead.";
+    case "unexpected_failure":
+      return "That username may already be taken. Choose another username and try again.";
     case "signup_disabled":
       return "New registrations are temporarily unavailable. Existing accounts can still sign in.";
     case "user_banned":

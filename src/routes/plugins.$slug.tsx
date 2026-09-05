@@ -37,7 +37,7 @@ function PluginDetail() {
     queryFn: async () => {
       const { data, error } = await supabase
         .from("plugins")
-        .select("*, platform:platforms(name,slug)")
+        .select("*, platform:platforms(name,slug), developer:developer_profiles(name,slug,avatar_url)")
         .eq("slug", slug)
         .maybeSingle();
       if (error) throw error;
@@ -100,6 +100,18 @@ function PluginDetail() {
         </p>
       )}
       <p className="mt-3 max-w-2xl text-muted-foreground">{data.short_description}</p>
+      {data.developer && (
+        <Link
+          to="/developers/$slug"
+          params={{ slug: data.developer.slug }}
+          className="mt-3 inline-flex items-center gap-2 text-sm text-muted-foreground transition hover:text-foreground"
+        >
+          {data.developer.avatar_url && (
+            <img src={data.developer.avatar_url} alt="" className="size-6 rounded-full object-cover" />
+          )}
+          by <span className="font-medium text-foreground">{data.developer.name}</span>
+        </Link>
+      )}
       <div className="mt-4 flex flex-wrap gap-2">
         <Badge variant="secondary">{data.pricing_model}</Badge>
         {data.is_open_source ? <Badge variant="secondary">Open source</Badge> : null}

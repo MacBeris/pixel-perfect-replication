@@ -42,6 +42,9 @@ export function PluginCard({ plugin }: { plugin: PluginListItem }) {
           <p className="text-xs text-muted-foreground">
             {plugin.platform?.name ?? "Unknown platform"}
           </p>
+          <p className="mt-0.5 truncate text-xs text-muted-foreground">
+            by {plugin.developer?.name ?? "Unknown developer"}
+          </p>
         </div>
         <span className="ml-auto text-sm font-medium text-foreground">{formatPrice(plugin)}</span>
       </div>

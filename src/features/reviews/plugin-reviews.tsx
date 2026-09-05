@@ -36,7 +36,9 @@ export function PluginReviews({
     queryFn: async () => {
       const { data, error, count } = await supabase
         .from("reviews")
-        .select("id,rating,title,body,updated_at", { count: "exact" })
+        .select("id,rating,title,body,updated_at,author:profiles(username,avatar_url)", {
+          count: "exact",
+        })
         .eq("plugin_id", pluginId)
         .eq("status", "active")
         .order("updated_at", { ascending: false })
@@ -107,7 +109,14 @@ export function PluginReviews({
           q.data.rows.map((r) => (
             <article key={r.id} className="rounded-xl border p-5">
               <div className="flex flex-wrap items-center gap-2">
-                <span className="font-medium">Community member</span>
+                {r.author?.avatar_url && (
+                  <img
+                    src={r.author.avatar_url}
+                    alt=""
+                    className="size-8 rounded-full object-cover"
+                  />
+                )}
+                <span className="font-medium">@{r.author?.username ?? "user"}</span>
                 <span
                   aria-label={`${r.rating} out of 5 stars`}
                   className="ml-auto inline-flex gap-0.5"

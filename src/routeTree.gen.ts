@@ -18,6 +18,7 @@ import { Route as AuthenticatedDashboardRouteImport } from './routes/_authentica
 import { Route as AuthenticatedFavoritesRouteImport } from './routes/_authenticated/favorites'
 import { Route as AuthenticatedLibraryRouteImport } from './routes/_authenticated/library'
 import { Route as AuthenticatedWishlistRouteImport } from './routes/_authenticated/wishlist'
+import { Route as AuthCallbackRouteImport } from './routes/auth_.callback'
 import { Route as CategorySlugRouteImport } from './routes/category.$slug'
 import { Route as DeveloperDashboardRouteImport } from './routes/developer.dashboard'
 import { Route as DevelopersSlugRouteImport } from './routes/developers.$slug'
@@ -70,6 +71,11 @@ const AuthenticatedWishlistRoute = AuthenticatedWishlistRouteImport.update({
   path: '/wishlist',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
+const AuthCallbackRoute = AuthCallbackRouteImport.update({
+  id: '/auth_/callback',
+  path: '/auth/callback',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const CategorySlugRoute = CategorySlugRouteImport.update({
   id: '/category/$slug',
   path: '/category/$slug',
@@ -116,6 +122,7 @@ export interface FileRoutesByFullPath {
   '/favorites': typeof AuthenticatedFavoritesRoute
   '/library': typeof AuthenticatedLibraryRoute
   '/wishlist': typeof AuthenticatedWishlistRoute
+  '/auth/callback': typeof AuthCallbackRoute
   '/category/$slug': typeof CategorySlugRoute
   '/developer/dashboard': typeof DeveloperDashboardRoute
   '/developers/$slug': typeof DevelopersSlugRoute
@@ -133,6 +140,7 @@ export interface FileRoutesByTo {
   '/favorites': typeof AuthenticatedFavoritesRoute
   '/library': typeof AuthenticatedLibraryRoute
   '/wishlist': typeof AuthenticatedWishlistRoute
+  '/auth/callback': typeof AuthCallbackRoute
   '/category/$slug': typeof CategorySlugRoute
   '/developer/dashboard': typeof DeveloperDashboardRoute
   '/developers/$slug': typeof DevelopersSlugRoute
@@ -152,6 +160,7 @@ export interface FileRoutesById {
   '/_authenticated/favorites': typeof AuthenticatedFavoritesRoute
   '/_authenticated/library': typeof AuthenticatedLibraryRoute
   '/_authenticated/wishlist': typeof AuthenticatedWishlistRoute
+  '/auth_/callback': typeof AuthCallbackRoute
   '/category/$slug': typeof CategorySlugRoute
   '/developer/dashboard': typeof DeveloperDashboardRoute
   '/developers/$slug': typeof DevelopersSlugRoute
@@ -171,6 +180,7 @@ export interface FileRouteTypes {
     | '/favorites'
     | '/library'
     | '/wishlist'
+    | '/auth/callback'
     | '/category/$slug'
     | '/developer/dashboard'
     | '/developers/$slug'
@@ -188,6 +198,7 @@ export interface FileRouteTypes {
     | '/favorites'
     | '/library'
     | '/wishlist'
+    | '/auth/callback'
     | '/category/$slug'
     | '/developer/dashboard'
     | '/developers/$slug'
@@ -206,6 +217,7 @@ export interface FileRouteTypes {
     | '/_authenticated/favorites'
     | '/_authenticated/library'
     | '/_authenticated/wishlist'
+    | '/auth_/callback'
     | '/category/$slug'
     | '/developer/dashboard'
     | '/developers/$slug'
@@ -221,6 +233,7 @@ export interface RootRouteChildren {
   AdminRoute: typeof AdminRoute
   AuthRoute: typeof AuthRoute
   PublishingRequirementsRoute: typeof PublishingRequirementsRoute
+  AuthCallbackRoute: typeof AuthCallbackRoute
   CategorySlugRoute: typeof CategorySlugRoute
   DeveloperDashboardRoute: typeof DeveloperDashboardRoute
   DevelopersSlugRoute: typeof DevelopersSlugRoute
@@ -294,6 +307,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/wishlist'
       preLoaderRoute: typeof AuthenticatedWishlistRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/auth_/callback': {
+      id: '/auth_/callback'
+      path: '/auth/callback'
+      fullPath: '/auth/callback'
+      preLoaderRoute: typeof AuthCallbackRouteImport
+      parentRoute: typeof rootRouteImport
     }
     '/category/$slug': {
       id: '/category/$slug'
@@ -370,6 +390,7 @@ const rootRouteChildren: RootRouteChildren = {
   AdminRoute: AdminRoute,
   AuthRoute: AuthRoute,
   PublishingRequirementsRoute: PublishingRequirementsRoute,
+  AuthCallbackRoute: AuthCallbackRoute,
   CategorySlugRoute: CategorySlugRoute,
   DeveloperDashboardRoute: DeveloperDashboardRoute,
   DevelopersSlugRoute: DevelopersSlugRoute,
