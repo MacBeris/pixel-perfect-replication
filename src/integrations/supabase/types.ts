@@ -408,6 +408,51 @@ export type Database = {
           },
         ]
       }
+      import_runs: {
+        Row: {
+          created: number
+          error_message: string | null
+          failed: number
+          fetched: number
+          finished_at: string | null
+          id: string
+          parameters: Json
+          source: string
+          started_at: string
+          status: Database["public"]["Enums"]["import_run_status"]
+          unchanged: number
+          updated: number
+        }
+        Insert: {
+          created?: number
+          error_message?: string | null
+          failed?: number
+          fetched?: number
+          finished_at?: string | null
+          id?: string
+          parameters?: Json
+          source: string
+          started_at?: string
+          status?: Database["public"]["Enums"]["import_run_status"]
+          unchanged?: number
+          updated?: number
+        }
+        Update: {
+          created?: number
+          error_message?: string | null
+          failed?: number
+          fetched?: number
+          finished_at?: string | null
+          id?: string
+          parameters?: Json
+          source?: string
+          started_at?: string
+          status?: Database["public"]["Enums"]["import_run_status"]
+          unchanged?: number
+          updated?: number
+        }
+        Relationships: []
+      }
       payouts: {
         Row: {
           amount: number
@@ -548,7 +593,7 @@ export type Database = {
           plugin_id: string
           public_url: string | null
           sort_order: number
-          storage_path: string
+          storage_path: string | null
         }
         Insert: {
           alt_text?: string | null
@@ -558,7 +603,7 @@ export type Database = {
           plugin_id: string
           public_url?: string | null
           sort_order?: number
-          storage_path: string
+          storage_path?: string | null
         }
         Update: {
           alt_text?: string | null
@@ -568,7 +613,7 @@ export type Database = {
           plugin_id?: string
           public_url?: string | null
           sort_order?: number
-          storage_path?: string
+          storage_path?: string | null
         }
         Relationships: [
           {
@@ -811,6 +856,7 @@ export type Database = {
           current_version: string | null
           developer_id: string | null
           downloads_count: number
+          external_id: string | null
           external_purchase_url: string | null
           favorites_count: number
           full_description: string | null
@@ -818,6 +864,7 @@ export type Database = {
           id: string
           is_claimable: boolean
           is_open_source: boolean
+          last_imported_at: string | null
           license: string | null
           listing_type: Database["public"]["Enums"]["listing_type"]
           logo_url: string | null
@@ -834,6 +881,22 @@ export type Database = {
           search_vector: unknown
           short_description: string
           slug: string
+          source: string | null
+          source_author_name: string | null
+          source_author_url: string | null
+          source_available: boolean | null
+          source_data_hash: string | null
+          source_downloads_count: number | null
+          source_hidden_at: string | null
+          source_installs_count: number | null
+          source_last_checked_at: string | null
+          source_managed: boolean
+          source_missing_count: number
+          source_published_at: string | null
+          source_rating_average: number | null
+          source_ratings_count: number | null
+          source_updated_at: string | null
+          source_url: string | null
           updated_at: string
           video_url: string | null
           views_count: number
@@ -847,6 +910,7 @@ export type Database = {
           current_version?: string | null
           developer_id?: string | null
           downloads_count?: number
+          external_id?: string | null
           external_purchase_url?: string | null
           favorites_count?: number
           full_description?: string | null
@@ -854,6 +918,7 @@ export type Database = {
           id?: string
           is_claimable?: boolean
           is_open_source?: boolean
+          last_imported_at?: string | null
           license?: string | null
           listing_type?: Database["public"]["Enums"]["listing_type"]
           logo_url?: string | null
@@ -870,6 +935,22 @@ export type Database = {
           search_vector?: unknown
           short_description: string
           slug: string
+          source?: string | null
+          source_author_name?: string | null
+          source_author_url?: string | null
+          source_available?: boolean | null
+          source_data_hash?: string | null
+          source_downloads_count?: number | null
+          source_hidden_at?: string | null
+          source_installs_count?: number | null
+          source_last_checked_at?: string | null
+          source_managed?: boolean
+          source_missing_count?: number
+          source_published_at?: string | null
+          source_rating_average?: number | null
+          source_ratings_count?: number | null
+          source_updated_at?: string | null
+          source_url?: string | null
           updated_at?: string
           video_url?: string | null
           views_count?: number
@@ -883,6 +964,7 @@ export type Database = {
           current_version?: string | null
           developer_id?: string | null
           downloads_count?: number
+          external_id?: string | null
           external_purchase_url?: string | null
           favorites_count?: number
           full_description?: string | null
@@ -890,6 +972,7 @@ export type Database = {
           id?: string
           is_claimable?: boolean
           is_open_source?: boolean
+          last_imported_at?: string | null
           license?: string | null
           listing_type?: Database["public"]["Enums"]["listing_type"]
           logo_url?: string | null
@@ -906,6 +989,22 @@ export type Database = {
           search_vector?: unknown
           short_description?: string
           slug?: string
+          source?: string | null
+          source_author_name?: string | null
+          source_author_url?: string | null
+          source_available?: boolean | null
+          source_data_hash?: string | null
+          source_downloads_count?: number | null
+          source_hidden_at?: string | null
+          source_installs_count?: number | null
+          source_last_checked_at?: string | null
+          source_managed?: boolean
+          source_missing_count?: number
+          source_published_at?: string | null
+          source_rating_average?: number | null
+          source_ratings_count?: number | null
+          source_updated_at?: string | null
+          source_url?: string | null
           updated_at?: string
           video_url?: string | null
           views_count?: number
@@ -1015,6 +1114,69 @@ export type Database = {
           },
           {
             foreignKeyName: "purchases_plugin_id_fkey"
+            columns: ["plugin_id"]
+            isOneToOne: false
+            referencedRelation: "plugins"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      raw_source_items: {
+        Row: {
+          error_message: string | null
+          external_id: string
+          first_seen_at: string
+          id: string
+          last_run_id: string | null
+          last_seen_at: string
+          normalized_at: string | null
+          normalized_hash: string | null
+          plugin_id: string | null
+          raw_hash: string
+          raw_payload: Json
+          source: string
+          status: Database["public"]["Enums"]["source_item_status"]
+        }
+        Insert: {
+          error_message?: string | null
+          external_id: string
+          first_seen_at?: string
+          id?: string
+          last_run_id?: string | null
+          last_seen_at?: string
+          normalized_at?: string | null
+          normalized_hash?: string | null
+          plugin_id?: string | null
+          raw_hash: string
+          raw_payload: Json
+          source: string
+          status?: Database["public"]["Enums"]["source_item_status"]
+        }
+        Update: {
+          error_message?: string | null
+          external_id?: string
+          first_seen_at?: string
+          id?: string
+          last_run_id?: string | null
+          last_seen_at?: string
+          normalized_at?: string | null
+          normalized_hash?: string | null
+          plugin_id?: string | null
+          raw_hash?: string
+          raw_payload?: Json
+          source?: string
+          status?: Database["public"]["Enums"]["source_item_status"]
+        }
+        Relationships: [
+          {
+            foreignKeyName: "raw_source_items_last_run_id_fkey"
+            columns: ["last_run_id"]
+            isOneToOne: false
+            referencedRelation: "import_runs"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "raw_source_items_plugin_id_fkey"
             columns: ["plugin_id"]
             isOneToOne: false
             referencedRelation: "plugins"
@@ -1303,8 +1465,26 @@ export type Database = {
         }
         Returns: Json
       }
+      ingest_source_item: {
+        Args: {
+          _external_id: string
+          _force?: boolean
+          _normalized: Json
+          _normalized_hash: string
+          _platform_slug: string
+          _raw: Json
+          _raw_hash: string
+          _run_id: string
+          _source: string
+        }
+        Returns: Json
+      }
       publishing_action: {
         Args: { _action: string; _actor: string; _input: Json }
+        Returns: Json
+      }
+      record_source_presence: {
+        Args: { _exists: boolean; _external_id: string; _source: string }
         Returns: Json
       }
       review_download_eligibility: {
@@ -1339,6 +1519,7 @@ export type Database = {
       change_request_status: "pending" | "approved" | "rejected"
       claim_status: "pending" | "approved" | "rejected"
       developer_account_type: "individual" | "company" | "organization"
+      import_run_status: "running" | "completed" | "partial" | "failed"
       listing_type: "direct_sale" | "external_listing"
       moderation_status:
         | "draft"
@@ -1362,6 +1543,13 @@ export type Database = {
       report_status: "open" | "reviewing" | "resolved" | "dismissed"
       report_target: "plugin" | "review"
       review_status: "active" | "hidden" | "removed"
+      source_item_status:
+        | "discovered"
+        | "normalized"
+        | "needs_review"
+        | "published"
+        | "rejected"
+        | "error"
       transaction_type:
         | "sale"
         | "platform_fee"
@@ -1509,6 +1697,7 @@ export const Constants = {
       change_request_status: ["pending", "approved", "rejected"],
       claim_status: ["pending", "approved", "rejected"],
       developer_account_type: ["individual", "company", "organization"],
+      import_run_status: ["running", "completed", "partial", "failed"],
       listing_type: ["direct_sale", "external_listing"],
       moderation_status: [
         "draft",
@@ -1529,6 +1718,14 @@ export const Constants = {
       report_status: ["open", "reviewing", "resolved", "dismissed"],
       report_target: ["plugin", "review"],
       review_status: ["active", "hidden", "removed"],
+      source_item_status: [
+        "discovered",
+        "normalized",
+        "needs_review",
+        "published",
+        "rejected",
+        "error",
+      ],
       transaction_type: [
         "sale",
         "platform_fee",

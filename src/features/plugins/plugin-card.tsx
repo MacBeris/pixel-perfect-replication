@@ -10,6 +10,11 @@ function formatPrice(plugin: PluginListItem) {
 
 export function PluginCard({ plugin }: { plugin: PluginListItem }) {
   const cover = plugin.plugin_assets?.find((asset) => asset.asset_type === "cover")?.public_url;
+  const sourceRating = plugin.reviews_count === 0 ? plugin.source_rating_average : null;
+  const visibleRating = Number(sourceRating ?? plugin.rating_average);
+  const visibleRatingCount = sourceRating !== null ? plugin.source_ratings_count : plugin.reviews_count;
+  const sourceMetric = plugin.source_installs_count ?? plugin.source_downloads_count;
+  const visibleDownloads = plugin.listing_type === "external_listing" ? sourceMetric : plugin.downloads_count;
   return (
     <Link
       to="/plugins/$slug"
@@ -43,7 +48,7 @@ export function PluginCard({ plugin }: { plugin: PluginListItem }) {
             {plugin.platform?.name ?? "Unknown platform"}
           </p>
           <p className="mt-0.5 truncate text-xs text-muted-foreground">
-            by {plugin.developer?.name ?? "Unknown developer"}
+            by {plugin.developer?.name ?? plugin.source_author_name ?? "Unknown developer"}
           </p>
         </div>
         <span className="ml-auto text-sm font-medium text-foreground">{formatPrice(plugin)}</span>
@@ -54,12 +59,13 @@ export function PluginCard({ plugin }: { plugin: PluginListItem }) {
       <div className="mt-auto flex items-center gap-3 pt-4 text-xs text-muted-foreground">
         <span className="inline-flex items-center gap-1">
           <Star className="size-3.5 fill-current text-warning" />
-          {Number(plugin.rating_average).toFixed(1)}
-          <span className="text-muted-foreground/70">({plugin.reviews_count})</span>
+          {visibleRating.toFixed(1)}
+          <span className="text-muted-foreground/70">({visibleRatingCount ?? 0})</span>
         </span>
         <span className="inline-flex items-center gap-1">
           <Download className="size-3.5" />
-          {plugin.downloads_count}
+          {visibleDownloads === null ? "—" : Number(visibleDownloads).toLocaleString("en-US")}
+          {plugin.listing_type === "external_listing" && plugin.source_installs_count !== null ? " installs" : ""}
         </span>
         {plugin.is_open_source ? (
           <Badge variant="secondary" className="ml-auto text-[10px]">

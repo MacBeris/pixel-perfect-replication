@@ -100,7 +100,7 @@ function PluginDetail() {
         </p>
       )}
       <p className="mt-3 max-w-2xl text-muted-foreground">{data.short_description}</p>
-      {data.developer && (
+      {data.developer ? (
         <Link
           to="/developers/$slug"
           params={{ slug: data.developer.slug }}
@@ -111,7 +111,16 @@ function PluginDetail() {
           )}
           by <span className="font-medium text-foreground">{data.developer.name}</span>
         </Link>
-      )}
+      ) : data.source_author_name ? (
+        <a
+          href={data.source_author_url ?? data.source_url ?? undefined}
+          target="_blank"
+          rel="noreferrer"
+          className="mt-3 inline-flex text-sm text-muted-foreground transition hover:text-foreground"
+        >
+          by <span className="ml-1 font-medium text-foreground">{data.source_author_name}</span>
+        </a>
+      ) : null}
       <div className="mt-4 flex flex-wrap gap-2">
         <Badge variant="secondary">{data.pricing_model}</Badge>
         {data.is_open_source ? <Badge variant="secondary">Open source</Badge> : null}
@@ -119,19 +128,21 @@ function PluginDetail() {
       </div>
       <div className="mt-7 flex flex-wrap gap-3 text-sm">
         <a
-          href="#reviews"
+          href={data.reviews_count > 0 ? "#reviews" : (data.source_url ?? "#reviews")}
+          target={data.reviews_count > 0 || !data.source_url ? undefined : "_blank"}
+          rel={data.reviews_count > 0 || !data.source_url ? undefined : "noreferrer"}
           className="inline-flex items-center gap-2 rounded-lg border bg-card px-3 py-2 transition hover:border-primary"
         >
           <Star className="size-4 fill-warning text-warning" />
-          {data.reviews_count ? data.rating_average.toFixed(1) : "No ratings"}
+          {data.reviews_count ? data.rating_average.toFixed(1) : data.source_rating_average !== null ? Number(data.source_rating_average).toFixed(1) : "No ratings"}
           <span className="text-muted-foreground">
-            · {data.reviews_count} {data.reviews_count === 1 ? "review" : "reviews"}
+            · {data.reviews_count || data.source_ratings_count || 0} {data.reviews_count ? "Extendly reviews" : data.source_ratings_count ? `${data.source} ratings` : "reviews"}
           </span>
         </a>
         <span className="inline-flex items-center gap-2 rounded-lg border bg-card px-3 py-2">
           <Download className="size-4" />
-          {data.downloads_count.toLocaleString("en-US")}{" "}
-          {data.downloads_count === 1 ? "download" : "downloads"}
+          {data.listing_type === "external_listing" ? (data.source_installs_count ?? data.source_downloads_count)?.toLocaleString("en-US") ?? "—" : data.downloads_count.toLocaleString("en-US")}{" "}
+          {data.listing_type === "external_listing" && data.source_installs_count !== null ? "active installs" : data.downloads_count === 1 ? "download" : "downloads"}
         </span>
       </div>
       <PluginDistribution plugin={data} />

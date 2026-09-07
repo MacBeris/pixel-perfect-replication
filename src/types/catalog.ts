@@ -20,10 +20,18 @@ export type PluginListItem = Pick<
   | "reviews_count"
   | "downloads_count"
   | "updated_at"
+  | "listing_type"
 > & {
   platform: Pick<Platform, "name" | "slug"> | null;
   developer: { name: string; slug: string } | null;
   plugin_assets?: { asset_type: string; public_url: string | null }[];
+  source: string | null;
+  source_url: string | null;
+  source_author_name: string | null;
+  source_rating_average: number | null;
+  source_ratings_count: number | null;
+  source_installs_count: number | null;
+  source_downloads_count: number | null;
 };
 
 export type PluginSort =

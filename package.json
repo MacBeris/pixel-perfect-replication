@@ -8,6 +8,9 @@
     "build": "vite build",
     "build:dev": "vite build --mode development",
     "preview": "vite preview",
+    "ingest": "tsx scripts/ingest/cli.ts",
+    "ingest:verify": "npm run ingest -- --source wordpress --verify && npm run ingest -- --source blender --verify",
+    "test:ingest": "node --import tsx --test scripts/ingest/*.test.ts",
     "lint": "eslint .",
     "format": "prettier --write ."
   },
@@ -84,6 +87,7 @@
     "globals": "^15.15.0",
     "nitro": "3.0.260603-beta",
     "prettier": "^3.7.3",
+    "tsx": "^4.20.6",
     "typescript": "^5.8.3",
     "typescript-eslint": "^8.56.1",
     "vite": "8.1.5"
