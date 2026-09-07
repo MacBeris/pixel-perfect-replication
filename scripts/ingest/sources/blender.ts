@@ -23,7 +23,17 @@ export const blenderAdapter: SourceAdapter<BlenderExtension> = {
   platformSlug: "blender",
   async *fetchList(http: HttpClient, options: FetchOptions) {
     const index = await getIndex(http);
-    for (const item of index.data.slice(0, options.limit ?? index.data.length)) yield item;
+    // The official v1 index can contain separate package variants for one extension ID.
+    // Extendly's external identity is that ID, so only emit the first (current) variant.
+    const emittedIds = new Set<string>();
+    let emitted = 0;
+    for (const item of index.data) {
+      if (emittedIds.has(item.id)) continue;
+      emittedIds.add(item.id);
+      yield item;
+      emitted += 1;
+      if (emitted >= (options.limit ?? Infinity)) return;
+    }
   },
   async fetchDetails(http, externalId) {
     const index = await getIndex(http);

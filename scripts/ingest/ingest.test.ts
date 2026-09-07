@@ -37,6 +37,15 @@ test("Blender normalization leaves unavailable facts null", async () => {
   assert.ok(plugin.category_slugs.includes("3d-modeling"));
 });
 
+test("Blender list emits each external ID once", async () => {
+  const duplicate = await fixture("blender");
+  const alternate = { ...duplicate, id: "another_tool", name: "Another Tool" };
+  const http = { json: async () => ({ version: "v1", data: [duplicate, duplicate, alternate] }) };
+  const ids: string[] = [];
+  for await (const item of blenderAdapter.fetchList(http, { limit: 50, verbose: false })) ids.push(item.id);
+  assert.deepEqual(ids, ["tree_tools", "another_tool"]);
+});
+
 test("canonical hash is independent of object key order", () => {
   assert.equal(hashJson({ a: 1, b: 2 }), hashJson({ b: 2, a: 1 }));
 });
