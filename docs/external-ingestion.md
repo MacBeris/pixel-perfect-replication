@@ -32,9 +32,10 @@ and translation, not a source of factual values.
 
 WordPress uses the official Plugins API. Its banner is used as the listing cover; if no banner is
 available, the first screenshot becomes the cover. Up to 10 screenshots are stored as trusted remote
-`ps.w.org` URLs and shown by the existing gallery. Blender uses the official Extensions v1 JSON
-index, which currently exposes no image fields, so Blender media is left empty instead of scraping
-HTML or inventing URLs. Images remain remote URLs; archives are never copied to Extendly Storage.
+`ps.w.org` URLs and shown by the existing gallery. Blender's v1 JSON index has no media fields, so
+the Blender adapter additionally reads each listing's official `extensions.blender.org` page and
+accepts only same-origin `/media/` icon, Open Graph cover and thumbnail URLs. It never imports image
+URLs embedded by third-party descriptions. Images remain remote URLs; archives are never copied to Extendly Storage.
 External ratings and installs are stored separately from Extendly reviews and downloads.
 
 Chrome Web Store and Shopify App Store adapters are deliberate stubs. Both require a separate source

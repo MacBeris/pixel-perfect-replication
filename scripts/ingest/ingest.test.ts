@@ -2,7 +2,7 @@ import assert from "node:assert/strict";
 import { readFile } from "node:fs/promises";
 import test from "node:test";
 import { parseArgs } from "./cli.ts";
-import { blenderAdapter } from "./sources/blender.ts";
+import { blenderAdapter, extractBlenderMedia } from "./sources/blender.ts";
 import { wordpressAdapter } from "./sources/wordpress.ts";
 import { hashJson } from "./utils.ts";
 
@@ -44,6 +44,19 @@ test("Blender list emits each external ID once", async () => {
   const ids: string[] = [];
   for await (const item of blenderAdapter.fetchList(http, { limit: 50, verbose: false })) ids.push(item.id);
   assert.deepEqual(ids, ["tree_tools", "another_tool"]);
+});
+
+test("Blender media parser keeps official images and rejects third-party content images", () => {
+  const media = extractBlenderMedia(`
+    <meta property="og:image" content="https://extensions.blender.org//media/thumbnails/cover_1920x1080.webp">
+    <img alt="Add-on Tree Tools" src="/media/images/tree-tools.png">
+    <img alt="Screenshot one" src="/media/thumbnails/one_640x360.webp">
+    <img alt="Screenshot duplicate" src="/media/thumbnails/one_640x360.webp">
+    <img alt="External image" src="https://example.invalid/untrusted.png">
+  `, "Tree Tools");
+  assert.equal(media.icon_url, "https://extensions.blender.org/media/images/tree-tools.png");
+  assert.equal(media.assets.filter((asset) => asset.type === "cover").length, 1);
+  assert.equal(media.assets.filter((asset) => asset.type === "screenshot").length, 1);
 });
 
 test("canonical hash is independent of object key order", () => {

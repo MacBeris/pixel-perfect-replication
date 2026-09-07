@@ -45,6 +45,7 @@ export type FetchOptions = {
 
 export interface HttpClient {
   json<T>(url: string, init?: RequestInit): Promise<T>;
+  text(url: string, init?: RequestInit): Promise<string>;
 }
 
 export interface SourceAdapter<TRaw = unknown> {
@@ -67,4 +68,3 @@ export const noOpEnrichment: EnrichmentStage = {
     return plugin;
   },
 };
-
