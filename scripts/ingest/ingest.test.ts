@@ -16,6 +16,16 @@ test("WordPress normalization preserves factual source metrics", async () => {
   assert.equal(plugin.author_name, "Example Author");
   assert.ok(plugin.category_slugs.includes("seo"));
   assert.equal(plugin.assets[0]?.type, "cover");
+  assert.equal(plugin.assets.filter((asset) => asset.type === "screenshot").length, 2);
+  assert.equal(plugin.assets[1]?.alt, "Main dashboard");
+});
+
+test("WordPress uses the first screenshot as cover when no banner exists", async () => {
+  const raw = await fixture("wordpress");
+  delete raw.banners;
+  const plugin = wordpressAdapter.normalize(raw);
+  assert.equal(plugin.assets[0]?.type, "cover");
+  assert.equal(plugin.assets[0]?.url, plugin.assets[1]?.url);
 });
 
 test("Blender normalization leaves unavailable facts null", async () => {
@@ -36,4 +46,3 @@ test("CLI parses import and verification options", () => {
   assert.equal(parseArgs(["--source", "blender", "--verify"]).verify, true);
   assert.throws(() => parseArgs(["--source", "unknown"]), /--source/);
 });
-

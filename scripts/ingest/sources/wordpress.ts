@@ -10,7 +10,7 @@ function requestUrl(action: "query_plugins" | "plugin_information", params: Reco
   const query = new URLSearchParams({ action });
   for (const [key, value] of Object.entries(params)) query.set(`request[${key}]`, value);
   if (action === "query_plugins") {
-    for (const field of ["description", "sections", "active_installs", "icons", "banners", "downloaded"]) query.set(`request[fields][${field}]`, "1");
+    for (const field of ["description", "sections", "screenshots", "active_installs", "icons", "banners", "downloaded"]) query.set(`request[fields][${field}]`, "1");
   }
   return `${API}?${query}`;
 }
@@ -21,6 +21,35 @@ const categoryRules: Array<[RegExp, string]> = [
   [/marketing|newsletter|email/, "marketing"], [/design|block|builder|theme|gallery/, "design-ui"],
   [/developer|api|debug|code/, "developer-tools"], [/integration|connector|webhook/, "integrations"],
 ];
+
+function trustedAssetUrl(value: unknown) {
+  if (typeof value !== "string") return null;
+  try {
+    const url = new URL(value);
+    return url.protocol === "https:" && url.hostname === "ps.w.org" ? url.toString() : null;
+  } catch {
+    return null;
+  }
+}
+
+function screenshotAssets(raw: WordPressPlugin) {
+  if (!raw.screenshots || typeof raw.screenshots !== "object") return [];
+  return Object.entries(raw.screenshots as Record<string, unknown>)
+    .sort(([left], [right]) => Number(left) - Number(right))
+    .flatMap(([, value], index) => {
+      if (!value || typeof value !== "object") return [];
+      const screenshot = value as Record<string, unknown>;
+      const url = trustedAssetUrl(screenshot.src);
+      if (!url) return [];
+      return [{
+        type: "screenshot" as const,
+        url,
+        alt: plainText(screenshot.caption) || `${plainText(raw.name)} screenshot ${index + 1}`,
+        sort_order: index + 1,
+      }];
+    })
+    .slice(0, 10);
+}
 
 export const wordpressAdapter: SourceAdapter<WordPressPlugin> = {
   key: "wordpress",
@@ -60,6 +89,13 @@ export const wordpressAdapter: SourceAdapter<WordPressPlugin> = {
     const banners = (raw.banners && typeof raw.banners === "object" ? raw.banners : {}) as Record<string, string>;
     const author = plainText(raw.author);
     const sourceUrl = `https://wordpress.org/plugins/${raw.slug}/`;
+    const screenshots = screenshotAssets(raw);
+    const bannerUrl = trustedAssetUrl(banners.high) ?? trustedAssetUrl(banners.low);
+    const coverUrl = bannerUrl ?? screenshots[0]?.url ?? null;
+    const assets = [
+      ...(coverUrl ? [{ type: "cover" as const, url: coverUrl, alt: `${plainText(raw.name)} cover`, sort_order: 0 }] : []),
+      ...screenshots,
+    ];
     return {
       source: "wordpress", external_id: raw.slug, slug: slugify(raw.slug), name: plainText(raw.name),
       short_description: plainText(raw.short_description).slice(0, 300),
@@ -72,11 +108,11 @@ export const wordpressAdapter: SourceAdapter<WordPressPlugin> = {
       ratings_count: typeof raw.num_ratings === "number" ? raw.num_ratings : null,
       installs_count: typeof raw.active_installs === "number" ? raw.active_installs : null,
       downloads_count: typeof raw.downloaded === "number" ? raw.downloaded : null,
-      category_slugs: categorySlugs, tags, icon_url: icons["2x"] ?? icons["1x"] ?? icons.svg ?? null,
-      assets: (banners.high ?? banners.low) ? [{ type: "cover", url: banners.high ?? banners.low, alt: `${plainText(raw.name)} banner`, sort_order: 0 }] : [],
+      category_slugs: categorySlugs, tags,
+      icon_url: trustedAssetUrl(icons["2x"]) ?? trustedAssetUrl(icons["1x"]) ?? trustedAssetUrl(icons.svg),
+      assets,
       compatibility: [raw.requires ? `Requires WordPress ${raw.requires}+` : null, raw.tested ? `Tested through ${raw.tested}` : null, raw.requires_php ? `Requires PHP ${raw.requires_php}+` : null].filter(Boolean).join(" · ") || null,
       published_at: isoDate(raw.added), source_updated_at: isoDate(raw.last_updated),
     };
   },
 };
-

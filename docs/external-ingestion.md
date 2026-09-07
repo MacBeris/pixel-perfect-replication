@@ -30,9 +30,12 @@ the engine. Normalized facts are nullable; adapters must never invent ratings, p
 compatibility, installs or dates. Optional enrichment is a no-op interface for future categorization
 and translation, not a source of factual values.
 
-WordPress uses the official Plugins API. Blender uses the official Extensions v1 JSON index. Images
-remain remote URLs; archives are never copied to Extendly Storage. External ratings and installs are
-stored separately from Extendly reviews and downloads.
+WordPress uses the official Plugins API. Its banner is used as the listing cover; if no banner is
+available, the first screenshot becomes the cover. Up to 10 screenshots are stored as trusted remote
+`ps.w.org` URLs and shown by the existing gallery. Blender uses the official Extensions v1 JSON
+index, which currently exposes no image fields, so Blender media is left empty instead of scraping
+HTML or inventing URLs. Images remain remote URLs; archives are never copied to Extendly Storage.
+External ratings and installs are stored separately from Extendly reviews and downloads.
 
 Chrome Web Store and Shopify App Store adapters are deliberate stubs. Both require a separate source
 and terms review: their storefronts can change, expose incomplete public data, and may enforce bot
@@ -48,4 +51,3 @@ Availability checks are explicit (`--verify`). A successful source response that
 increments `source_missing_count`. Three consecutive confirmed misses suspend and hide the listing;
 timeouts, HTTP 429 and failed source requests never count. A source-managed listing that reappears is
 restored automatically. Records are never deleted.
-
