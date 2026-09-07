@@ -43,6 +43,32 @@ export type DeveloperProfile = Pick<
   | "created_at"
   | "updated_at"
 >;
+const pluginDetailSchema = z.object({
+  cover_url: z.string().nullable(),
+  versions: z.array(
+    z.object({
+      id: z.string(),
+      version_number: z.string(),
+      status: z.string(),
+      is_current: z.boolean(),
+      compatibility: z.string().nullable(),
+      released_at: z.string().nullable(),
+      created_at: z.string(),
+      changelog: z.string().nullable(),
+    }),
+  ),
+  reviews: z.array(
+    z.object({
+      id: z.string(),
+      rating: z.number(),
+      title: z.string().nullable(),
+      body: z.string().nullable(),
+      username: z.string(),
+      created_at: z.string(),
+    }),
+  ),
+  activity: z.array(z.object({ action: z.string(), created_at: z.string() })),
+});
 export const analyticsSchema = z.object({
   totals: z.object({
     plugins: z.number(),
@@ -115,17 +141,27 @@ export const analyticsSchema = z.object({
       changelog: z.string().nullable(),
     }),
   ),
+  detail: pluginDetailSchema.nullable(),
 });
 export type Analytics = z.infer<typeof analyticsSchema>;
 export async function loadAnalytics(profile: string, search: DashboardSearch) {
-  const { data, error } = await supabase.rpc("developer_dashboard", {
-    _developer_id: profile,
-    ...(search.plugin ? { _plugin_id: search.plugin } : {}),
-    _range: search.range,
-    _page: search.plugin ? 1 : search.page,
-  });
-  if (error) throw error;
-  return analyticsSchema.parse(data);
+  const [dashboard, detail] = await Promise.all([
+    supabase.rpc("developer_dashboard", {
+      _developer_id: profile,
+      ...(search.plugin ? { _plugin_id: search.plugin } : {}),
+      _range: search.range,
+      _page: search.plugin ? 1 : search.page,
+    }),
+    search.plugin
+      ? supabase.rpc("developer_plugin_detail", {
+          _developer_id: profile,
+          _plugin_id: search.plugin,
+        })
+      : Promise.resolve({ data: null, error: null }),
+  ]);
+  if (dashboard.error) throw dashboard.error;
+  if (detail.error) throw detail.error;
+  return analyticsSchema.parse({ ...(dashboard.data as object), detail: detail.data });
 }
 export function message(error: unknown) {
   return error && typeof error === "object" && "message" in error

@@ -1474,6 +1474,10 @@ export type Database = {
         }
         Returns: Json
       }
+      developer_plugin_detail: {
+        Args: { _developer_id: string; _plugin_id: string }
+        Returns: Json
+      }
       ingest_source_item: {
         Args: {
           _external_id: string
