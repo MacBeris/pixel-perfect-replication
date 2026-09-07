@@ -16,6 +16,10 @@ const requestSchema = z.object({
     "revise",
     "download",
     "outbound",
+    "unpublish",
+    "republish",
+    "delete",
+    "restore",
   ]),
   input: z.record(z.unknown()),
 });

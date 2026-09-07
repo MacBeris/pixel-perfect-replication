@@ -855,6 +855,9 @@ export type Database = {
           currency: string
           current_version: string | null
           developer_id: string | null
+          developer_removed_at: string | null
+          developer_removed_by: string | null
+          developer_unpublished_at: string | null
           downloads_count: number
           external_id: string | null
           external_purchase_url: string | null
@@ -909,6 +912,9 @@ export type Database = {
           currency?: string
           current_version?: string | null
           developer_id?: string | null
+          developer_removed_at?: string | null
+          developer_removed_by?: string | null
+          developer_unpublished_at?: string | null
           downloads_count?: number
           external_id?: string | null
           external_purchase_url?: string | null
@@ -963,6 +969,9 @@ export type Database = {
           currency?: string
           current_version?: string | null
           developer_id?: string | null
+          developer_removed_at?: string | null
+          developer_removed_by?: string | null
+          developer_unpublished_at?: string | null
           downloads_count?: number
           external_id?: string | null
           external_purchase_url?: string | null

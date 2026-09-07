@@ -8,7 +8,11 @@ type ReportStatus = "open" | "reviewing" | "resolved" | "dismissed";
 type CatalogKind = "platforms" | "categories" | "tags";
 
 function requireToken(input: unknown): AdminInput {
-  if (!input || typeof input !== "object" || typeof (input as AdminInput).accessToken !== "string") {
+  if (
+    !input ||
+    typeof input !== "object" ||
+    typeof (input as AdminInput).accessToken !== "string"
+  ) {
     throw new Error("An authenticated session is required.");
   }
   return input as AdminInput;
@@ -48,23 +52,87 @@ export const getAdminDashboard = createServerFn({ method: "POST" })
       audit,
       users,
       developerProfiles,
+      changeRequests,
     ] = await Promise.all([
       admin.rpc("admin_dashboard_metrics", { _actor_id: user.id }),
-      admin.from("plugins").select("id,name,slug,moderation_status,short_description,created_at,developer:developer_profiles(name,slug)").order("created_at", { ascending: false }).limit(100),
-      admin.from("claims").select("id,status,evidence,message,created_at,developer_profile_id,plugin:plugins(name,slug)").order("created_at", { ascending: false }).limit(100),
-      admin.from("reports").select("id,status,reason,details,target_type,created_at,plugin:plugins(name,slug)").order("created_at", { ascending: false }).limit(100),
-      admin.from("purchases").select("id,amount,currency,status,created_at").order("created_at", { ascending: false }).limit(100),
-      admin.from("transactions").select("id,type,amount,currency,description,created_at").order("created_at", { ascending: false }).limit(100),
-      admin.from("payouts").select("id,amount,currency,status,requested_at").order("requested_at", { ascending: false }).limit(100),
-      admin.from("platforms").select("id,name,slug,description,active,sort_order").order("sort_order"),
-      admin.from("categories").select("id,name,slug,description,active,sort_order").order("sort_order"),
+      admin
+        .from("plugins")
+        .select(
+          "id,name,slug,moderation_status,developer_unpublished_at,developer_removed_at,short_description,created_at,developer:developer_profiles(name,slug)",
+        )
+        .order("created_at", { ascending: false })
+        .limit(100),
+      admin
+        .from("claims")
+        .select(
+          "id,status,evidence,message,created_at,developer_profile_id,plugin:plugins(name,slug)",
+        )
+        .order("created_at", { ascending: false })
+        .limit(100),
+      admin
+        .from("reports")
+        .select("id,status,reason,details,target_type,created_at,plugin:plugins(name,slug)")
+        .order("created_at", { ascending: false })
+        .limit(100),
+      admin
+        .from("purchases")
+        .select("id,amount,currency,status,created_at")
+        .order("created_at", { ascending: false })
+        .limit(100),
+      admin
+        .from("transactions")
+        .select("id,type,amount,currency,description,created_at")
+        .order("created_at", { ascending: false })
+        .limit(100),
+      admin
+        .from("payouts")
+        .select("id,amount,currency,status,requested_at")
+        .order("requested_at", { ascending: false })
+        .limit(100),
+      admin
+        .from("platforms")
+        .select("id,name,slug,description,active,sort_order")
+        .order("sort_order"),
+      admin
+        .from("categories")
+        .select("id,name,slug,description,active,sort_order")
+        .order("sort_order"),
       admin.from("tags").select("id,name,slug,created_at").order("name"),
-      admin.from("admin_audit_logs").select("id,actor_id,action,resource_type,resource_id,reason,created_at").order("created_at", { ascending: false }).limit(100),
+      admin
+        .from("admin_audit_logs")
+        .select("id,actor_id,action,resource_type,resource_id,reason,created_at")
+        .order("created_at", { ascending: false })
+        .limit(100),
       admin.auth.admin.listUsers({ page: 1, perPage: 200 }),
-      admin.from("developer_profiles").select("id,name,slug,owner_id,is_public,created_at").order("created_at", { ascending: false }).limit(200),
+      admin
+        .from("developer_profiles")
+        .select("id,name,slug,owner_id,is_public,created_at")
+        .order("created_at", { ascending: false })
+        .limit(200),
+      admin
+        .from("plugin_change_requests")
+        .select("id,plugin_id,changed_fields,status,created_at,plugin:plugins(name,slug)")
+        .eq("status", "pending")
+        .order("created_at", { ascending: true })
+        .limit(100),
     ]);
 
-    const results = { metrics, plugins, claims, reports, purchases, transactions, payouts, platforms, categories, tags, audit, users, developerProfiles };
+    const results = {
+      metrics,
+      plugins,
+      claims,
+      reports,
+      purchases,
+      transactions,
+      payouts,
+      platforms,
+      categories,
+      tags,
+      audit,
+      users,
+      developerProfiles,
+      changeRequests,
+    };
     for (const [resource, result] of Object.entries(results)) {
       if (result.error) throw new Error(`Unable to load ${resource}: ${result.error.message}`);
     }
@@ -81,50 +149,133 @@ export const getAdminDashboard = createServerFn({ method: "POST" })
       categories: categories.data ?? [],
       tags: tags.data ?? [],
       audit: audit.data ?? [],
-      users: (users.data?.users ?? []).map((user: any) => ({ id: user.id, email: user.email, created_at: user.created_at, last_sign_in_at: user.last_sign_in_at })),
+      users: (users.data?.users ?? []).map((user: any) => ({
+        id: user.id,
+        email: user.email,
+        created_at: user.created_at,
+        last_sign_in_at: user.last_sign_in_at,
+      })),
       developerProfiles: developerProfiles.data ?? [],
+      changeRequests: changeRequests.data ?? [],
     };
   });
 
-export const moderatePlugin = createServerFn({ method: "POST" })
+export const reviewPluginChangeRequest = createServerFn({ method: "POST" })
   .validator((input: unknown) => {
-    const data = input as AdminInput & { pluginId: string; status: ModerationStatus; reason?: string };
-    if (!data?.pluginId || !["draft", "pending_review", "approved", "rejected", "suspended"].includes(data.status)) throw new Error("Invalid plugin moderation request.");
+    const data = input as AdminInput & { requestId: string; approve: boolean; notes?: string };
+    if (!data?.requestId || typeof data.approve !== "boolean")
+      throw new Error("Invalid plugin change request.");
     return data;
   })
   .handler(async ({ data }) => {
     const { admin, user } = await requireAdmin(data.accessToken);
-    if (data.status === "rejected" && !data.reason?.trim()) throw new Error("A rejection reason is required.");
-    const { data: after, error } = await admin.rpc("admin_moderate_plugin", { _actor_id: user.id, _plugin_id: data.pluginId, _status: data.status, _reason: data.reason || null });
+    const { data: result, error } = await admin.rpc("admin_review_plugin_change_request", {
+      _actor_id: user.id,
+      _request_id: data.requestId,
+      _approve: data.approve,
+      _notes: data.notes || null,
+    });
+    if (error)
+      throw new Error(
+        error.code === "23505" ? "The requested slug is already in use." : error.message,
+      );
+    return result;
+  });
+
+export const moderatePlugin = createServerFn({ method: "POST" })
+  .validator((input: unknown) => {
+    const data = input as AdminInput & {
+      pluginId: string;
+      status: ModerationStatus;
+      reason?: string;
+    };
+    if (
+      !data?.pluginId ||
+      !["draft", "pending_review", "approved", "rejected", "suspended"].includes(data.status)
+    )
+      throw new Error("Invalid plugin moderation request.");
+    return data;
+  })
+  .handler(async ({ data }) => {
+    const { admin, user } = await requireAdmin(data.accessToken);
+    if (data.status === "rejected" && !data.reason?.trim())
+      throw new Error("A rejection reason is required.");
+    if (data.status === "approved") {
+      const restored = await admin.rpc("admin_restore_removed_plugin", {
+        _actor_id: user.id,
+        _plugin_id: data.pluginId,
+      });
+      if (restored.error) throw new Error(restored.error.message);
+    }
+    const { data: after, error } = await admin.rpc("admin_moderate_plugin", {
+      _actor_id: user.id,
+      _plugin_id: data.pluginId,
+      _status: data.status,
+      _reason: data.reason || null,
+    });
     if (error) throw new Error(error.message);
     return after;
   });
 
 export const updateAdminWorkflow = createServerFn({ method: "POST" })
   .validator((input: unknown) => {
-    const data = input as AdminInput & ({ kind: "claims"; itemId: string; status: ClaimStatus; notes?: string } | { kind: "reports"; itemId: string; status: ReportStatus; notes?: string });
-    const valid = data?.kind === "claims"
-      ? ["pending", "approved", "rejected"].includes(data.status)
-      : data?.kind === "reports" && ["open", "reviewing", "resolved", "dismissed"].includes(data.status);
+    const data = input as AdminInput &
+      (
+        | { kind: "claims"; itemId: string; status: ClaimStatus; notes?: string }
+        | { kind: "reports"; itemId: string; status: ReportStatus; notes?: string }
+      );
+    const valid =
+      data?.kind === "claims"
+        ? ["pending", "approved", "rejected"].includes(data.status)
+        : data?.kind === "reports" &&
+          ["open", "reviewing", "resolved", "dismissed"].includes(data.status);
     if (!data?.itemId || !valid) throw new Error("Invalid moderation item.");
     return data;
   })
   .handler(async ({ data }) => {
     const { admin, user } = await requireAdmin(data.accessToken);
-    const { data: after, error } = await admin.rpc("admin_update_workflow", { _actor_id: user.id, _kind: data.kind, _item_id: data.itemId, _status: data.status, _notes: data.notes || null });
+    const { data: after, error } = await admin.rpc("admin_update_workflow", {
+      _actor_id: user.id,
+      _kind: data.kind,
+      _item_id: data.itemId,
+      _status: data.status,
+      _notes: data.notes || null,
+    });
     if (error) throw new Error(error.message);
     return after;
   });
 
 export const saveCatalogItem = createServerFn({ method: "POST" })
   .validator((input: unknown) => {
-    const data = input as AdminInput & { kind: CatalogKind; id?: string; name: string; slug: string; description?: string; active?: boolean; sortOrder?: number };
-    if (!data?.name?.trim() || !data?.slug?.trim() || !["platforms", "categories", "tags"].includes(data.kind)) throw new Error("A name, slug and catalog type are required.");
+    const data = input as AdminInput & {
+      kind: CatalogKind;
+      id?: string;
+      name: string;
+      slug: string;
+      description?: string;
+      active?: boolean;
+      sortOrder?: number;
+    };
+    if (
+      !data?.name?.trim() ||
+      !data?.slug?.trim() ||
+      !["platforms", "categories", "tags"].includes(data.kind)
+    )
+      throw new Error("A name, slug and catalog type are required.");
     return data;
   })
   .handler(async ({ data }) => {
     const { admin, user } = await requireAdmin(data.accessToken);
-    const { data: after, error } = await admin.rpc("admin_save_catalog_item", { _actor_id: user.id, _kind: data.kind, _id: data.id || null, _name: data.name.trim(), _slug: data.slug.trim(), _description: data.description?.trim() || null, _active: data.active ?? true, _sort_order: data.sortOrder ?? 0 });
+    const { data: after, error } = await admin.rpc("admin_save_catalog_item", {
+      _actor_id: user.id,
+      _kind: data.kind,
+      _id: data.id || null,
+      _name: data.name.trim(),
+      _slug: data.slug.trim(),
+      _description: data.description?.trim() || null,
+      _active: data.active ?? true,
+      _sort_order: data.sortOrder ?? 0,
+    });
     if (error) throw new Error(error.message);
     return after;
   });
@@ -132,12 +283,17 @@ export const saveCatalogItem = createServerFn({ method: "POST" })
 export const deleteCatalogItem = createServerFn({ method: "POST" })
   .validator((input: unknown) => {
     const data = input as AdminInput & { kind: CatalogKind; id: string };
-    if (!data?.id || !["platforms", "categories", "tags"].includes(data.kind)) throw new Error("Invalid catalog item.");
+    if (!data?.id || !["platforms", "categories", "tags"].includes(data.kind))
+      throw new Error("Invalid catalog item.");
     return data;
   })
   .handler(async ({ data }) => {
     const { admin, user } = await requireAdmin(data.accessToken);
-    const { error } = await admin.rpc("admin_delete_catalog_item", { _actor_id: user.id, _kind: data.kind, _id: data.id });
+    const { error } = await admin.rpc("admin_delete_catalog_item", {
+      _actor_id: user.id,
+      _kind: data.kind,
+      _id: data.id,
+    });
     if (error) throw new Error(error.message);
     return { id: data.id };
   });

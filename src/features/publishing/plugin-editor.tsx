@@ -21,8 +21,11 @@ const loadedSchema = z.object({
     license: z.string().nullable(),
     listing_type: z.enum(["direct_sale", "external_listing"]),
     external_purchase_url: z.string().nullable(),
+    website_url: z.string().nullable(),
+    github_url: z.string().nullable(),
     moderation_status: z.string(),
     rejection_reason: z.string().nullable(),
+    developer_removed_at: z.string().nullable(),
   }),
   versions: z.array(
     z.object({
@@ -118,6 +121,8 @@ function EditorForm({
     license: loaded?.plugin.license ?? "",
     listing_type: loaded?.plugin.listing_type ?? "direct_sale",
     external_purchase_url: loaded?.plugin.external_purchase_url ?? "",
+    website_url: loaded?.plugin.website_url ?? "",
+    github_url: loaded?.plugin.github_url ?? "",
     categories: loaded?.categories.map((x) => x.category_id) ?? ([] as string[]),
     tags: loaded?.tags.map((x) => x.tag_id) ?? ([] as string[]),
   });
@@ -130,7 +135,9 @@ function EditorForm({
   const [verified, setVerified] = useState(Boolean(loaded?.versions[0]?.file_verified_at));
   const [uploadProgress, setUploadProgress] = useState("");
   const [newTags, setNewTags] = useState("");
-  const editable = status === "draft";
+  const editable =
+    (status === "draft" || status === "approved") && !loaded?.plugin.developer_removed_at;
+  const published = status === "approved";
   const steps = ["Basics", "Description", "Media", "Distribution", "Version", "Review"];
   async function refresh() {
     const data = loadedSchema.parse(await publishing("load", { id }));
@@ -163,7 +170,11 @@ function EditorForm({
         .filter(Boolean),
     });
     setCreated(true);
-    setNotice("Draft saved. You can return to it from Developer.");
+    setNotice(
+      published
+        ? "Safe changes were saved. Critical changes were sent to administrator review."
+        : "Draft saved. You can return to it from Developer.",
+    );
     await cache.invalidateQueries({ queryKey: ["account", userId, "developer-analytics"] });
   }
   async function saveVersion() {
@@ -248,6 +259,8 @@ function EditorForm({
       | "full_description"
       | "compatibility"
       | "license"
+      | "website_url"
+      | "github_url"
       | "external_purchase_url",
     label: string,
     multiline = false,
@@ -408,7 +421,8 @@ function EditorForm({
               void run(async () => {
                 if (editable) {
                   await save();
-                  if (step === 4 && form.listing_type === "direct_sale") await saveVersion();
+                  if (!published && step === 4 && form.listing_type === "direct_sale")
+                    await saveVersion();
                 }
                 setStep(i);
               })
@@ -478,6 +492,8 @@ function EditorForm({
               )}
               {field("compatibility", "Supported versions / compatibility", true)}
               {field("license", "License")}
+              {field("website_url", "Website URL")}
+              {field("github_url", "GitHub URL")}
             </>
           )}
           {step === 2 && (
@@ -568,7 +584,12 @@ function EditorForm({
             </>
           )}
           {step === 4 &&
-            (form.listing_type === "external_listing" ? (
+            (published ? (
+              <div className="rounded-lg border p-4 text-sm text-muted-foreground">
+                Published ZIP files are immutable. A code update must be uploaded as a new release;
+                release creation will use a separate reviewed flow.
+              </div>
+            ) : form.listing_type === "external_listing" ? (
               <p>
                 This listing links to an external platform. No ZIP or hosted version is required.
               </p>
@@ -625,7 +646,7 @@ function EditorForm({
                 </li>
               ))}
             </ul>
-            {editable && (
+            {editable && !published && (
               <Button
                 disabled={busy || checks.some(([, ok]) => !ok)}
                 onClick={() =>
@@ -651,11 +672,12 @@ function EditorForm({
               onClick={() =>
                 void run(async () => {
                   await save();
-                  if (step === 4 && form.listing_type === "direct_sale") await saveVersion();
+                  if (!published && step === 4 && form.listing_type === "direct_sale")
+                    await saveVersion();
                 })
               }
             >
-              Save draft
+              {published ? "Save changes" : "Save draft"}
             </Button>
             {step < 5 && (
               <Button
@@ -663,7 +685,8 @@ function EditorForm({
                 onClick={() =>
                   void run(async () => {
                     await save();
-                    if (step === 4 && form.listing_type === "direct_sale") await saveVersion();
+                    if (!published && step === 4 && form.listing_type === "direct_sale")
+                      await saveVersion();
                     setStep(step + 1);
                   })
                 }

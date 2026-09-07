@@ -13,7 +13,11 @@ export async function publishing(
     | "submit"
     | "revise"
     | "download"
-    | "outbound",
+    | "outbound"
+    | "unpublish"
+    | "republish"
+    | "delete"
+    | "restore",
   input: Record<string, unknown>,
 ) {
   const { data } = await supabase.auth.getSession();

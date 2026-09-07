@@ -22,6 +22,8 @@ export async function handlePublishing(action: string, token: string, input: Jso
   if (!/^[0-9a-f-]{36}$/i.test(id)) throw new Error("Invalid plugin ID");
   if (args["external_purchase_url"])
     args["external_purchase_url"] = safeExternal(args["external_purchase_url"]);
+  if (args["website_url"]) args["website_url"] = safeExternal(args["website_url"]);
+  if (args["github_url"]) args["github_url"] = safeExternal(args["github_url"]);
   async function rpc(operation: string, payload: Json = input) {
     const { data, error } = await db.rpc("publishing_action", {
       _actor: actor,
@@ -125,6 +127,17 @@ export async function handlePublishing(action: string, token: string, input: Jso
     return rpc(action, { id, upload_id: upload.id, public_url: publicUrl });
   }
   if (action === "download") {
+    const availability = await db
+      .from("plugins")
+      .select("developer_unpublished_at,developer_removed_at")
+      .eq("id", id)
+      .single();
+    if (
+      availability.error ||
+      availability.data.developer_unpublished_at ||
+      availability.data.developer_removed_at
+    )
+      throw new Error("Plugin is not available for download");
     const authorized = object(await rpc("download"));
     const { data, error } = await db.storage
       .from("plugin-files")
@@ -140,8 +153,28 @@ export async function handlePublishing(action: string, token: string, input: Jso
     };
   }
   if (action === "outbound") {
+    const availability = await db
+      .from("plugins")
+      .select("developer_unpublished_at,developer_removed_at")
+      .eq("id", id)
+      .single();
+    if (
+      availability.error ||
+      availability.data.developer_unpublished_at ||
+      availability.data.developer_removed_at
+    )
+      throw new Error("External listing unavailable");
     const value = object(await rpc(action));
     return { url: safeExternal(value["url"]) };
   }
-  return rpc(action);
+  const result = await rpc(action);
+  if (action === "save" || action === "create") {
+    const links = {
+      website_url: args["website_url"] ? String(args["website_url"]) : null,
+      github_url: args["github_url"] ? String(args["github_url"]) : null,
+    };
+    const saved = await db.from("plugins").update(links).eq("id", id);
+    if (saved.error) throw new Error(saved.error.message);
+  }
+  return result;
 }

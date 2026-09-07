@@ -10,10 +10,21 @@ import {
   XAxis,
   YAxis,
 } from "recharts";
-import { ArrowLeft, ArrowUpRight, Code2, Plus } from "lucide-react";
+import { ArrowLeft, ArrowUpRight, Code2, EyeOff, Plus, RotateCcw, Trash2 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
 import {
   developerFields,
   loadAnalytics,
@@ -24,6 +35,8 @@ import {
 import { DeveloperProfileForm } from "./developer-profile";
 import { readDeveloperDraft, saveDeveloperDraft } from "./developer-draft";
 import { PluginEditor } from "@/features/publishing/plugin-editor";
+import { publishing } from "@/features/publishing/client";
+import { message } from "./data";
 import { Busy, Empty, Failure, Metrics, Panel, fieldClass } from "./ui";
 
 export function DeveloperSection({ userId, search }: { userId: string; search: DashboardSearch }) {
@@ -168,6 +181,9 @@ function DeveloperAnalytics({
   search: DashboardSearch;
   change: (next: Partial<DashboardSearch>) => void;
 }) {
+  const cache = useQueryClient();
+  const [lifecycleBusy, setLifecycleBusy] = useState<string>();
+  const [lifecycleError, setLifecycleError] = useState("");
   const q = useQuery({
     queryKey: [
       "account",
@@ -185,6 +201,18 @@ function DeveloperAnalytics({
   const d = q.data;
   const plugin = search.plugin ? d.plugins[0] : undefined;
   const incomplete = !profile.description || !profile.avatar_url;
+  async function lifecycle(action: "unpublish" | "republish" | "delete" | "restore", id: string) {
+    setLifecycleBusy(id);
+    setLifecycleError("");
+    try {
+      await publishing(action, { id });
+      await cache.invalidateQueries({ queryKey: ["account", userId] });
+    } catch (error) {
+      setLifecycleError(message(error));
+    } finally {
+      setLifecycleBusy(undefined);
+    }
+  }
   return (
     <div className="space-y-6">
       <div className="flex flex-wrap items-start justify-between gap-3">
@@ -222,6 +250,14 @@ function DeveloperAnalytics({
           </Button>
         </div>
       </div>
+      {lifecycleError && (
+        <p
+          role="alert"
+          className="rounded-lg border border-destructive/40 p-4 text-sm text-destructive"
+        >
+          {lifecycleError}
+        </p>
+      )}
       {d.totals.plugins === 0 && !search.plugin ? (
         <Panel
           title="Your developer profile is ready"
@@ -299,7 +335,7 @@ function DeveloperAnalytics({
           ) : (
             <Panel
               title="Your plugins"
-              description="Publishing and editing will be available in a future update."
+              description="Manage publishing, visibility, edits and the lifecycle of your plugins."
             >
               <div className="mb-4">
                 <Button onClick={() => change({ view: "create", plugin: undefined })}>
@@ -348,8 +384,16 @@ function DeveloperAnalytics({
                           </div>
                         </td>
                         <td className="px-3">
-                          <Badge variant="secondary">
-                            {p.moderation_status.replaceAll("_", " ")}
+                          <Badge variant={p.developer_removed_at ? "destructive" : "secondary"}>
+                            {p.developer_removed_at
+                              ? "Removed"
+                              : p.moderation_status === "approved" && p.developer_unpublished_at
+                                ? "Unpublished"
+                                : p.moderation_status === "approved"
+                                  ? "Published"
+                                  : p.moderation_status === "suspended"
+                                    ? "Suspended"
+                                    : p.moderation_status.replaceAll("_", " ")}
                           </Badge>
                           {p.rejection_reason && (
                             <p className="mt-1 max-w-48 whitespace-normal text-xs text-muted-foreground">
@@ -371,11 +415,13 @@ function DeveloperAnalytics({
                         </td>
                         <td className="px-3">
                           <div className="flex gap-1">
-                            <Button size="sm" variant="ghost" asChild>
-                              <Link to="/plugins/$slug" params={{ slug: p.slug }}>
-                                View
-                              </Link>
-                            </Button>
+                            {!p.developer_removed_at && (
+                              <Button size="sm" variant="ghost" asChild>
+                                <Link to="/plugins/$slug" params={{ slug: p.slug }}>
+                                  View
+                                </Link>
+                              </Button>
+                            )}
                             <Button
                               size="sm"
                               variant="ghost"
@@ -393,13 +439,20 @@ function DeveloperAnalytics({
                             <Button
                               size="sm"
                               variant="ghost"
+                              disabled={
+                                Boolean(p.developer_removed_at) ||
+                                p.moderation_status === "pending_review" ||
+                                p.moderation_status === "suspended"
+                              }
                               onClick={() => change({ plugin: p.id, view: "edit", page: 1 })}
                             >
-                              {p.moderation_status === "draft"
-                                ? "Resume draft"
-                                : p.moderation_status === "rejected"
-                                  ? "Revise submission"
-                                  : "Submission"}
+                              {p.moderation_status === "approved"
+                                ? "Edit"
+                                : p.moderation_status === "draft"
+                                  ? "Resume draft"
+                                  : p.moderation_status === "rejected"
+                                    ? "Revise submission"
+                                    : "Submission"}
                             </Button>
                             <Button
                               size="sm"
@@ -409,6 +462,71 @@ function DeveloperAnalytics({
                             >
                               Submit for review
                             </Button>
+                            {p.moderation_status === "approved" && !p.developer_removed_at && (
+                              <Button
+                                size="sm"
+                                variant="ghost"
+                                disabled={lifecycleBusy === p.id}
+                                onClick={() =>
+                                  void lifecycle(
+                                    p.developer_unpublished_at ? "republish" : "unpublish",
+                                    p.id,
+                                  )
+                                }
+                              >
+                                {p.developer_unpublished_at ? (
+                                  <RotateCcw className="mr-1 size-3.5" />
+                                ) : (
+                                  <EyeOff className="mr-1 size-3.5" />
+                                )}
+                                {p.developer_unpublished_at ? "Republish" : "Unpublish"}
+                              </Button>
+                            )}
+                            {p.developer_removed_at ? (
+                              <Button
+                                size="sm"
+                                variant="ghost"
+                                disabled={
+                                  lifecycleBusy === p.id || p.moderation_status === "suspended"
+                                }
+                                onClick={() => void lifecycle("restore", p.id)}
+                              >
+                                <RotateCcw className="mr-1 size-3.5" /> Restore
+                              </Button>
+                            ) : p.moderation_status !== "suspended" ? (
+                              <AlertDialog>
+                                <AlertDialogTrigger asChild>
+                                  <Button
+                                    size="sm"
+                                    variant="ghost"
+                                    className="text-destructive hover:text-destructive"
+                                    disabled={lifecycleBusy === p.id}
+                                  >
+                                    <Trash2 className="mr-1 size-3.5" /> Delete
+                                  </Button>
+                                </AlertDialogTrigger>
+                                <AlertDialogContent>
+                                  <AlertDialogHeader>
+                                    <AlertDialogTitle>Remove {p.name}?</AlertDialogTitle>
+                                    <AlertDialogDescription>
+                                      The plugin will disappear from the marketplace and downloads
+                                      will stop. Versions, files, reviews, analytics and audit
+                                      history will be retained. You can restore it later unless an
+                                      administrator suspends it.
+                                    </AlertDialogDescription>
+                                  </AlertDialogHeader>
+                                  <AlertDialogFooter>
+                                    <AlertDialogCancel>Cancel</AlertDialogCancel>
+                                    <AlertDialogAction
+                                      className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+                                      onClick={() => void lifecycle("delete", p.id)}
+                                    >
+                                      Remove plugin
+                                    </AlertDialogAction>
+                                  </AlertDialogFooter>
+                                </AlertDialogContent>
+                              </AlertDialog>
+                            ) : null}
                           </div>
                         </td>
                       </tr>
