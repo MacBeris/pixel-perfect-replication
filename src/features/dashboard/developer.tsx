@@ -379,7 +379,14 @@ function DeveloperAnalytics({
           <Metrics
             items={
               search.plugin
-                ? [
+                ? plugin?.listing_type === "external_listing"
+                  ? [
+                      { label: "Total views", value: d.totals.views },
+                      { label: "External clicks", value: d.history.outbound_clicks },
+                      { label: "Extendly rating", value: d.totals.rating ?? "Not rated" },
+                      { label: "Extendly reviews", value: d.totals.reviews },
+                    ]
+                  : [
                     { label: "Total downloads", value: d.totals.downloads },
                     { label: "Total views", value: d.totals.views },
                     { label: "Rating average", value: d.totals.rating ?? "Not rated" },
@@ -412,7 +419,12 @@ function DeveloperAnalytics({
             coverage; they may not match lifetime totals.
           </p>
           {search.plugin && search.view === "versions" && <Versions data={d} />}
-          <Performance data={d} range={search.range} onRange={(range) => change({ range })} />
+          <Performance
+            data={d}
+            plugin={plugin}
+            range={search.range}
+            onRange={(range) => change({ range })}
+          />
           {search.plugin ? (
             <>
               <Panel
@@ -435,6 +447,32 @@ function DeveloperAnalytics({
                       : [{ label: "Total downloads", value: d.totals.downloads }]
                   }
                 />
+                {plugin?.listing_type === "external_listing" &&
+                  (plugin.source_installs_count !== null ||
+                    plugin.source_downloads_count !== null ||
+                    plugin.source_rating_average !== null) && (
+                    <div className="mt-5 border-t pt-5">
+                      <p className="mb-3 text-xs font-medium uppercase tracking-wide text-muted-foreground">
+                        External source · {plugin.source ?? "marketplace"}
+                      </p>
+                      <Metrics
+                        items={[
+                          ...(plugin.source_installs_count !== null
+                            ? [{ label: "Source installs", value: plugin.source_installs_count }]
+                            : []),
+                          ...(plugin.source_downloads_count !== null
+                            ? [{ label: "Source downloads", value: plugin.source_downloads_count }]
+                            : []),
+                          ...(plugin.source_rating_average !== null
+                            ? [{ label: "Source rating", value: plugin.source_rating_average }]
+                            : []),
+                          ...(plugin.source_ratings_count !== null
+                            ? [{ label: "Source ratings", value: plugin.source_ratings_count }]
+                            : []),
+                        ]}
+                      />
+                    </div>
+                  )}
                 <div className="mt-5 grid gap-3 text-sm text-muted-foreground sm:grid-cols-2">
                   <p>Unique views: unavailable</p>
                   <p>Library users and growth: unavailable</p>
@@ -773,18 +811,35 @@ function PluginActivity({ data }: { data: Analytics }) {
 
 function Performance({
   data,
+  plugin,
   range,
   onRange,
 }: {
   data: Analytics;
+  plugin: DeveloperPlugin | undefined;
   range: DashboardSearch["range"];
   onRange: (range: DashboardSearch["range"]) => void;
 }) {
   const [metric, setMetric] = useState<"views" | "downloads" | "outbound_clicks">("views");
+  const metrics: Array<"views" | "downloads" | "outbound_clicks"> = plugin
+    ? plugin.listing_type === "external_listing"
+      ? ["views", "outbound_clicks"]
+      : ["views", "downloads"]
+    : ["views", "downloads", "outbound_clicks"];
+  const selectedMetric = metrics.includes(metric) ? metric : metrics[0]!;
+  const metricStartedAt = data.history.metric_started_at[selectedMetric];
+  const metricStartBucket = metricStartedAt
+    ? data.history.bucket === "month"
+      ? `${metricStartedAt.slice(0, 7)}-01`
+      : metricStartedAt.slice(0, 10)
+    : null;
+  const series = metricStartBucket
+    ? data.history.series.filter((point) => point.date >= metricStartBucket)
+    : [];
   return (
     <Panel
       title="Performance overview"
-      description="Recorded events in UTC. Historical coverage is unknown; missing dates are not assumed to have zero traffic."
+      description={`Recorded ${selectedMetric.replaceAll("_", " ")} in UTC${metricStartedAt ? ` since ${new Date(metricStartedAt).toLocaleDateString("en-US")}` : ""}.`}
     >
       <div className="mb-5 flex flex-wrap gap-3">
         <label className="text-xs text-muted-foreground">
@@ -812,36 +867,40 @@ function Performance({
           Metric
           <select
             className={fieldClass}
-            value={metric}
+            value={selectedMetric}
             aria-label="Metric"
             onChange={(e) => setMetric(e.target.value as typeof metric)}
           >
-            <option value="views">Views</option>
-            <option value="downloads">Downloads</option>
-            <option value="outbound_clicks">Outbound clicks</option>
+            {metrics.map((value) => (
+              <option key={value} value={value}>
+                {value === "outbound_clicks"
+                  ? "External clicks"
+                  : value.charAt(0).toUpperCase() + value.slice(1)}
+              </option>
+            ))}
           </select>
         </label>
       </div>
-      {!data.history.available ? (
-        <Empty>Historical data unavailable. Trends will appear once events are recorded.</Empty>
-      ) : !data.history.series.length ? (
-        <Empty>No recorded events in this period. Historical coverage is unknown.</Empty>
+      {!data.history.available || !metricStartedAt ? (
+        <Empty>Historical data unavailable for this metric.</Empty>
+      ) : !series.length ? (
+        <Empty>No recorded events in this period.</Empty>
       ) : (
         <>
           <div
             className="h-64"
             role="img"
-            aria-label={`${metric.replaceAll("_", " ")} by ${data.history.bucket}, UTC`}
+            aria-label={`${selectedMetric.replaceAll("_", " ")} by ${data.history.bucket}, UTC`}
           >
             <ResponsiveContainer width="100%" height="100%">
-              <AreaChart data={data.history.series}>
+              <AreaChart data={series}>
                 <CartesianGrid strokeDasharray="3 3" opacity={0.15} />
                 <XAxis dataKey="date" tick={{ fontSize: 11 }} minTickGap={35} />
                 <YAxis allowDecimals={false} tick={{ fontSize: 11 }} width={45} />
                 <Tooltip />
                 <Area
                   type="linear"
-                  dataKey={metric}
+                  dataKey={selectedMetric}
                   stroke="#4f7cff"
                   fill="#4f7cff"
                   fillOpacity={0.12}
@@ -857,14 +916,14 @@ function Performance({
                 <thead>
                   <tr>
                     <th>Date (UTC)</th>
-                    <th>{metric.replaceAll("_", " ")}</th>
+                    <th>{selectedMetric.replaceAll("_", " ")}</th>
                   </tr>
                 </thead>
                 <tbody>
-                  {data.history.series.map((p) => (
+                  {series.map((p) => (
                     <tr key={p.date}>
                       <td>{p.date}</td>
-                      <td>{p[metric]}</td>
+                      <td>{p[selectedMetric]}</td>
                     </tr>
                   ))}
                 </tbody>

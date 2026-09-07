@@ -85,7 +85,13 @@ export const analyticsSchema = z.object({
   }),
   history: z.object({
     available: z.boolean(),
-    coverage: z.literal("unknown"),
+    coverage: z.literal("tracked"),
+    started_at: z.string().nullable(),
+    metric_started_at: z.object({
+      views: z.string().nullable(),
+      downloads: z.string().nullable(),
+      outbound_clicks: z.string().nullable(),
+    }),
     bucket: z.enum(["day", "month"]),
     downloads_last_30_days: z.number(),
     outbound_clicks: z.number(),
@@ -117,6 +123,11 @@ export const analyticsSchema = z.object({
       developer_removed_at: z.string().nullable(),
       developer_removed_by: z.string().nullable(),
       platform: z.string().nullable(),
+      source: z.string().nullable(),
+      source_installs_count: z.number().nullable(),
+      source_downloads_count: z.number().nullable(),
+      source_rating_average: z.number().nullable(),
+      source_ratings_count: z.number().nullable(),
     }),
   ),
   recent_reviews: z.array(

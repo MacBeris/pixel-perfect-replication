@@ -7,6 +7,7 @@ import { useAuth } from "@/hooks/use-auth";
 import { PluginDistribution } from "@/features/publishing/plugin-download";
 import { PluginReviews } from "@/features/reviews/plugin-reviews";
 import { Download, Star } from "lucide-react";
+import { PublicPluginView } from "@/features/analytics/plugin-interactions";
 
 export const Route = createFileRoute("/plugins/$slug")({
   head: ({ params }) => ({
@@ -77,6 +78,7 @@ function PluginDetail() {
 
   return (
     <article className="container-page py-14">
+      {data.moderation_status === "approved" && <PublicPluginView pluginId={data.id} />}
       <div className="flex flex-wrap items-center gap-2 text-xs text-muted-foreground">
         <Link to="/plugins" className="hover:text-foreground">
           Plugins

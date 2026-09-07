@@ -858,6 +858,8 @@ export type Database = {
           developer_removed_at: string | null
           developer_removed_by: string | null
           developer_unpublished_at: string | null
+          analytics_tracking_started_at: string
+          view_tracking_started_at: string
           downloads_count: number
           external_id: string | null
           external_purchase_url: string | null
@@ -915,6 +917,8 @@ export type Database = {
           developer_removed_at?: string | null
           developer_removed_by?: string | null
           developer_unpublished_at?: string | null
+          analytics_tracking_started_at?: string
+          view_tracking_started_at?: string
           downloads_count?: number
           external_id?: string | null
           external_purchase_url?: string | null
@@ -972,6 +976,8 @@ export type Database = {
           developer_removed_at?: string | null
           developer_removed_by?: string | null
           developer_unpublished_at?: string | null
+          analytics_tracking_started_at?: string
+          view_tracking_started_at?: string
           downloads_count?: number
           external_id?: string | null
           external_purchase_url?: string | null
@@ -1494,6 +1500,15 @@ export type Database = {
       }
       publishing_action: {
         Args: { _action: string; _actor: string; _input: Json }
+        Returns: Json
+      }
+      record_plugin_interaction: {
+        Args: {
+          _actor: string | null
+          _event_type: string
+          _plugin_id: string
+          _session_hash: string
+        }
         Returns: Json
       }
       record_source_presence: {

@@ -8,6 +8,8 @@ import { Link } from "@tanstack/react-router";
 import { useAuth } from "@/hooks/use-auth";
 import { supabase } from "@/integrations/supabase/client";
 import type { Tables } from "@/integrations/supabase/types";
+import { interactionIdentity } from "@/features/analytics/interaction-identity";
+import { recordPluginInteraction } from "@/features/analytics/analytics.functions";
 
 export function PluginDistribution({ plugin }: { plugin: Tables<"plugins"> }) {
   const { user } = useAuth();
@@ -77,15 +79,7 @@ export function PluginDistribution({ plugin }: { plugin: Tables<"plugins"> }) {
       {plugin.listing_type === "external_listing" ? (
         plugin.moderation_status === "approved" &&
         url &&
-        (user ? (
-          <ExternalButton pluginId={plugin.id} />
-        ) : (
-          <Button asChild>
-            <a href={url} rel="nofollow noopener noreferrer">
-              Visit external platform
-            </a>
-          </Button>
-        ))
+        <ExternalButton pluginId={plugin.id} />
       ) : test ? (
         <DownloadButton pluginId={plugin.id} test />
       ) : plugin.moderation_status === "approved" && current ? (
@@ -168,6 +162,7 @@ export function DownloadButton({ pluginId, test = false }: { pluginId: string; t
   );
 }
 export function ExternalButton({ pluginId }: { pluginId: string }) {
+  const cache = useQueryClient();
   const [error, setError] = useState(""),
     [busy, setBusy] = useState(false);
   return (
@@ -178,10 +173,12 @@ export function ExternalButton({ pluginId }: { pluginId: string }) {
           setBusy(true);
           setError("");
           try {
-            const data = z
-              .object({ url: z.string().url() })
-              .parse(await publishing("outbound", { id: pluginId }));
+            const data = await recordPluginInteraction({
+              data: { pluginId, type: "outbound_click", ...(await interactionIdentity()) },
+            });
+            if (!data.url) throw new Error("External listing unavailable");
             window.location.assign(data.url);
+            void cache.invalidateQueries({ queryKey: ["account"] });
           } catch (e) {
             setError(message(e));
           } finally {
