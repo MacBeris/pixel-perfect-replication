@@ -2,7 +2,7 @@ import { Link } from "@tanstack/react-router";
 import { Download, Star } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import type { PluginListItem } from "@/types/catalog";
-import { PluginSaveActions } from "./plugin-save-actions";
+import { PluginFavoriteAction } from "./plugin-favorite-action";
 
 function formatPrice(plugin: PluginListItem) {
   if (plugin.pricing_model === "free" || Number(plugin.price) === 0) return "Free";
@@ -78,7 +78,7 @@ export function PluginCard({ plugin }: { plugin: PluginListItem }) {
           ) : null}
         </div>
       </Link>
-      <PluginSaveActions pluginId={plugin.id} compact className="mt-4 border-t pt-4" />
+      <PluginFavoriteAction pluginId={plugin.id} compact className="mt-4 border-t pt-4" />
     </article>
   );
 }

@@ -406,7 +406,6 @@ function DeveloperAnalytics({
                     { label: "Rating average", value: d.totals.rating ?? "Not rated" },
                     { label: "Reviews", value: d.totals.reviews },
                     { label: "Favorites", value: d.totals.favorites },
-                    { label: "Wishlist adds", value: d.totals.wishlist },
                     {
                       label: "Recorded downloads · 30 days",
                       value: d.history.available ? d.history.downloads_last_30_days : "Unavailable",

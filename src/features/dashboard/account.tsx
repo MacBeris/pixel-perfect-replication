@@ -15,7 +15,7 @@ function useAction(userId: string) {
     mutationFn: (action: () => Promise<unknown>) => action(),
     onSuccess: async () => {
       await cache.invalidateQueries({ queryKey: ["account", userId] });
-      await cache.invalidateQueries({ queryKey: ["saved-plugins", userId] });
+      await cache.invalidateQueries({ queryKey: ["favorites", userId] });
       toast.success("Changes saved");
     },
     onError: (e) => toast.error(message(e)),
@@ -58,10 +58,6 @@ export function AccountOverview({ userId }: { userId: string }) {
           .select("plugin_id", { count: "exact", head: true })
           .eq("user_id", userId),
         supabase
-          .from("wishlists")
-          .select("plugin_id", { count: "exact", head: true })
-          .eq("user_id", userId),
-        supabase
           .from("collections")
           .select("id", { count: "exact", head: true })
           .eq("owner_id", userId),
@@ -76,7 +72,7 @@ export function AccountOverview({ userId }: { userId: string }) {
   return (
     <div className="space-y-6">
       <Metrics
-        items={["Paid purchases", "Favorites", "Wishlist", "Collections", "Reviews"].map(
+        items={["Paid purchases", "Favorites", "Collections", "Reviews"].map(
           (label, i) => ({ label, value: q.data[i] ?? 0 }),
         )}
       />
@@ -115,7 +111,7 @@ export function SavedPlugins({
   tab,
 }: {
   userId: string;
-  tab: "library" | "favorites" | "wishlist";
+  tab: "library" | "favorites";
 }) {
   const [page, setPage] = useState(0);
   const action = useAction(userId);
@@ -129,10 +125,7 @@ export function SavedPlugins({
               .select(savedSelect)
               .eq("user_id", userId)
               .in("status", ["paid", "partially_refunded"])
-          : supabase
-              .from(tab === "wishlist" ? "wishlists" : "favorites")
-              .select(savedSelect)
-              .eq("user_id", userId);
+          : supabase.from("favorites").select(savedSelect).eq("user_id", userId);
       const { data, error } = await query
         .order("created_at", { ascending: false })
         .range(page * 20, page * 20 + 19);
@@ -144,9 +137,7 @@ export function SavedPlugins({
   if (q.error) return <Failure error={q.error} retry={() => void q.refetch()} />;
   return (
     <Panel
-      title={
-        { library: "Your library", favorites: "Your favorites", wishlist: "Your wishlist" }[tab]
-      }
+      title={{ library: "Your library", favorites: "Your favorites" }[tab]}
       description={
         tab === "library"
           ? "Plugins from your paid purchases. Free library additions are not available yet."
@@ -186,7 +177,7 @@ export function SavedPlugins({
                 onClick={() =>
                   action.mutate(async () => {
                     const { error } = await supabase
-                      .from(tab === "wishlist" ? "wishlists" : "favorites")
+                      .from("favorites")
                       .delete()
                       .eq("user_id", userId)
                       .eq("plugin_id", row.plugin_id);

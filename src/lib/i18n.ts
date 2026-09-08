@@ -15,7 +15,6 @@ export const messages = {
     "nav.account": "Account",
     "nav.library": "My Library",
     "nav.favorites": "Favorites",
-    "nav.wishlist": "Wishlist",
     "nav.collections": "Collections",
     "hero.title": "Extend what your tools can do.",
     "hero.subtitle":

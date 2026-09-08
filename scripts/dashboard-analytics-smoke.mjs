@@ -43,13 +43,11 @@ try {
   await page.getByLabel("Rating", { exact: true }).selectOption("5");
   await page.getByRole("button", { name: "Save review", exact: true }).click();
   await page.getByText("Changes saved", { exact: true }).waitFor();
-  for (const tab of ["favorites", "wishlist"]) {
-    await page.goto(`${base}/dashboard?tab=${tab}`);
-    await page.getByRole("button", { name: "Remove", exact: true }).click();
-    await page
-      .getByText("No saved plugins yet. Explore the catalog to get started.", { exact: true })
-      .waitFor();
-  }
+  await page.goto(`${base}/dashboard?tab=favorites`);
+  await page.getByRole("button", { name: "Remove", exact: true }).click();
+  await page
+    .getByText("No saved plugins yet. Explore the catalog to get started.", { exact: true })
+    .waitFor();
   await page.goto(`${base}/dashboard?tab=developer`);
   await page.getByRole("heading", { name: "Your plugins", exact: true }).waitFor();
   await page.setViewportSize({ width: 390, height: 844 });
@@ -68,7 +66,7 @@ try {
   await page.screenshot({ path: ".wrangler/developer-analytics-dark.png", fullPage: true });
   assert.deepEqual(errors, []);
   console.log(
-    "PASS: 21-plugin pagination, time ranges, metrics, versions, legacy plugin analytics, private preview, review edits, favorite/wishlist removal, mobile menu and dark mode.",
+    "PASS: 21-plugin pagination, time ranges, metrics, versions, legacy plugin analytics, private preview, review edits, favorite removal, mobile menu and dark mode.",
   );
 } catch (error) {
   console.error("Page state:", await page.locator("body").innerText());

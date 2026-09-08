@@ -17,7 +17,6 @@ import { Route as PublishingRequirementsRouteImport } from './routes/publishing-
 import { Route as AuthenticatedDashboardRouteImport } from './routes/_authenticated/dashboard'
 import { Route as AuthenticatedFavoritesRouteImport } from './routes/_authenticated/favorites'
 import { Route as AuthenticatedLibraryRouteImport } from './routes/_authenticated/library'
-import { Route as AuthenticatedWishlistRouteImport } from './routes/_authenticated/wishlist'
 import { Route as AuthCallbackRouteImport } from './routes/auth_.callback'
 import { Route as CategorySlugRouteImport } from './routes/category.$slug'
 import { Route as DeveloperDashboardRouteImport } from './routes/developer.dashboard'
@@ -64,11 +63,6 @@ const AuthenticatedFavoritesRoute = AuthenticatedFavoritesRouteImport.update({
 const AuthenticatedLibraryRoute = AuthenticatedLibraryRouteImport.update({
   id: '/library',
   path: '/library',
-  getParentRoute: () => AuthenticatedRouteRoute,
-} as any)
-const AuthenticatedWishlistRoute = AuthenticatedWishlistRouteImport.update({
-  id: '/wishlist',
-  path: '/wishlist',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
 const AuthCallbackRoute = AuthCallbackRouteImport.update({
@@ -121,7 +115,6 @@ export interface FileRoutesByFullPath {
   '/dashboard': typeof AuthenticatedDashboardRoute
   '/favorites': typeof AuthenticatedFavoritesRoute
   '/library': typeof AuthenticatedLibraryRoute
-  '/wishlist': typeof AuthenticatedWishlistRoute
   '/auth/callback': typeof AuthCallbackRoute
   '/category/$slug': typeof CategorySlugRoute
   '/developer/dashboard': typeof DeveloperDashboardRoute
@@ -139,7 +132,6 @@ export interface FileRoutesByTo {
   '/dashboard': typeof AuthenticatedDashboardRoute
   '/favorites': typeof AuthenticatedFavoritesRoute
   '/library': typeof AuthenticatedLibraryRoute
-  '/wishlist': typeof AuthenticatedWishlistRoute
   '/auth/callback': typeof AuthCallbackRoute
   '/category/$slug': typeof CategorySlugRoute
   '/developer/dashboard': typeof DeveloperDashboardRoute
@@ -159,7 +151,6 @@ export interface FileRoutesById {
   '/_authenticated/dashboard': typeof AuthenticatedDashboardRoute
   '/_authenticated/favorites': typeof AuthenticatedFavoritesRoute
   '/_authenticated/library': typeof AuthenticatedLibraryRoute
-  '/_authenticated/wishlist': typeof AuthenticatedWishlistRoute
   '/auth_/callback': typeof AuthCallbackRoute
   '/category/$slug': typeof CategorySlugRoute
   '/developer/dashboard': typeof DeveloperDashboardRoute
@@ -179,7 +170,6 @@ export interface FileRouteTypes {
     | '/dashboard'
     | '/favorites'
     | '/library'
-    | '/wishlist'
     | '/auth/callback'
     | '/category/$slug'
     | '/developer/dashboard'
@@ -197,7 +187,6 @@ export interface FileRouteTypes {
     | '/dashboard'
     | '/favorites'
     | '/library'
-    | '/wishlist'
     | '/auth/callback'
     | '/category/$slug'
     | '/developer/dashboard'
@@ -216,7 +205,6 @@ export interface FileRouteTypes {
     | '/_authenticated/dashboard'
     | '/_authenticated/favorites'
     | '/_authenticated/library'
-    | '/_authenticated/wishlist'
     | '/auth_/callback'
     | '/category/$slug'
     | '/developer/dashboard'
@@ -301,13 +289,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedLibraryRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
-    '/_authenticated/wishlist': {
-      id: '/_authenticated/wishlist'
-      path: '/wishlist'
-      fullPath: '/wishlist'
-      preLoaderRoute: typeof AuthenticatedWishlistRouteImport
-      parentRoute: typeof AuthenticatedRouteRoute
-    }
     '/auth_/callback': {
       id: '/auth_/callback'
       path: '/auth/callback'
@@ -371,14 +352,12 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedDashboardRoute: typeof AuthenticatedDashboardRoute
   AuthenticatedFavoritesRoute: typeof AuthenticatedFavoritesRoute
   AuthenticatedLibraryRoute: typeof AuthenticatedLibraryRoute
-  AuthenticatedWishlistRoute: typeof AuthenticatedWishlistRoute
 }
 
 const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedDashboardRoute: AuthenticatedDashboardRoute,
   AuthenticatedFavoritesRoute: AuthenticatedFavoritesRoute,
   AuthenticatedLibraryRoute: AuthenticatedLibraryRoute,
-  AuthenticatedWishlistRoute: AuthenticatedWishlistRoute,
 }
 
 const AuthenticatedRouteRouteWithChildren =

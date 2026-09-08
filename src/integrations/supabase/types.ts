@@ -906,7 +906,6 @@ export type Database = {
           video_url: string | null
           views_count: number
           website_url: string | null
-          wishlist_count: number
         }
         Insert: {
           compatibility?: string | null
@@ -965,7 +964,6 @@ export type Database = {
           video_url?: string | null
           views_count?: number
           website_url?: string | null
-          wishlist_count?: number
         }
         Update: {
           compatibility?: string | null
@@ -1024,7 +1022,6 @@ export type Database = {
           video_url?: string | null
           views_count?: number
           website_url?: string | null
-          wishlist_count?: number
         }
         Relationships: [
           {
@@ -1402,32 +1399,6 @@ export type Database = {
           user_id?: string
         }
         Relationships: []
-      }
-      wishlists: {
-        Row: {
-          created_at: string
-          plugin_id: string
-          user_id: string
-        }
-        Insert: {
-          created_at?: string
-          plugin_id: string
-          user_id: string
-        }
-        Update: {
-          created_at?: string
-          plugin_id?: string
-          user_id?: string
-        }
-        Relationships: [
-          {
-            foreignKeyName: "wishlists_plugin_id_fkey"
-            columns: ["plugin_id"]
-            isOneToOne: false
-            referencedRelation: "plugins"
-            referencedColumns: ["id"]
-          },
-        ]
       }
     }
     Views: {

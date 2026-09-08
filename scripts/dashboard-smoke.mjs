@@ -55,7 +55,6 @@ try {
     ["Overview", "Make this space your own"],
     ["Library", "Your library"],
     ["Favorites", "Your favorites"],
-    ["Wishlist", "Your wishlist"],
     ["Reviews", "Your reviews"],
     ["Settings", "Account profile"],
   ]) {

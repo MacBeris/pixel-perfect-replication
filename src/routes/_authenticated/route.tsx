@@ -7,9 +7,7 @@ export const Route = createFileRoute("/_authenticated")({
   ssr: false,
   beforeLoad: async ({ location }) => {
     const { data, error } = await supabase.auth.getUser();
-    const legacy = ["library", "favorites", "wishlist"].find(
-      (tab) => location.pathname === `/${tab}`,
-    );
+    const legacy = ["library", "favorites"].find((tab) => location.pathname === `/${tab}`);
     const returnTo =
       location.pathname === "/dashboard"
         ? location.href

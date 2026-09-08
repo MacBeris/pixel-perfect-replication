@@ -8,7 +8,7 @@ import { PluginDistribution } from "@/features/publishing/plugin-download";
 import { PluginReviews } from "@/features/reviews/plugin-reviews";
 import { Download, Star } from "lucide-react";
 import { PublicPluginView } from "@/features/analytics/plugin-interactions";
-import { PluginSaveActions } from "@/features/plugins/plugin-save-actions";
+import { PluginFavoriteAction } from "@/features/plugins/plugin-favorite-action";
 
 export const Route = createFileRoute("/plugins/$slug")({
   head: ({ params }) => ({
@@ -135,7 +135,7 @@ function PluginDetail() {
         {data.is_open_source ? <Badge variant="secondary">Open source</Badge> : null}
         {data.current_version ? <Badge variant="outline">v{data.current_version}</Badge> : null}
       </div>
-      <PluginSaveActions pluginId={data.id} className="mt-5" />
+      <PluginFavoriteAction pluginId={data.id} className="mt-5" />
       <div className="mt-7 flex flex-wrap gap-3 text-sm">
         <a
           href={data.reviews_count > 0 ? "#reviews" : (data.source_url ?? "#reviews")}

@@ -3,7 +3,6 @@ import { Link, useNavigate } from "@tanstack/react-router";
 import {
   LibraryBig,
   Heart,
-  ListPlus,
   LogOut,
   Menu,
   Search,
@@ -134,11 +133,6 @@ export function SiteHeader() {
                 <DropdownMenuItem asChild>
                   <Link to="/dashboard" search={{ tab: "favorites" }} className="gap-2">
                     <Heart className="size-4" /> {t("nav.favorites")}
-                  </Link>
-                </DropdownMenuItem>
-                <DropdownMenuItem asChild>
-                  <Link to="/dashboard" search={{ tab: "wishlist" }} className="gap-2">
-                    <ListPlus className="size-4" /> {t("nav.wishlist")}
                   </Link>
                 </DropdownMenuItem>
                 {isAdmin && (

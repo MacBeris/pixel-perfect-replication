@@ -7,10 +7,10 @@ version changes, financial reports and new event tracking are intentionally unav
 
 ## Navigation
 
-Tabs: overview, library, favorites, wishlist, collections, reviews, developer, settings.
+Tabs: overview, library, favorites, collections, reviews, developer, settings.
 Unknown tabs fall back to overview. The authenticated layout validates the session before
 rendering any account content. Login accepts only local `/dashboard` return addresses.
-Legacy library/favorites/wishlist and developer routes redirect into this workspace.
+Legacy library/favorites and developer routes redirect into this workspace.
 
 Developer URL options: `profile` (owned profile UUID), `plugin` (plugin UUID), `view`
 (analytics, versions, profile), `range` (7, 30, 90, 365, all), `page` (one-based).
@@ -61,7 +61,7 @@ Browser smoke scripts require Playwright with Chrome and an explicitly disposabl
 test account. Credentials must remain outside git (for example `.wrangler/dashboard-e2e.json`).
 Run `node scripts/dashboard-smoke.mjs <credentials.json> <base-url>` for onboarding and empty
 account flows. The analytics script expects 21 private plugin fixtures owned by that account,
-including `Dashboard private fixture 1`, one version, review, favorite and wishlist entry.
+including `Dashboard private fixture 1`, one version, review and favorite entry.
 These scripts must never be pointed at a real user's credentials. Remove test avatars,
 plugins and the disposable auth account after the checks.
 

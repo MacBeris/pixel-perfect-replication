@@ -6,7 +6,6 @@ export const tabs = [
   "overview",
   "library",
   "favorites",
-  "wishlist",
   "collections",
   "reviews",
   "developer",
@@ -80,7 +79,6 @@ export const analyticsSchema = z.object({
     views: z.number(),
     reviews: z.number(),
     favorites: z.number(),
-    wishlist: z.number(),
     rating: z.number().nullable(),
   }),
   history: z.object({
