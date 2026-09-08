@@ -2,6 +2,7 @@ import { Link } from "@tanstack/react-router";
 import { Download, Star } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import type { PluginListItem } from "@/types/catalog";
+import { PluginSaveActions } from "./plugin-save-actions";
 
 function formatPrice(plugin: PluginListItem) {
   if (plugin.pricing_model === "free" || Number(plugin.price) === 0) return "Free";
@@ -12,67 +13,72 @@ export function PluginCard({ plugin }: { plugin: PluginListItem }) {
   const cover = plugin.plugin_assets?.find((asset) => asset.asset_type === "cover")?.public_url;
   const sourceRating = plugin.reviews_count === 0 ? plugin.source_rating_average : null;
   const visibleRating = Number(sourceRating ?? plugin.rating_average);
-  const visibleRatingCount = sourceRating !== null ? plugin.source_ratings_count : plugin.reviews_count;
+  const visibleRatingCount =
+    sourceRating !== null ? plugin.source_ratings_count : plugin.reviews_count;
   const sourceMetric = plugin.source_installs_count ?? plugin.source_downloads_count;
-  const visibleDownloads = plugin.listing_type === "external_listing" ? sourceMetric : plugin.downloads_count;
+  const visibleDownloads =
+    plugin.listing_type === "external_listing" ? sourceMetric : plugin.downloads_count;
   return (
-    <Link
-      to="/plugins/$slug"
-      params={{ slug: plugin.slug }}
-      className="group flex h-full flex-col rounded-xl border border-border bg-card p-5 shadow-card transition-all hover:border-border-strong hover:shadow-elevated"
-    >
-      {cover && (
-        <img
-          src={cover}
-          alt=""
-          className="mb-4 h-32 w-full rounded-lg border object-cover"
-          loading="lazy"
-        />
-      )}
-      <div className="flex items-start gap-3">
-        <div className="flex size-11 shrink-0 items-center justify-center overflow-hidden rounded-lg border border-border bg-surface font-display text-sm font-semibold text-muted-foreground">
-          {plugin.logo_url ? (
-            <img
-              src={plugin.logo_url}
-              alt={`${plugin.name} logo`}
-              className="size-full object-cover"
-              loading="lazy"
-            />
-          ) : (
-            plugin.name.slice(0, 2).toUpperCase()
-          )}
+    <article className="group flex h-full flex-col rounded-xl border border-border bg-card p-5 shadow-card transition-all hover:border-border-strong hover:shadow-elevated">
+      <Link to="/plugins/$slug" params={{ slug: plugin.slug }} className="flex flex-1 flex-col">
+        {cover && (
+          <img
+            src={cover}
+            alt=""
+            className="mb-4 h-32 w-full rounded-lg border object-cover"
+            loading="lazy"
+          />
+        )}
+        <div className="flex items-start gap-3">
+          <div className="flex size-11 shrink-0 items-center justify-center overflow-hidden rounded-lg border border-border bg-surface font-display text-sm font-semibold text-muted-foreground">
+            {plugin.logo_url ? (
+              <img
+                src={plugin.logo_url}
+                alt={`${plugin.name} logo`}
+                className="size-full object-cover"
+                loading="lazy"
+              />
+            ) : (
+              plugin.name.slice(0, 2).toUpperCase()
+            )}
+          </div>
+          <div className="min-w-0">
+            <h3 className="truncate text-sm font-semibold text-foreground">{plugin.name}</h3>
+            <p className="text-xs text-muted-foreground">
+              {plugin.platform?.name ?? "Unknown platform"}
+            </p>
+            <p className="mt-0.5 truncate text-xs text-muted-foreground">
+              by {plugin.developer?.name ?? plugin.source_author_name ?? "Unknown developer"}
+            </p>
+          </div>
+          <span className="ml-auto text-sm font-medium text-foreground">{formatPrice(plugin)}</span>
         </div>
-        <div className="min-w-0">
-          <h3 className="truncate text-sm font-semibold text-foreground">{plugin.name}</h3>
-          <p className="text-xs text-muted-foreground">
-            {plugin.platform?.name ?? "Unknown platform"}
-          </p>
-          <p className="mt-0.5 truncate text-xs text-muted-foreground">
-            by {plugin.developer?.name ?? plugin.source_author_name ?? "Unknown developer"}
-          </p>
+
+        <p className="mt-3 line-clamp-2 text-sm text-muted-foreground">
+          {plugin.short_description}
+        </p>
+
+        <div className="mt-auto flex items-center gap-3 pt-4 text-xs text-muted-foreground">
+          <span className="inline-flex items-center gap-1">
+            <Star className="size-3.5 fill-current text-warning" />
+            {visibleRating.toFixed(1)}
+            <span className="text-muted-foreground/70">({visibleRatingCount ?? 0})</span>
+          </span>
+          <span className="inline-flex items-center gap-1">
+            <Download className="size-3.5" />
+            {visibleDownloads === null ? "—" : Number(visibleDownloads).toLocaleString("en-US")}
+            {plugin.listing_type === "external_listing" && plugin.source_installs_count !== null
+              ? " installs"
+              : ""}
+          </span>
+          {plugin.is_open_source ? (
+            <Badge variant="secondary" className="ml-auto text-[10px]">
+              Open source
+            </Badge>
+          ) : null}
         </div>
-        <span className="ml-auto text-sm font-medium text-foreground">{formatPrice(plugin)}</span>
-      </div>
-
-      <p className="mt-3 line-clamp-2 text-sm text-muted-foreground">{plugin.short_description}</p>
-
-      <div className="mt-auto flex items-center gap-3 pt-4 text-xs text-muted-foreground">
-        <span className="inline-flex items-center gap-1">
-          <Star className="size-3.5 fill-current text-warning" />
-          {visibleRating.toFixed(1)}
-          <span className="text-muted-foreground/70">({visibleRatingCount ?? 0})</span>
-        </span>
-        <span className="inline-flex items-center gap-1">
-          <Download className="size-3.5" />
-          {visibleDownloads === null ? "—" : Number(visibleDownloads).toLocaleString("en-US")}
-          {plugin.listing_type === "external_listing" && plugin.source_installs_count !== null ? " installs" : ""}
-        </span>
-        {plugin.is_open_source ? (
-          <Badge variant="secondary" className="ml-auto text-[10px]">
-            Open source
-          </Badge>
-        ) : null}
-      </div>
-    </Link>
+      </Link>
+      <PluginSaveActions pluginId={plugin.id} compact className="mt-4 border-t pt-4" />
+    </article>
   );
 }

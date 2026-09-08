@@ -8,6 +8,7 @@ import { PluginDistribution } from "@/features/publishing/plugin-download";
 import { PluginReviews } from "@/features/reviews/plugin-reviews";
 import { Download, Star } from "lucide-react";
 import { PublicPluginView } from "@/features/analytics/plugin-interactions";
+import { PluginSaveActions } from "@/features/plugins/plugin-save-actions";
 
 export const Route = createFileRoute("/plugins/$slug")({
   head: ({ params }) => ({
@@ -38,7 +39,9 @@ function PluginDetail() {
     queryFn: async () => {
       const { data, error } = await supabase
         .from("plugins")
-        .select("*, platform:platforms(name,slug), developer:developer_profiles(name,slug,avatar_url)")
+        .select(
+          "*, platform:platforms(name,slug), developer:developer_profiles(name,slug,avatar_url)",
+        )
         .eq("slug", slug)
         .maybeSingle();
       if (error) throw error;
@@ -109,7 +112,11 @@ function PluginDetail() {
           className="mt-3 inline-flex items-center gap-2 text-sm text-muted-foreground transition hover:text-foreground"
         >
           {data.developer.avatar_url && (
-            <img src={data.developer.avatar_url} alt="" className="size-6 rounded-full object-cover" />
+            <img
+              src={data.developer.avatar_url}
+              alt=""
+              className="size-6 rounded-full object-cover"
+            />
           )}
           by <span className="font-medium text-foreground">{data.developer.name}</span>
         </Link>
@@ -128,6 +135,7 @@ function PluginDetail() {
         {data.is_open_source ? <Badge variant="secondary">Open source</Badge> : null}
         {data.current_version ? <Badge variant="outline">v{data.current_version}</Badge> : null}
       </div>
+      <PluginSaveActions pluginId={data.id} className="mt-5" />
       <div className="mt-7 flex flex-wrap gap-3 text-sm">
         <a
           href={data.reviews_count > 0 ? "#reviews" : (data.source_url ?? "#reviews")}
@@ -136,15 +144,32 @@ function PluginDetail() {
           className="inline-flex items-center gap-2 rounded-lg border bg-card px-3 py-2 transition hover:border-primary"
         >
           <Star className="size-4 fill-warning text-warning" />
-          {data.reviews_count ? data.rating_average.toFixed(1) : data.source_rating_average !== null ? Number(data.source_rating_average).toFixed(1) : "No ratings"}
+          {data.reviews_count
+            ? data.rating_average.toFixed(1)
+            : data.source_rating_average !== null
+              ? Number(data.source_rating_average).toFixed(1)
+              : "No ratings"}
           <span className="text-muted-foreground">
-            · {data.reviews_count || data.source_ratings_count || 0} {data.reviews_count ? "ExtendShare reviews" : data.source_ratings_count ? `${data.source} ratings` : "reviews"}
+            · {data.reviews_count || data.source_ratings_count || 0}{" "}
+            {data.reviews_count
+              ? "ExtendShare reviews"
+              : data.source_ratings_count
+                ? `${data.source} ratings`
+                : "reviews"}
           </span>
         </a>
         <span className="inline-flex items-center gap-2 rounded-lg border bg-card px-3 py-2">
           <Download className="size-4" />
-          {data.listing_type === "external_listing" ? (data.source_installs_count ?? data.source_downloads_count)?.toLocaleString("en-US") ?? "—" : data.downloads_count.toLocaleString("en-US")}{" "}
-          {data.listing_type === "external_listing" && data.source_installs_count !== null ? "active installs" : data.downloads_count === 1 ? "download" : "downloads"}
+          {data.listing_type === "external_listing"
+            ? ((data.source_installs_count ?? data.source_downloads_count)?.toLocaleString(
+                "en-US",
+              ) ?? "—")
+            : data.downloads_count.toLocaleString("en-US")}{" "}
+          {data.listing_type === "external_listing" && data.source_installs_count !== null
+            ? "active installs"
+            : data.downloads_count === 1
+              ? "download"
+              : "downloads"}
         </span>
       </div>
       <PluginDistribution plugin={data} />

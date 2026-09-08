@@ -15,6 +15,7 @@ function useAction(userId: string) {
     mutationFn: (action: () => Promise<unknown>) => action(),
     onSuccess: async () => {
       await cache.invalidateQueries({ queryKey: ["account", userId] });
+      await cache.invalidateQueries({ queryKey: ["saved-plugins", userId] });
       toast.success("Changes saved");
     },
     onError: (e) => toast.error(message(e)),
