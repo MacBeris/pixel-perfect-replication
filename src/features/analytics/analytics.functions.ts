@@ -29,7 +29,7 @@ export const recordPluginInteraction = createServerFn({ method: "POST" })
     const { data: result, error } = await db.rpc("record_plugin_interaction", {
       _plugin_id: data.pluginId,
       _event_type: data.type,
-      _actor: actor,
+      _actor: actor as string,
       _session_hash: sessionHash,
     });
     if (error) throw new Error(error.message);

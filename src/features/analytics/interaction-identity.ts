@@ -1,6 +1,6 @@
 import { supabase } from "@/integrations/supabase/client";
 
-const visitorKey = "extendly.analytics.visitor.v1";
+const visitorKey = "extendshare.analytics.visitor.v1";
 
 export function analyticsVisitorId() {
   try {

@@ -33,6 +33,7 @@ import {
   saveCatalogItem,
   updateAdminWorkflow,
 } from "@/features/admin/admin.functions";
+import { getAdminSiteAnalytics } from "@/features/analytics/site-analytics.functions";
 
 export const Route = createFileRoute("/admin")({
   component: AdminPage,
@@ -852,24 +853,160 @@ function Marketplace({ dashboard }: { dashboard: DashboardData }) {
 }
 
 function Analytics({ dashboard }: { dashboard: DashboardData }) {
-  const entries = Object.entries(dashboard.metrics.analyticsByType) as Array<[string, number]>;
+  void dashboard;
+  const { session } = useAuth();
+  const [range, setRange] = useState<"5m" | "30m" | "24h" | "7d" | "30d">("24h");
+  const [data, setData] = useState<any>(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (!session?.access_token) return;
+    let active = true;
+    const loadTraffic = (showLoader: boolean) => {
+      if (showLoader) setLoading(true);
+      setError(null);
+      getAdminSiteAnalytics({ data: { accessToken: session.access_token, range } })
+        .then((result) => active && setData(result))
+        .catch((reason) => {
+          if (active)
+            setError(reason instanceof Error ? reason.message : "Unable to load analytics.");
+        })
+        .finally(() => active && setLoading(false));
+    };
+    loadTraffic(true);
+    const live = range === "5m" || range === "30m";
+    const interval = live ? window.setInterval(() => loadTraffic(false), 15_000) : undefined;
+    return () => {
+      active = false;
+      if (interval) window.clearInterval(interval);
+    };
+  }, [range, session?.access_token]);
+
+  const ranges = [
+    ["5m", "Live · 5 min"],
+    ["30m", "Live · 30 min"],
+    ["24h", "24h"],
+    ["7d", "7 days"],
+    ["30d", "30 days"],
+  ] as const;
+  const live = range === "5m" || range === "30m";
+
   return (
     <div className="space-y-6">
-      <div>
-        <h2 className="text-xl font-semibold">Marketplace analytics</h2>
-        <p className="text-sm text-muted-foreground">
-          Counts are based on recorded plugin analytics events.
-        </p>
+      <div className="flex flex-wrap items-end justify-between gap-4">
+        <div>
+          <h2 className="text-xl font-semibold">Traffic analytics</h2>
+          <p className="text-sm text-muted-foreground">
+            Privacy-preserving first-party traffic. Bots, technical requests and signed-in admins
+            are excluded.
+          </p>
+        </div>
+        <div className="flex flex-wrap gap-2" aria-label="Analytics range">
+          {ranges.map(([value, label]) => (
+            <Button
+              key={value}
+              type="button"
+              size="sm"
+              variant={range === value ? "default" : "outline"}
+              onClick={() => setRange(value)}
+            >
+              {label}
+            </Button>
+          ))}
+        </div>
       </div>
-      <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
-        {entries.map(([type, count]) => (
-          <Metric key={type} label={type.replaceAll("_", " ")} value={count} />
+
+      {loading && (
+        <div className="flex items-center gap-2 rounded-xl border border-border bg-card p-5 text-sm text-muted-foreground">
+          <Loader2 className="h-4 w-4 animate-spin" /> Loading traffic data…
+        </div>
+      )}
+      {error && <Empty>{error}</Empty>}
+      {!loading && !error && data && (
+        <>
+          <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-5">
+            <Metric
+              label={live ? "Active users" : "Unique visitors"}
+              value={data.uniqueVisitors ?? 0}
+            />
+            <Metric label="Page views" value={data.pageViews ?? 0} />
+            <Metric
+              label="Sessions"
+              value={data.sessions ?? 0}
+              detail="30 min inactivity timeout"
+            />
+            <Metric
+              label="Pages per session"
+              value={Number(data.pagesPerSession ?? 0).toFixed(2)}
+            />
+            <Metric label="Excluded bot traffic" value={data.excludedBotTraffic ?? 0} />
+          </div>
+
+          <div className="grid gap-4 xl:grid-cols-3">
+            <AnalyticsList
+              title={live ? "Pages being viewed" : "Top pages"}
+              rows={(data.topPages ?? []).map((item: any) => ({
+                label: item.path,
+                value: item.views,
+                href: item.path,
+              }))}
+            />
+            <AnalyticsList
+              title={live ? "Plugins being viewed" : "Top plugin pages"}
+              rows={(data.topPlugins ?? []).map((item: any) => ({
+                label: item.name,
+                value: item.views,
+                href: `/plugins/${item.slug}`,
+              }))}
+            />
+            <AnalyticsList
+              title="Traffic sources / referrers"
+              rows={(data.referrers ?? []).map((item: any) => ({
+                label: item.source,
+                value: item.views,
+              }))}
+            />
+          </div>
+        </>
+      )}
+    </div>
+  );
+}
+
+function AnalyticsList({
+  title,
+  rows,
+}: {
+  title: string;
+  rows: Array<{ label: string; value: number; href?: string }>;
+}) {
+  return (
+    <section className="min-w-0 rounded-xl border border-border bg-card p-5 shadow-sm">
+      <h3 className="font-semibold">{title}</h3>
+      <div className="mt-4 space-y-3">
+        {rows.map((row, index) => (
+          <div
+            key={`${row.label}-${index}`}
+            className="flex min-w-0 items-center justify-between gap-4 text-sm"
+          >
+            {row.href ? (
+              <a className="truncate text-foreground hover:underline" href={row.href}>
+                {row.label}
+              </a>
+            ) : (
+              <span className="truncate text-foreground">{row.label}</span>
+            )}
+            <span className="shrink-0 tabular-nums text-muted-foreground">{row.value}</span>
+          </div>
         ))}
-        {!entries.length && (
-          <Empty>Analytics will appear as users browse, save and download plugins.</Empty>
+        {!rows.length && (
+          <p className="text-sm text-muted-foreground">
+            No human page views recorded in this period.
+          </p>
         )}
       </div>
-    </div>
+    </section>
   );
 }
 
