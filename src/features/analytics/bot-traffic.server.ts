@@ -23,15 +23,16 @@ export async function recordExcludedBotPageRequest(request: Request, rawEnv: unk
   if (!reason) return;
 
   const env = rawEnv as WorkerEnv;
-  if (!env.SUPABASE_URL || !env.SUPABASE_SERVICE_ROLE_KEY) return;
-  const key = env.SUPABASE_SERVICE_ROLE_KEY;
+  const supabaseUrl = env?.SUPABASE_URL ?? process.env["SUPABASE_URL"];
+  const key = env?.SUPABASE_SERVICE_ROLE_KEY ?? process.env["SUPABASE_SERVICE_ROLE_KEY"];
+  if (!supabaseUrl || !key) return;
   const headers = new Headers({
     apikey: key,
     "content-type": "application/json",
     prefer: "return=minimal",
   });
   if (!key.startsWith("sb_secret_")) headers.set("authorization", `Bearer ${key}`);
-  const response = await fetch(`${env.SUPABASE_URL}/rest/v1/site_analytics_events`, {
+  const response = await fetch(`${supabaseUrl}/rest/v1/site_analytics_events`, {
     method: "POST",
     headers,
     body: JSON.stringify({ event_kind: "excluded_bot", path, excluded_reason: reason }),
