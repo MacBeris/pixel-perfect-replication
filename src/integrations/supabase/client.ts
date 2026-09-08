@@ -8,7 +8,7 @@ function isNewSupabaseApiKey(value: string): boolean {
 }
 
 function createSupabaseFetch(supabaseKey: string): typeof fetch {
-  return (input, init) => {
+  return async (input, init) => {
     const headers = new Headers(
       typeof Request !== 'undefined' && input instanceof Request ? input.headers : undefined,
     );
@@ -23,7 +23,21 @@ function createSupabaseFetch(supabaseKey: string): typeof fetch {
     }
 
     headers.set('apikey', supabaseKey);
-    return fetch(input, { ...init, headers });
+
+    // A stalled network request otherwise leaves React Query in a loading state
+    // indefinitely. Abort it so the normal retry/error UI can recover.
+    const controller = new AbortController();
+    const timeout = setTimeout(() => controller.abort(), 12_000);
+    const sourceSignal = init?.signal;
+    const abortFromSource = () => controller.abort(sourceSignal?.reason);
+    sourceSignal?.addEventListener('abort', abortFromSource, { once: true });
+
+    try {
+      return await fetch(input, { ...init, headers, signal: controller.signal });
+    } finally {
+      clearTimeout(timeout);
+      sourceSignal?.removeEventListener('abort', abortFromSource);
+    }
   };
 }
 
@@ -66,4 +80,3 @@ export const supabase = new Proxy({} as ReturnType<typeof createSupabaseClient>,
     return Reflect.get(_supabase, prop, receiver);
   },
 });
-

@@ -1,6 +1,7 @@
 import { Link } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { ArrowRight } from "lucide-react";
+import { Button } from "@/components/ui/button";
 import { PluginGrid } from "@/features/plugins/plugin-grid";
 import { fetchPlugins, type PluginQuery } from "@/services/catalog";
 import { t } from "@/lib/i18n";
@@ -14,7 +15,7 @@ type Props = {
 };
 
 export function PluginSection({ title, description, query, queryKey, viewAllSearch }: Props) {
-  const { data, isLoading } = useQuery({
+  const { data, error, isLoading, isFetching, refetch } = useQuery({
     queryKey: ["plugins", queryKey],
     queryFn: () => fetchPlugins({ limit: 4, ...query }),
   });
@@ -36,7 +37,23 @@ export function PluginSection({ title, description, query, queryKey, viewAllSear
       </div>
 
       <div className="mt-6">
-        <PluginGrid plugins={data ?? []} isLoading={isLoading} emptyMessage="No plugins published here yet." />
+        {error ? (
+          <div className="rounded-xl border border-dashed border-border bg-surface p-8 text-center">
+            <p className="text-sm font-medium text-foreground">Plugins could not be loaded.</p>
+            <p className="mt-1 text-sm text-muted-foreground">Check your connection and try again.</p>
+            <Button
+              variant="outline"
+              size="sm"
+              className="mt-4"
+              disabled={isFetching}
+              onClick={() => void refetch()}
+            >
+              {isFetching ? "Retrying…" : "Try again"}
+            </Button>
+          </div>
+        ) : (
+          <PluginGrid plugins={data ?? []} isLoading={isLoading} emptyMessage="No plugins published here yet." />
+        )}
       </div>
     </section>
   );
