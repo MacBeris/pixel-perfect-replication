@@ -11,7 +11,7 @@ export function Wordmark({ className }: { className?: string }) {
       )}
       aria-label="ExtendShare home"
     >
-      Extend<span className="text-primary">ly</span>
+      Extend<span className="text-primary">Share</span>
     </Link>
   );
 }
