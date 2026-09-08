@@ -2,7 +2,7 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { Panel } from "@/features/dashboard/ui";
 import { Button } from "@/components/ui/button";
 export const Route = createFileRoute("/publishing-requirements")({
-  head: () => ({ meta: [{ title: "Publishing requirements — Extendly" }] }),
+  head: () => ({ meta: [{ title: "Publishing requirements — ExtendShare" }] }),
   component: () => (
     <div className="container-page max-w-3xl py-12">
       <Panel

@@ -17,7 +17,7 @@ import { fieldClass } from "@/features/dashboard/ui";
 export const Route = createFileRoute("/_authenticated/dashboard")({
   validateSearch: searchSchema,
   head: () => ({
-    meta: [{ title: "Your dashboard — Extendly" }, { name: "robots", content: "noindex,nofollow" }],
+    meta: [{ title: "Your dashboard — ExtendShare" }, { name: "robots", content: "noindex,nofollow" }],
   }),
   component: Dashboard,
 });

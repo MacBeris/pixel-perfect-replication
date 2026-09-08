@@ -5,11 +5,11 @@
 
 export const messages = {
   en: {
-    "brand.name": "Extendly",
+    "brand.name": "ExtendShare",
     "nav.explore": "Explore plugins",
     "nav.platforms": "Platforms",
     "nav.categories": "Categories",
-    "nav.sell": "Sell on Extendly",
+    "nav.sell": "Sell on ExtendShare",
     "nav.signIn": "Sign in",
     "nav.signOut": "Sign out",
     "nav.account": "Account",

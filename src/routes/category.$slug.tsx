@@ -6,10 +6,10 @@ import { fetchCategories, fetchPlugins } from "@/services/catalog";
 export const Route = createFileRoute("/category/$slug")({
   head: ({ params }) => ({
     meta: [
-      { title: `${params.slug} plugins by category — Extendly` },
-      { name: "description", content: `Browse ${params.slug} plugins, extensions and add-ons on Extendly.` },
-      { property: "og:title", content: `${params.slug} plugins — Extendly` },
-      { property: "og:description", content: `Browse the ${params.slug} category on Extendly.` },
+      { title: `${params.slug} plugins by category — ExtendShare` },
+      { name: "description", content: `Browse ${params.slug} plugins, extensions and add-ons on ExtendShare.` },
+      { property: "og:title", content: `${params.slug} plugins — ExtendShare` },
+      { property: "og:description", content: `Browse the ${params.slug} category on ExtendShare.` },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
     ],

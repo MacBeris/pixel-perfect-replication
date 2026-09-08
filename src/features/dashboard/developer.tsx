@@ -112,7 +112,7 @@ export function DeveloperSection({ userId, search }: { userId: string; search: D
         />
       );
     return (
-      <Panel title="Become a Developer" description="Give your creative work a home on Extendly.">
+      <Panel title="Become a Developer" description="Give your creative work a home on ExtendShare.">
         <div className="grid gap-6 md:grid-cols-[1fr_auto]">
           <div>
             <p className="max-w-xl text-sm leading-relaxed text-muted-foreground">
@@ -383,8 +383,8 @@ function DeveloperAnalytics({
                   ? [
                       { label: "Total views", value: d.totals.views },
                       { label: "External clicks", value: d.history.outbound_clicks },
-                      { label: "Extendly rating", value: d.totals.rating ?? "Not rated" },
-                      { label: "Extendly reviews", value: d.totals.reviews },
+                      { label: "ExtendShare rating", value: d.totals.rating ?? "Not rated" },
+                      { label: "ExtendShare reviews", value: d.totals.reviews },
                     ]
                   : [
                     { label: "Total downloads", value: d.totals.downloads },
@@ -728,7 +728,7 @@ function DeveloperAnalytics({
 function DetailReviews({ data }: { data: Analytics }) {
   const reviews = data.detail?.reviews ?? [];
   return (
-    <Panel title="Latest reviews" description="The most recent feedback from Extendly users.">
+    <Panel title="Latest reviews" description="The most recent feedback from ExtendShare users.">
       {!reviews.length ? (
         <Empty>No reviews yet.</Empty>
       ) : (

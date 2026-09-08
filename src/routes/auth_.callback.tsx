@@ -24,7 +24,7 @@ export const Route = createFileRoute("/auth_/callback")({
     error_description:
       typeof search["error_description"] === "string" ? search["error_description"] : undefined,
   }),
-  head: () => ({ meta: [{ title: "Confirming your account — Extendly" }] }),
+  head: () => ({ meta: [{ title: "Confirming your account — ExtendShare" }] }),
   component: AuthCallback,
 });
 
@@ -95,10 +95,10 @@ function AuthCallback() {
             <CheckCircle2 className="mx-auto mt-8 size-11 text-primary" />
             <h1 className="mt-5 text-2xl font-semibold">You’re signed in</h1>
             <p role="status" className="mt-2 text-sm leading-relaxed text-muted-foreground">
-              Your email has been confirmed and your Extendly account is ready.
+              Your email has been confirmed and your ExtendShare account is ready.
             </p>
             <Button className="mt-7 w-full" onClick={() => window.location.assign(search.next)}>
-              Return to Extendly
+              Return to ExtendShare
             </Button>
           </>
         ) : (

@@ -8,13 +8,13 @@ import { t } from "@/lib/i18n";
 export const Route = createFileRoute("/")({
   head: () => ({
     meta: [
-      { title: "Extendly — Plugins, extensions and add-ons marketplace" },
+      { title: "ExtendShare — Plugins, extensions and add-ons marketplace" },
       {
         name: "description",
         content:
           "Discover, buy and sell plugins, extensions and add-ons for WordPress, Blender, Unity, Figma, VS Code, Chrome, Shopify and more.",
       },
-      { property: "og:title", content: "Extendly — Extend what your tools can do" },
+      { property: "og:title", content: "ExtendShare — Extend what your tools can do" },
       {
         property: "og:description",
         content: "A marketplace for plugins, extensions and add-ons across 10 creative and developer platforms.",

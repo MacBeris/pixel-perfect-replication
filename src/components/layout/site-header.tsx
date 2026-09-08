@@ -172,7 +172,7 @@ export function SiteHeader() {
               </Button>
             </SheetTrigger>
             <SheetContent side="right" className="w-80">
-              <SheetTitle className="font-display">Extendly</SheetTitle>
+              <SheetTitle className="font-display">ExtendShare</SheetTitle>
               <form onSubmit={submitSearch} className="mt-4">
                 <Input
                   value={query}

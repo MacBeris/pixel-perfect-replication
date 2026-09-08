@@ -1,4 +1,4 @@
-# Extendly — plan dalszej rozbudowy
+# ExtendShare — plan dalszej rozbudowy
 
 Plan wynika z audytu obecnego stanu: baza danych, RLS, moderacja i katalog publiczny są gotowe, natomiast brakuje całej ścieżki „użytkownik → developer → publikacja wtyczki → pliki → sprzedaż" oraz zarządzania kontem.
 

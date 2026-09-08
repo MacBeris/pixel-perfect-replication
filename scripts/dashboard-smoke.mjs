@@ -14,7 +14,7 @@ const failures = [];
 page.on("pageerror", (e) => failures.push(e.message));
 try {
   await page.goto(`${base}/dashboard?tab=developer`);
-  await page.getByRole("heading", { name: "Welcome to Extendly" }).waitFor();
+  await page.getByRole("heading", { name: "Welcome to ExtendShare" }).waitFor();
   assert.match(page.url(), /next=/);
   await page.getByLabel("Email", { exact: true }).fill(credentials.email);
   await page.getByLabel("Password", { exact: true }).fill(credentials.password);
@@ -94,7 +94,7 @@ try {
   await page.getByRole("button", { name: "Account", exact: true }).click();
   await page.getByRole("menuitem", { name: "Sign out", exact: true }).click();
   await page.goto(`${base}/dashboard?tab=developer`);
-  await page.getByRole("heading", { name: "Welcome to Extendly" }).waitFor();
+  await page.getByRole("heading", { name: "Welcome to ExtendShare" }).waitFor();
   assert.deepEqual(failures, []);
   console.log(
     "PASS: authenticated redirects, onboarding, avatar upload, evidence, profile edit, all account tabs, collections, public profile, mobile layout, aliases and logout.",

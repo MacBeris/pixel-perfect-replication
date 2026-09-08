@@ -30,7 +30,7 @@ export function authErrorMessage(error: unknown): string {
     case "validation_failed":
       return "Check your email address and password, then try again.";
     case "email_address_not_authorized":
-      return "Email delivery is not available for this address yet. Please contact Extendly support.";
+      return "Email delivery is not available for this address yet. Please contact ExtendShare support.";
     case "over_email_send_rate_limit":
       return "We cannot send another email right now. If you already have an account, use Sign in. Otherwise, try again later.";
     case "over_request_rate_limit":
@@ -45,7 +45,7 @@ export function authErrorMessage(error: unknown): string {
     case "signup_disabled":
       return "New registrations are temporarily unavailable. Existing accounts can still sign in.";
     case "user_banned":
-      return "Sign-in is unavailable for this account. Please contact Extendly support.";
+      return "Sign-in is unavailable for this account. Please contact ExtendShare support.";
   }
   if (value.status === 429)
     return "Too many requests in a short time. Wait a little before trying again. Your entries have been kept.";

@@ -569,7 +569,7 @@ function EditorForm({
                     setForm({ ...form, listing_type: e.target.value as typeof form.listing_type })
                   }
                 >
-                  <option value="direct_sale">Hosted on Extendly</option>
+                  <option value="direct_sale">Hosted on ExtendShare</option>
                   <option value="external_listing">External listing</option>
                 </select>
               </label>

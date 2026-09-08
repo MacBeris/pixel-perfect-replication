@@ -48,7 +48,7 @@ export function SiteFooter() {
       </div>
       <div className="border-t border-border">
         <div className="container-page flex flex-col gap-2 py-6 text-xs text-muted-foreground sm:flex-row sm:items-center sm:justify-between">
-          <span>© {new Date().getFullYear()} Extendly</span>
+          <span>© {new Date().getFullYear()} ExtendShare</span>
           <span>Built for creators of plugins, extensions and add-ons.</span>
         </div>
       </div>

@@ -1,6 +1,6 @@
 # External plugin ingestion
 
-Extendly imports trusted marketplace listings into the existing `plugins` table. Imported rows are
+ExtendShare imports trusted marketplace listings into the existing `plugins` table. Imported rows are
 `external_listing`, have no developer owner, and are claimable. The source payload is retained in
 `raw_source_items`; each CLI execution is summarized in `import_runs`.
 
@@ -35,12 +35,12 @@ available, the first screenshot becomes the cover. Up to 10 screenshots are stor
 `ps.w.org` URLs and shown by the existing gallery. Blender's v1 JSON index has no media fields, so
 the Blender adapter additionally reads each listing's official `extensions.blender.org` page and
 accepts only same-origin `/media/` icon, Open Graph cover and thumbnail URLs. It never imports image
-URLs embedded by third-party descriptions. Images remain remote URLs; archives are never copied to Extendly Storage.
-External ratings and installs are stored separately from Extendly reviews and downloads.
+URLs embedded by third-party descriptions. Images remain remote URLs; archives are never copied to ExtendShare Storage.
+External ratings and installs are stored separately from ExtendShare reviews and downloads.
 
 Chrome Web Store and Shopify App Store adapters are deliberate stubs. Both require a separate source
 and terms review: their storefronts can change, expose incomplete public data, and may enforce bot
-controls. Extendly will not bypass CAPTCHAs, Cloudflare or anti-automation controls.
+controls. ExtendShare will not bypass CAPTCHAs, Cloudflare or anti-automation controls.
 
 ## Updates, claims and availability
 

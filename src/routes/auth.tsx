@@ -17,16 +17,16 @@ export const Route = createFileRoute("/auth")({
   }),
   head: () => ({
     meta: [
-      { title: "Sign in or create an account — Extendly" },
+      { title: "Sign in or create an account — ExtendShare" },
       {
         name: "description",
         content:
-          "Sign in to Extendly to buy plugins, manage your library, or publish extensions as a developer.",
+          "Sign in to ExtendShare to buy plugins, manage your library, or publish extensions as a developer.",
       },
-      { property: "og:title", content: "Sign in or create an account — Extendly" },
+      { property: "og:title", content: "Sign in or create an account — ExtendShare" },
       {
         property: "og:description",
-        content: "Access your Extendly library, favorites and developer dashboard.",
+        content: "Access your ExtendShare library, favorites and developer dashboard.",
       },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },

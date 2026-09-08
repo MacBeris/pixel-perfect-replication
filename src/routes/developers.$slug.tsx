@@ -9,7 +9,7 @@ import { Button } from "@/components/ui/button";
 import { useState } from "react";
 export const Route = createFileRoute("/developers/$slug")({
   ssr: false,
-  head: () => ({ meta: [{ title: "Developer profile — Extendly" }] }),
+  head: () => ({ meta: [{ title: "Developer profile — ExtendShare" }] }),
   component: DeveloperPage,
 });
 function DeveloperPage() {

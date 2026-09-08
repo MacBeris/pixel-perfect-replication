@@ -71,7 +71,7 @@ export function PluginReviews({
       </div>
       {!user ? (
         <p className="mt-6 text-sm text-muted-foreground">
-          Sign in and download through Extendly to leave a rating.
+          Sign in and download through ExtendShare to leave a rating.
         </p>
       ) : access.isPending ? (
         <p className="mt-6 text-sm text-muted-foreground">Checking review eligibility…</p>
@@ -92,7 +92,7 @@ export function PluginReviews({
         <p className="mt-6 rounded-xl border bg-secondary/30 p-5 text-sm text-muted-foreground">
           {access.data?.own && access.data.own.status !== "active"
             ? "Your review is under moderation and cannot be edited here."
-            : "Hosted plugins can be rated after downloading through Extendly. External listings require an existing purchase; visiting an external platform does not count as a download. Authors cannot review their own plugins."}
+            : "Hosted plugins can be rated after downloading through ExtendShare. External listings require an existing purchase; visiting an external platform does not count as a download. Authors cannot review their own plugins."}
         </p>
       )}
       <div className="mt-7 space-y-4">

@@ -9,7 +9,7 @@ export function Wordmark({ className }: { className?: string }) {
         "font-display text-lg font-semibold tracking-tight text-foreground transition-opacity hover:opacity-80",
         className,
       )}
-      aria-label="Extendly home"
+      aria-label="ExtendShare home"
     >
       Extend<span className="text-primary">ly</span>
     </Link>

@@ -72,7 +72,7 @@ export const blenderAdapter: SourceAdapter<BlenderExtension> = {
   async *fetchList(http: HttpClient, options: FetchOptions) {
     const index = await getIndex(http);
     // The official v1 index can contain separate package variants for one extension ID.
-    // Extendly's external identity is that ID, so only emit the first (current) variant.
+    // ExtendShare's external identity is that ID, so only emit the first (current) variant.
     const emittedIds = new Set<string>();
     let emitted = 0;
     for (const item of index.data) {

@@ -14,7 +14,7 @@ try {
   await page.waitForURL("**/dashboard**");
   await page.goto(base + "/auth/callback?next=%2Fdashboard%3Ftab%3Dsettings");
   await page.getByRole("heading", { name: "You’re signed in", exact: true }).waitFor();
-  await page.getByRole("button", { name: "Return to Extendly", exact: true }).click();
+  await page.getByRole("button", { name: "Return to ExtendShare", exact: true }).click();
   await page.waitForURL("**/dashboard?tab=settings*");
   assert.ok(await page.getByLabel("username", { exact: false }).inputValue());
   assert.ok(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth));

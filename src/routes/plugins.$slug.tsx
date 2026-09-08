@@ -12,12 +12,12 @@ import { PublicPluginView } from "@/features/analytics/plugin-interactions";
 export const Route = createFileRoute("/plugins/$slug")({
   head: ({ params }) => ({
     meta: [
-      { title: `${params.slug} — plugin on Extendly` },
+      { title: `${params.slug} — plugin on ExtendShare` },
       {
         name: "description",
-        content: `Details, pricing, versions and reviews for ${params.slug} on Extendly.`,
+        content: `Details, pricing, versions and reviews for ${params.slug} on ExtendShare.`,
       },
-      { property: "og:title", content: `${params.slug} — plugin on Extendly` },
+      { property: "og:title", content: `${params.slug} — plugin on ExtendShare` },
       {
         property: "og:description",
         content: `Details, pricing, versions and reviews for ${params.slug}.`,
@@ -138,7 +138,7 @@ function PluginDetail() {
           <Star className="size-4 fill-warning text-warning" />
           {data.reviews_count ? data.rating_average.toFixed(1) : data.source_rating_average !== null ? Number(data.source_rating_average).toFixed(1) : "No ratings"}
           <span className="text-muted-foreground">
-            · {data.reviews_count || data.source_ratings_count || 0} {data.reviews_count ? "Extendly reviews" : data.source_ratings_count ? `${data.source} ratings` : "reviews"}
+            · {data.reviews_count || data.source_ratings_count || 0} {data.reviews_count ? "ExtendShare reviews" : data.source_ratings_count ? `${data.source} ratings` : "reviews"}
           </span>
         </a>
         <span className="inline-flex items-center gap-2 rounded-lg border bg-card px-3 py-2">

@@ -1,4 +1,4 @@
-# Extendly analytics
+# ExtendShare analytics
 
 ## Metric definitions
 
@@ -6,9 +6,9 @@
   previews, administrators, unpublished/removed plugins and dashboard reads are excluded.
 - **Download**: access to a hosted ZIP was authorized and a signed URL was issued. Owner and
   administrator test downloads are excluded.
-- **External click**: Extendly authorized navigation from an external listing to its canonical
+- **External click**: ExtendShare authorized navigation from an external listing to its canonical
   marketplace URL. It is not a download and never changes `downloads_count`.
-- **Rating / reviews**: aggregates of `active` Extendly reviews only. Imported source ratings,
+- **Rating / reviews**: aggregates of `active` ExtendShare reviews only. Imported source ratings,
   installs and downloads stay in the separate `source_*` fields.
 
 ## Data flow

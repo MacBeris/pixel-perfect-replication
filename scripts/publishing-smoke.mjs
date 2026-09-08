@@ -26,7 +26,7 @@ page.on("pageerror", (e) => errors.push(e.message));
 page.setDefaultTimeout(20000);
 function zip() {
   const name = Buffer.from("README.txt"),
-    body = Buffer.from("Extendly publishing test\n");
+    body = Buffer.from("ExtendShare publishing test\n");
   let crc = 0xffffffff;
   for (const b of body) {
     crc ^= b;

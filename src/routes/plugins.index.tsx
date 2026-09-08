@@ -34,16 +34,16 @@ export const Route = createFileRoute("/plugins/")({
   }),
   head: () => ({
     meta: [
-      { title: "Explore plugins and extensions — Extendly" },
+      { title: "Explore plugins and extensions — ExtendShare" },
       {
         name: "description",
         content:
-          "Search and filter plugins, extensions and add-ons by platform, category, pricing, license and rating on Extendly.",
+          "Search and filter plugins, extensions and add-ons by platform, category, pricing, license and rating on ExtendShare.",
       },
-      { property: "og:title", content: "Explore plugins and extensions — Extendly" },
+      { property: "og:title", content: "Explore plugins and extensions — ExtendShare" },
       {
         property: "og:description",
-        content: "Search the Extendly catalog by platform, pricing, license and rating.",
+        content: "Search the ExtendShare catalog by platform, pricing, license and rating.",
       },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },

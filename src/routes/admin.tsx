@@ -36,7 +36,7 @@ import {
 
 export const Route = createFileRoute("/admin")({
   component: AdminPage,
-  head: () => ({ meta: [{ title: "Admin — Extendly" }] }),
+  head: () => ({ meta: [{ title: "Admin — ExtendShare" }] }),
 });
 
 type Section =
@@ -234,7 +234,7 @@ function AdminPage() {
           <div className="flex items-center gap-2 text-sm text-primary">
             <ShieldCheck className="size-4" /> Administration
           </div>
-          <h1 className="mt-2 text-3xl font-semibold tracking-tight">Extendly control center</h1>
+          <h1 className="mt-2 text-3xl font-semibold tracking-tight">ExtendShare control center</h1>
           <p className="mt-2 text-sm text-muted-foreground">
             Moderate the marketplace, protect its community and manage its catalog.
           </p>

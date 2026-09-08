@@ -1,4 +1,4 @@
-# Extendly — plan architektury i wdrożenia
+# ExtendShare — plan architektury i wdrożenia
 
 Marketplace pluginów/rozszerzeń dla 10 platform (WordPress, Blender, Unity, Adobe, Figma, VS Code, Chrome, Shopify, Unreal Engine 5, PrestaShop).
 
