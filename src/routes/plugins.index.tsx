@@ -15,6 +15,7 @@ import { PluginGrid } from "@/features/plugins/plugin-grid";
 import { fetchPlatforms, fetchPlugins } from "@/services/catalog";
 import type { PluginSort } from "@/types/catalog";
 import { t } from "@/lib/i18n";
+import { siteUrl } from "@/lib/site";
 
 type PluginSearch = {
   q?: string | undefined;
@@ -46,8 +47,10 @@ export const Route = createFileRoute("/plugins/")({
         content: "Search the ExtendShare catalog by platform, pricing, license and rating.",
       },
       { property: "og:type", content: "website" },
+      { property: "og:url", content: siteUrl("/plugins") },
       { name: "twitter:card", content: "summary_large_image" },
     ],
+    links: [{ rel: "canonical", href: siteUrl("/plugins") }],
   }),
   component: PluginsPage,
 });

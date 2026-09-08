@@ -2,6 +2,7 @@ import { createFileRoute } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { PluginGrid } from "@/features/plugins/plugin-grid";
 import { fetchPlatforms, fetchPlugins } from "@/services/catalog";
+import { siteUrl } from "@/lib/site";
 
 export const Route = createFileRoute("/platform/$slug")({
   head: ({ params }) => ({
@@ -11,8 +12,10 @@ export const Route = createFileRoute("/platform/$slug")({
       { property: "og:title", content: `${params.slug} plugins — ExtendShare` },
       { property: "og:description", content: `Browse the ${params.slug} catalog on ExtendShare.` },
       { property: "og:type", content: "website" },
+      { property: "og:url", content: siteUrl(`/platform/${params.slug}`) },
       { name: "twitter:card", content: "summary_large_image" },
     ],
+    links: [{ rel: "canonical", href: siteUrl(`/platform/${params.slug}`) }],
   }),
   component: PlatformPage,
 });

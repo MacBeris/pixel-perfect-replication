@@ -4,6 +4,7 @@ import { PlatformGrid } from "@/features/home/platform-grid";
 import { PluginSection } from "@/features/home/plugin-section";
 import { CategoryGrid } from "@/features/home/category-grid";
 import { t } from "@/lib/i18n";
+import { SITE_URL } from "@/lib/site";
 
 export const Route = createFileRoute("/")({
   head: () => ({
@@ -20,8 +21,10 @@ export const Route = createFileRoute("/")({
         content: "A marketplace for plugins, extensions and add-ons across 10 creative and developer platforms.",
       },
       { property: "og:type", content: "website" },
+      { property: "og:url", content: SITE_URL },
       { name: "twitter:card", content: "summary_large_image" },
     ],
+    links: [{ rel: "canonical", href: SITE_URL }],
   }),
   component: Index,
 });

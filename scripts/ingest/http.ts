@@ -36,7 +36,7 @@ export class SafeHttpClient implements HttpClient {
             signal: controller.signal,
             headers: {
               Accept: "application/json",
-              "User-Agent": "ExtendShareImporter/0.1 (+https://pixel-perfect-replication.praktykimaciej.workers.dev)",
+              "User-Agent": "ExtendShareImporter/0.1 (+https://extendshare.com)",
               ...init.headers,
             },
           });
@@ -69,7 +69,7 @@ export class SafeHttpClient implements HttpClient {
             signal: controller.signal,
             headers: {
               Accept: "text/html,application/xhtml+xml",
-              "User-Agent": "ExtendShareImporter/0.1 (+https://pixel-perfect-replication.praktykimaciej.workers.dev)",
+              "User-Agent": "ExtendShareImporter/0.1 (+https://extendshare.com)",
               ...init.headers,
             },
           });

@@ -7,9 +7,16 @@ import { Busy, Empty, Failure, Panel } from "@/features/dashboard/ui";
 import { PluginGrid } from "@/features/plugins/plugin-grid";
 import { Button } from "@/components/ui/button";
 import { useState } from "react";
+import { siteUrl } from "@/lib/site";
 export const Route = createFileRoute("/developers/$slug")({
   ssr: false,
-  head: () => ({ meta: [{ title: "Developer profile — ExtendShare" }] }),
+  head: ({ params }) => ({
+    meta: [
+      { title: `${params.slug} — developer on ExtendShare` },
+      { property: "og:url", content: siteUrl(`/developers/${params.slug}`) },
+    ],
+    links: [{ rel: "canonical", href: siteUrl(`/developers/${params.slug}`) }],
+  }),
   component: DeveloperPage,
 });
 function DeveloperPage() {

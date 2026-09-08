@@ -9,6 +9,7 @@ import { PluginReviews } from "@/features/reviews/plugin-reviews";
 import { Download, Star } from "lucide-react";
 import { PublicPluginView } from "@/features/analytics/plugin-interactions";
 import { PluginFavoriteAction } from "@/features/plugins/plugin-favorite-action";
+import { siteUrl } from "@/lib/site";
 
 export const Route = createFileRoute("/plugins/$slug")({
   head: ({ params }) => ({
@@ -24,8 +25,10 @@ export const Route = createFileRoute("/plugins/$slug")({
         content: `Details, pricing, versions and reviews for ${params.slug}.`,
       },
       { property: "og:type", content: "website" },
+      { property: "og:url", content: siteUrl(`/plugins/${params.slug}`) },
       { name: "twitter:card", content: "summary_large_image" },
     ],
+    links: [{ rel: "canonical", href: siteUrl(`/plugins/${params.slug}`) }],
   }),
   component: PluginDetail,
 });
