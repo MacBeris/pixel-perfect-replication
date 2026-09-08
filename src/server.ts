@@ -52,7 +52,8 @@ export default {
       const botMetric = recordExcludedBotPageRequest(request, env).catch((error) =>
         console.error("[Analytics]", error),
       );
-      executionContext?.waitUntil?.(botMetric);
+      if (executionContext?.waitUntil) executionContext.waitUntil(botMetric);
+      else await botMetric;
       const handler = await getServerEntry();
       const response = await handler.fetch(request, env, ctx);
       return await normalizeCatastrophicSsrResponse(response);
