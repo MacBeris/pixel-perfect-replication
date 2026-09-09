@@ -16,6 +16,13 @@ function plainText(value: string) {
   return value.replace(/\s+/g, " ").trim();
 }
 
+function truncateWords(value: string, limit: number) {
+  const clean = plainText(value);
+  if (clean.length <= limit) return clean;
+  const shortened = clean.slice(0, Math.max(0, limit - 1));
+  return `${shortened.replace(/\s+\S*$/, "").replace(/[.,;:!?\s]+$/, "")}…`;
+}
+
 function pluginDescription(plugin: {
   name: string;
   short_description: string;
@@ -25,14 +32,14 @@ function pluginDescription(plugin: {
 }) {
   const platform = plugin.platform?.name ?? "your platform";
   const compatibility = plugin.compatibility
-    ? ` Compatible with ${plainText(plugin.compatibility)}.`
+    ? ` Compatible with ${truncateWords(plugin.compatibility, 38)}.`
     : "";
   const source = plugin.source
-    ? ` Find its official ${plugin.source} source and download link on ExtendShare.`
-    : " Discover details, ratings and download information on ExtendShare.";
-  return plainText(
-    `${plugin.name} for ${platform}. ${plugin.short_description}.${compatibility}${source}`,
-  ).slice(0, 165);
+    ? ` Official ${plugin.source} source and download link.`
+    : " Download information on ExtendShare.";
+  const prefix = `${plugin.name} for ${platform}.${compatibility}${source}`;
+  const remaining = Math.max(0, 165 - prefix.length - 1);
+  return `${prefix} ${truncateWords(plugin.short_description, remaining)}`.trim();
 }
 
 export const Route = createFileRoute("/plugins/$slug")({
