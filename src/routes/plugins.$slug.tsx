@@ -103,10 +103,12 @@ function PluginNotFound() {
 
 function PluginDetail() {
   const { slug } = Route.useParams();
+  const loaderData = Route.useLoaderData();
   const { user, loading } = useAuth();
   const { data, isLoading, error } = useQuery({
     queryKey: ["account", user?.id ?? "public", "plugin", slug],
     enabled: !loading,
+    initialData: loaderData.public ? loaderData.plugin : undefined,
     queryFn: async () => {
       const { data, error } = await supabase
         .from("plugins")
