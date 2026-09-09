@@ -34,8 +34,14 @@ function pluginDescription(plugin: {
   const compatibility = plugin.compatibility
     ? ` Compatibility: ${truncateWords(plugin.compatibility, 38)}.`
     : "";
+  const sourceName =
+    plugin.source === "wordpress"
+      ? "WordPress"
+      : plugin.source === "blender"
+        ? "Blender"
+        : plugin.source;
   const source = plugin.source
-    ? ` Official ${plugin.source.charAt(0).toUpperCase()}${plugin.source.slice(1)} source and download link.`
+    ? ` Official ${sourceName} source and download link.`
     : " Download information on ExtendShare.";
   const prefix = `${plugin.name} for ${platform}.${compatibility}${source}`;
   const remaining = Math.max(0, 165 - prefix.length - 1);
