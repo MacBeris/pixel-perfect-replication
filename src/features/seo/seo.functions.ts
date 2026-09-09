@@ -10,7 +10,7 @@ export const getPluginSeo = createServerFn({ method: "GET" })
     const { data: plugin, error } = await db
       .from("plugins")
       .select(
-        "*,platform:platforms(name,slug),developer:developer_profiles(name,slug,avatar_url),plugin_assets(asset_type,public_url)",
+        "name,slug,short_description,compatibility,logo_url,moderation_status,developer_unpublished_at,developer_removed_at,source_hidden_at,source,source_url,platform:platforms(name,slug),plugin_assets(asset_type,public_url)",
       )
       .eq("slug", data.slug)
       .maybeSingle();

@@ -108,7 +108,6 @@ function PluginDetail() {
   const { data, isLoading, error } = useQuery({
     queryKey: ["account", user?.id ?? "public", "plugin", slug],
     enabled: !loading,
-    initialData: loaderData.public ? loaderData.plugin : undefined,
     queryFn: async () => {
       const { data, error } = await supabase
         .from("plugins")
@@ -125,7 +124,11 @@ function PluginDetail() {
   if (loading || isLoading) {
     return (
       <div className="container-page space-y-4 py-14">
-        <Skeleton className="h-10 w-72" />
+        {loaderData.public ? (
+          <h1 className="text-3xl font-semibold md:text-4xl">{loaderData.plugin.name}</h1>
+        ) : (
+          <Skeleton className="h-10 w-72" />
+        )}
         <Skeleton className="h-40 w-full" />
       </div>
     );
