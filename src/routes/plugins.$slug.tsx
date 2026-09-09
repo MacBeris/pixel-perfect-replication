@@ -1,4 +1,4 @@
-import { createFileRoute, Link } from "@tanstack/react-router";
+import { createFileRoute, Link, notFound } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -10,28 +10,89 @@ import { Download, Star } from "lucide-react";
 import { PublicPluginView } from "@/features/analytics/plugin-interactions";
 import { PluginFavoriteAction } from "@/features/plugins/plugin-favorite-action";
 import { siteUrl } from "@/lib/site";
+import { getPluginSeo } from "@/features/seo/seo.functions";
+
+function plainText(value: string) {
+  return value.replace(/\s+/g, " ").trim();
+}
+
+function pluginDescription(plugin: {
+  name: string;
+  short_description: string;
+  compatibility: string | null;
+  source: string | null;
+  platform: { name: string; slug: string } | null;
+}) {
+  const platform = plugin.platform?.name ?? "your platform";
+  const compatibility = plugin.compatibility
+    ? ` Compatible with ${plainText(plugin.compatibility)}.`
+    : "";
+  const source = plugin.source
+    ? ` Find its official ${plugin.source} source and download link on ExtendShare.`
+    : " Discover details, ratings and download information on ExtendShare.";
+  return plainText(
+    `${plugin.name} for ${platform}. ${plugin.short_description}.${compatibility}${source}`,
+  ).slice(0, 165);
+}
 
 export const Route = createFileRoute("/plugins/$slug")({
-  head: ({ params }) => ({
-    meta: [
-      { title: `${params.slug} — plugin on ExtendShare` },
-      {
-        name: "description",
-        content: `Details, pricing, versions and reviews for ${params.slug} on ExtendShare.`,
-      },
-      { property: "og:title", content: `${params.slug} — plugin on ExtendShare` },
-      {
-        property: "og:description",
-        content: `Details, pricing, versions and reviews for ${params.slug}.`,
-      },
-      { property: "og:type", content: "website" },
-      { property: "og:url", content: siteUrl(`/plugins/${params.slug}`) },
-      { name: "twitter:card", content: "summary_large_image" },
-    ],
-    links: [{ rel: "canonical", href: siteUrl(`/plugins/${params.slug}`) }],
-  }),
+  loader: async ({ params }) => {
+    const result = await getPluginSeo({ data: { slug: params.slug } });
+    if (!result.exists) throw notFound();
+    return result;
+  },
+  head: ({ params, loaderData }) => {
+    const canonical = siteUrl(`/plugins/${params.slug}`);
+    if (!loaderData?.public) {
+      return {
+        meta: [
+          { title: "Plugin preview — ExtendShare" },
+          { name: "robots", content: "noindex,nofollow" },
+        ],
+        links: [{ rel: "canonical", href: canonical }],
+      };
+    }
+    const plugin = loaderData.plugin;
+    const platform = plugin.platform?.name ?? "Extension";
+    const title = `${plugin.name} – ${platform} Plugin | ExtendShare`;
+    const description = pluginDescription(plugin);
+    const image =
+      plugin.plugin_assets.find((asset) => asset.asset_type === "cover")?.public_url ??
+      plugin.plugin_assets.find((asset) => asset.asset_type === "screenshot")?.public_url ??
+      plugin.logo_url;
+    return {
+      meta: [
+        { title },
+        { name: "description", content: description },
+        { property: "og:title", content: title },
+        { property: "og:description", content: description },
+        { property: "og:type", content: "website" },
+        { property: "og:url", content: canonical },
+        ...(image ? [{ property: "og:image", content: image }] : []),
+        { name: "twitter:card", content: image ? "summary_large_image" : "summary" },
+        { name: "twitter:title", content: title },
+        { name: "twitter:description", content: description },
+      ],
+      links: [{ rel: "canonical", href: canonical }],
+    };
+  },
+  notFoundComponent: PluginNotFound,
   component: PluginDetail,
 });
+
+function PluginNotFound() {
+  return (
+    <div className="container-page py-24 text-center">
+      <h1 className="text-2xl font-semibold">Plugin not found</h1>
+      <p className="mt-2 text-sm text-muted-foreground">
+        This plugin doesn&apos;t exist or is not publicly available.
+      </p>
+      <Link to="/plugins" className="mt-6 inline-block text-sm text-primary hover:underline">
+        Back to catalog
+      </Link>
+    </div>
+  );
+}
 
 function PluginDetail() {
   const { slug } = Route.useParams();
@@ -69,17 +130,7 @@ function PluginDetail() {
     );
 
   if (!data) {
-    return (
-      <div className="container-page py-24 text-center">
-        <h1 className="text-2xl font-semibold">Plugin not found</h1>
-        <p className="mt-2 text-sm text-muted-foreground">
-          This plugin doesn&apos;t exist or hasn&apos;t been approved yet.
-        </p>
-        <Link to="/plugins" className="mt-6 inline-block text-sm text-primary hover:underline">
-          Back to catalog
-        </Link>
-      </div>
-    );
+    return <PluginNotFound />;
   }
 
   return (

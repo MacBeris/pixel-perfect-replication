@@ -89,7 +89,7 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       {
         name: "description",
         content:
-          "Discover, buy and sell plugins, extensions and add-ons for the tools you already use.",
+          "Discover plugins, extensions and add-ons for WordPress, Blender and more. Compare tools and find official downloads on ExtendShare.",
       },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },

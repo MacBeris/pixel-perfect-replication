@@ -13,12 +13,13 @@ export const Route = createFileRoute("/")({
       {
         name: "description",
         content:
-          "Discover, buy and sell plugins, extensions and add-ons for WordPress, Blender, Unity, Figma, VS Code, Chrome, Shopify and more.",
+          "Discover plugins, extensions and add-ons for WordPress, Blender and more. Compare tools, find official downloads and discover new extensions on ExtendShare.",
       },
       { property: "og:title", content: "ExtendShare — Extend what your tools can do" },
       {
         property: "og:description",
-        content: "A marketplace for plugins, extensions and add-ons across 10 creative and developer platforms.",
+        content:
+          "Discover and compare plugins, extensions and add-ons with clear links to their official sources.",
       },
       { property: "og:type", content: "website" },
       { property: "og:url", content: SITE_URL },

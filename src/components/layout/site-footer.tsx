@@ -6,14 +6,14 @@ const columns = [
     title: "Marketplace",
     links: [
       { label: "Explore plugins", to: "/plugins" },
-      { label: "Sign in", to: "/auth" },
+      { label: "About", to: "/about" },
     ],
   },
   {
     title: "Developers",
     links: [
-      { label: "Developer dashboard", to: "/developer/dashboard" },
-      { label: "My Library", to: "/library" },
+      { label: "For developers", to: "/for-developers" },
+      { label: "Developer dashboard", to: "/dashboard" },
     ],
   },
 ] as const;
@@ -25,7 +25,7 @@ export function SiteFooter() {
         <div className="md:col-span-2">
           <Wordmark />
           <p className="mt-3 max-w-xs text-sm text-muted-foreground">
-            A marketplace for plugins, extensions and add-ons across the tools you build with.
+            Discover and compare plugins, extensions and add-ons from official sources.
           </p>
         </div>
         {columns.map((column) => (
