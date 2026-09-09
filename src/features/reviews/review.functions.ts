@@ -46,3 +46,23 @@ export const saveReview = createServerFn({ method: "POST" })
     if (error) throw new Error(error.message);
     return result;
   });
+
+export const deleteReview = createServerFn({ method: "POST" })
+  .validator((value: unknown) => identity.parse(value))
+  .handler(async ({ data }) => {
+    const { supabaseAdmin: db } = await import("@/integrations/supabase/client.server");
+    const { data: auth, error: authError } = await db.auth.getUser(data.accessToken);
+    if (authError || !auth.user) throw new Error("Your session has expired. Please sign in again.");
+
+    const { data: deleted, error } = await db
+      .from("reviews")
+      .delete()
+      .eq("plugin_id", data.pluginId)
+      .eq("user_id", auth.user.id)
+      .eq("status", "active")
+      .select("id")
+      .maybeSingle();
+    if (error) throw new Error("Your review could not be deleted. Please try again.");
+    if (!deleted) throw new Error("Review not found or you do not have permission to delete it.");
+    return { deleted: true };
+  });

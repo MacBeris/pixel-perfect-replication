@@ -1,11 +1,24 @@
 import { useState } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
-import { Star } from "lucide-react";
+import { Pencil, Star, Trash2 } from "lucide-react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/use-auth";
-import { saveReview, reviewEligibility } from "./review.functions";
+import { deleteReview, saveReview, reviewEligibility } from "./review.functions";
 import { message } from "@/features/dashboard/data";
 
 async function token() {
@@ -20,6 +33,15 @@ type OwnReview = {
   body: string | null;
   updated_at: string;
 };
+
+type ReviewRow = OwnReview & {
+  user_id: string;
+  author: { username: string; avatar_url: string | null } | null;
+};
+
+function initial(value: string | null | undefined) {
+  return value?.trim().charAt(0).toUpperCase() || "U";
+}
 export function PluginReviews({
   pluginId,
   rating,
@@ -31,12 +53,15 @@ export function PluginReviews({
 }) {
   const { user } = useAuth();
   const [page, setPage] = useState(0);
+  const [editingId, setEditingId] = useState<string | null>(null);
+  const [deletingId, setDeletingId] = useState<string | null>(null);
+  const cache = useQueryClient();
   const q = useQuery({
     queryKey: ["plugin", pluginId, "reviews", user?.id ?? "public", page],
     queryFn: async () => {
       const { data, error, count } = await supabase
         .from("reviews")
-        .select("id,rating,title,body,updated_at,author:profiles(username,avatar_url)", {
+        .select("id,user_id,rating,title,body,updated_at,author:profiles(username,avatar_url)", {
           count: "exact",
         })
         .eq("plugin_id", pluginId)
@@ -82,15 +107,11 @@ export function PluginReviews({
             Retry
           </Button>
         </div>
-      ) : access.data?.allowed ? (
-        <ReviewForm
-          key={`${user.id}:${pluginId}:${access.data.own?.updated_at ?? "new"}`}
-          pluginId={pluginId}
-          own={access.data.own}
-        />
-      ) : (
+      ) : access.data?.allowed && !access.data.own ? (
+        <ReviewForm key={`${user.id}:${pluginId}:new`} pluginId={pluginId} own={access.data.own} />
+      ) : access.data?.own?.status === "active" ? null : (
         <p className="mt-6 rounded-xl border bg-secondary/30 p-5 text-sm text-muted-foreground">
-          {access.data?.own && access.data.own.status !== "active"
+          {access.data?.own
             ? "Your review is under moderation and cannot be edited here."
             : "Hosted plugins can be rated after downloading through ExtendShare. External listings require an existing purchase; visiting an external platform does not count as a download. Authors cannot review their own plugins."}
         </p>
@@ -106,41 +127,137 @@ export function PluginReviews({
             </Button>
           </div>
         ) : q.data?.rows.length ? (
-          q.data.rows.map((r) => (
-            <article key={r.id} className="rounded-xl border p-5">
-              <div className="flex flex-wrap items-center gap-2">
-                {r.author?.avatar_url && (
-                  <img
-                    src={r.author.avatar_url}
-                    alt=""
-                    className="size-8 rounded-full object-cover"
-                  />
-                )}
-                <span className="font-medium">@{r.author?.username ?? "user"}</span>
-                <span
-                  aria-label={`${r.rating} out of 5 stars`}
-                  className="ml-auto inline-flex gap-0.5"
-                >
-                  {[1, 2, 3, 4, 5].map((n) => (
-                    <Star
-                      key={n}
-                      aria-hidden="true"
-                      className={`size-4 ${n <= r.rating ? "fill-warning text-warning" : "text-muted-foreground"}`}
-                    />
-                  ))}
-                </span>
-              </div>
-              {r.title && <h3 className="mt-3 break-words font-medium">{r.title}</h3>}
-              {r.body && (
-                <p className="mt-2 whitespace-pre-wrap break-words text-sm text-muted-foreground">
-                  {r.body}
-                </p>
-              )}
-              <p className="mt-3 text-xs text-muted-foreground">
-                {new Date(r.updated_at).toLocaleDateString("en-US")}
-              </p>
-            </article>
-          ))
+          (q.data.rows as ReviewRow[]).map((r) => {
+            const isOwn = r.user_id === user?.id;
+            const username = r.author?.username ?? "user";
+            return (
+              <article key={r.id} className="group rounded-xl border p-5">
+                <div className="flex items-start gap-3">
+                  <Avatar className="size-10 border" aria-hidden="true">
+                    <AvatarImage src={r.author?.avatar_url ?? undefined} alt="" />
+                    <AvatarFallback className="text-sm font-medium">
+                      {initial(username)}
+                    </AvatarFallback>
+                  </Avatar>
+                  <div className="min-w-0 flex-1">
+                    <div className="flex flex-wrap items-center gap-x-3 gap-y-1">
+                      <span className="break-all font-medium">@{username}</span>
+                      <span
+                        aria-label={`${r.rating} out of 5 stars`}
+                        className="inline-flex gap-0.5"
+                      >
+                        {[1, 2, 3, 4, 5].map((n) => (
+                          <Star
+                            key={n}
+                            aria-hidden="true"
+                            className={`size-4 ${n <= r.rating ? "fill-warning text-warning" : "text-muted-foreground"}`}
+                          />
+                        ))}
+                      </span>
+                      <time dateTime={r.updated_at} className="text-xs text-muted-foreground">
+                        {new Date(r.updated_at).toLocaleDateString("en-US")}
+                      </time>
+                      {isOwn && (
+                        <TooltipProvider delayDuration={250}>
+                          <div className="ml-auto flex items-center gap-1 opacity-100 transition-opacity sm:opacity-0 sm:group-hover:opacity-100 sm:group-focus-within:opacity-100">
+                            <Tooltip>
+                              <TooltipTrigger asChild>
+                                <Button
+                                  type="button"
+                                  size="icon"
+                                  variant="ghost"
+                                  className="size-8"
+                                  aria-label="Edit review"
+                                  onClick={() => setEditingId(r.id)}
+                                >
+                                  <Pencil aria-hidden="true" className="size-4" />
+                                </Button>
+                              </TooltipTrigger>
+                              <TooltipContent>Edit review</TooltipContent>
+                            </Tooltip>
+                            <AlertDialog>
+                              <Tooltip>
+                                <TooltipTrigger asChild>
+                                  <AlertDialogTrigger asChild>
+                                    <Button
+                                      type="button"
+                                      size="icon"
+                                      variant="ghost"
+                                      className="size-8 text-destructive hover:text-destructive"
+                                      aria-label="Delete review"
+                                    >
+                                      <Trash2 aria-hidden="true" className="size-4" />
+                                    </Button>
+                                  </AlertDialogTrigger>
+                                </TooltipTrigger>
+                                <TooltipContent>Delete review</TooltipContent>
+                              </Tooltip>
+                              <AlertDialogContent>
+                                <AlertDialogHeader>
+                                  <AlertDialogTitle>Delete review?</AlertDialogTitle>
+                                  <AlertDialogDescription>
+                                    Are you sure you want to permanently delete this review?
+                                  </AlertDialogDescription>
+                                </AlertDialogHeader>
+                                <AlertDialogFooter>
+                                  <AlertDialogCancel disabled={deletingId === r.id}>
+                                    Cancel
+                                  </AlertDialogCancel>
+                                  <AlertDialogAction
+                                    disabled={deletingId === r.id}
+                                    className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+                                    onClick={async () => {
+                                      setDeletingId(r.id);
+                                      try {
+                                        await deleteReview({
+                                          data: { accessToken: await token(), pluginId },
+                                        });
+                                        toast.success("Review deleted");
+                                        await Promise.all([
+                                          cache.invalidateQueries({
+                                            queryKey: ["plugin", pluginId, "reviews"],
+                                          }),
+                                          cache.invalidateQueries({ queryKey: ["account"] }),
+                                        ]);
+                                      } catch (error) {
+                                        toast.error(message(error));
+                                      } finally {
+                                        setDeletingId(null);
+                                      }
+                                    }}
+                                  >
+                                    {deletingId === r.id ? "Deleting…" : "Delete review"}
+                                  </AlertDialogAction>
+                                </AlertDialogFooter>
+                              </AlertDialogContent>
+                            </AlertDialog>
+                          </div>
+                        </TooltipProvider>
+                      )}
+                    </div>
+                    {editingId === r.id ? (
+                      <ReviewForm
+                        pluginId={pluginId}
+                        own={r}
+                        inline
+                        onCancel={() => setEditingId(null)}
+                        onSaved={() => setEditingId(null)}
+                      />
+                    ) : (
+                      <>
+                        {r.title && <h3 className="mt-3 break-words font-medium">{r.title}</h3>}
+                        {r.body && (
+                          <p className="mt-2 whitespace-pre-wrap break-words text-sm text-muted-foreground">
+                            {r.body}
+                          </p>
+                        )}
+                      </>
+                    )}
+                  </div>
+                </div>
+              </article>
+            );
+          })
         ) : (
           <p className="rounded-xl border border-dashed p-8 text-center text-sm text-muted-foreground">
             No published reviews yet.
@@ -165,7 +282,19 @@ export function PluginReviews({
     </section>
   );
 }
-function ReviewForm({ pluginId, own }: { pluginId: string; own: OwnReview | null }) {
+function ReviewForm({
+  pluginId,
+  own,
+  inline = false,
+  onCancel,
+  onSaved,
+}: {
+  pluginId: string;
+  own: OwnReview | null;
+  inline?: boolean;
+  onCancel?: () => void;
+  onSaved?: () => void;
+}) {
   const cache = useQueryClient();
   const [rating, setRating] = useState(own?.rating ?? 0);
   const [title, setTitle] = useState(own?.title ?? "");
@@ -174,7 +303,7 @@ function ReviewForm({ pluginId, own }: { pluginId: string; own: OwnReview | null
   const [error, setError] = useState("");
   return (
     <form
-      className="mt-6 rounded-xl border bg-card p-5"
+      className={inline ? "mt-4 border-t pt-4" : "mt-6 rounded-xl border bg-card p-5"}
       onSubmit={async (e) => {
         e.preventDefault();
         if (!rating || busy) return;
@@ -183,15 +312,21 @@ function ReviewForm({ pluginId, own }: { pluginId: string; own: OwnReview | null
         try {
           await saveReview({ data: { accessToken: await token(), pluginId, rating, title, body } });
           toast.success(own ? "Review updated" : "Review published");
-          await cache.invalidateQueries();
+          await Promise.all([
+            cache.invalidateQueries({ queryKey: ["plugin", pluginId, "reviews"] }),
+            cache.invalidateQueries({ queryKey: ["account"] }),
+          ]);
+          onSaved?.();
         } catch (e) {
-          setError(message(e));
+          const text = message(e);
+          setError(text);
+          toast.error(text);
         } finally {
           setBusy(false);
         }
       }}
     >
-      <h3 className="font-semibold">{own ? "Update your review" : "Share your experience"}</h3>
+      <h3 className="font-semibold">{own ? "Edit your review" : "Share your experience"}</h3>
       <fieldset disabled={busy} className="mt-4 space-y-3">
         <legend className="sr-only">Your rating and optional review</legend>
         <div className="flex gap-1">
@@ -236,9 +371,16 @@ function ReviewForm({ pluginId, own }: { pluginId: string; own: OwnReview | null
             {error}
           </p>
         )}
-        <Button type="submit" disabled={!rating || busy}>
-          {busy ? "Saving…" : own ? "Update review" : "Publish review"}
-        </Button>
+        <div className="flex flex-wrap gap-2">
+          <Button type="submit" disabled={!rating || busy}>
+            {busy ? "Saving…" : own ? "Save changes" : "Publish review"}
+          </Button>
+          {own && onCancel && (
+            <Button type="button" variant="outline" disabled={busy} onClick={onCancel}>
+              Cancel
+            </Button>
+          )}
+        </div>
       </fieldset>
     </form>
   );
