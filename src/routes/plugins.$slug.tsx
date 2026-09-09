@@ -32,10 +32,10 @@ function pluginDescription(plugin: {
 }) {
   const platform = plugin.platform?.name ?? "your platform";
   const compatibility = plugin.compatibility
-    ? ` Compatible with ${truncateWords(plugin.compatibility, 38)}.`
+    ? ` Compatibility: ${truncateWords(plugin.compatibility, 38)}.`
     : "";
   const source = plugin.source
-    ? ` Official ${plugin.source} source and download link.`
+    ? ` Official ${plugin.source.charAt(0).toUpperCase()}${plugin.source.slice(1)} source and download link.`
     : " Download information on ExtendShare.";
   const prefix = `${plugin.name} for ${platform}.${compatibility}${source}`;
   const remaining = Math.max(0, 165 - prefix.length - 1);
