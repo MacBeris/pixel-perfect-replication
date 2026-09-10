@@ -9,6 +9,8 @@ const routes = [
   "/plugins",
   "/about",
   "/for-developers",
+  "/privacy",
+  "/terms",
   "/platform/wordpress",
   "/platform/blender",
   "/category/developer-tools",

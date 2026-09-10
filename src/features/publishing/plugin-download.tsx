@@ -10,6 +10,7 @@ import { supabase } from "@/integrations/supabase/client";
 import type { Tables } from "@/integrations/supabase/types";
 import { interactionIdentity } from "@/features/analytics/interaction-identity";
 import { recordPluginInteraction } from "@/features/analytics/analytics.functions";
+import { getAnalyticsConsent } from "@/features/privacy/consent";
 
 export function PluginDistribution({ plugin }: { plugin: Tables<"plugins"> }) {
   const { user } = useAuth();
@@ -77,9 +78,7 @@ export function PluginDistribution({ plugin }: { plugin: Tables<"plugins"> }) {
   return (
     <div className="mt-8 space-y-6">
       {plugin.listing_type === "external_listing" ? (
-        plugin.moderation_status === "approved" &&
-        url &&
-        <ExternalButton pluginId={plugin.id} />
+        plugin.moderation_status === "approved" && url && <ExternalButton pluginId={plugin.id} />
       ) : test ? (
         <DownloadButton pluginId={plugin.id} test />
       ) : plugin.moderation_status === "approved" && current ? (
@@ -173,8 +172,15 @@ export function ExternalButton({ pluginId }: { pluginId: string }) {
           setBusy(true);
           setError("");
           try {
+            const analyticsConsent = getAnalyticsConsent() === "accepted";
+            const identity = analyticsConsent ? await interactionIdentity() : {};
             const data = await recordPluginInteraction({
-              data: { pluginId, type: "outbound_click", ...(await interactionIdentity()) },
+              data: {
+                pluginId,
+                type: "outbound_click",
+                analyticsConsent,
+                ...identity,
+              },
             });
             if (!data.url) throw new Error("External listing unavailable");
             window.location.assign(data.url);

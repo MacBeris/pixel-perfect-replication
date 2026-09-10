@@ -3,6 +3,7 @@ import { useLocation } from "@tanstack/react-router";
 
 import { interactionIdentity } from "./interaction-identity";
 import { recordSitePageView } from "./site-analytics.functions";
+import { useAnalyticsConsent } from "@/features/privacy/consent";
 
 const sessionKey = "extendshare.analytics.session.v1";
 const timeoutMs = 30 * 60 * 1000;
@@ -29,8 +30,10 @@ function analyticsSessionId() {
 
 export function SiteAnalyticsTracker() {
   const location = useLocation();
+  const consent = useAnalyticsConsent();
 
   useEffect(() => {
+    if (consent !== "accepted") return;
     const timer = window.setTimeout(() => {
       void interactionIdentity().then(({ visitorId, accessToken }) =>
         recordSitePageView({
@@ -45,7 +48,7 @@ export function SiteAnalyticsTracker() {
       );
     }, 0);
     return () => window.clearTimeout(timer);
-  }, [location.pathname, location.searchStr]);
+  }, [consent, location.pathname, location.searchStr]);
 
   return null;
 }

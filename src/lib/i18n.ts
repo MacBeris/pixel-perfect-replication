@@ -9,7 +9,7 @@ export const messages = {
     "nav.explore": "Explore plugins",
     "nav.platforms": "Platforms",
     "nav.categories": "Categories",
-    "nav.sell": "Sell on ExtendShare",
+    "nav.sell": "Publish on ExtendShare",
     "nav.signIn": "Sign in",
     "nav.signOut": "Sign out",
     "nav.account": "Account",
@@ -18,7 +18,7 @@ export const messages = {
     "nav.collections": "Collections",
     "hero.title": "Extend what your tools can do.",
     "hero.subtitle":
-      "Discover, buy and sell plugins, extensions and add-ons for the tools you already use.",
+      "Discover plugins, extensions and add-ons for the tools you already use.",
     "search.placeholder": "Search plugins, extensions and add-ons...",
     "section.browseByPlatform": "Browse by platform",
     "section.trending": "Trending plugins",

@@ -15,7 +15,9 @@ import { Route as AboutRouteImport } from './routes/about'
 import { Route as AdminRouteImport } from './routes/admin'
 import { Route as AuthRouteImport } from './routes/auth'
 import { Route as ForDevelopersRouteImport } from './routes/for-developers'
+import { Route as PrivacyRouteImport } from './routes/privacy'
 import { Route as PublishingRequirementsRouteImport } from './routes/publishing-requirements'
+import { Route as TermsRouteImport } from './routes/terms'
 import { Route as AuthenticatedDashboardRouteImport } from './routes/_authenticated/dashboard'
 import { Route as AuthenticatedFavoritesRouteImport } from './routes/_authenticated/favorites'
 import { Route as AuthenticatedLibraryRouteImport } from './routes/_authenticated/library'
@@ -57,9 +59,19 @@ const ForDevelopersRoute = ForDevelopersRouteImport.update({
   path: '/for-developers',
   getParentRoute: () => rootRouteImport,
 } as any)
+const PrivacyRoute = PrivacyRouteImport.update({
+  id: '/privacy',
+  path: '/privacy',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const PublishingRequirementsRoute = PublishingRequirementsRouteImport.update({
   id: '/publishing-requirements',
   path: '/publishing-requirements',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const TermsRoute = TermsRouteImport.update({
+  id: '/terms',
+  path: '/terms',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AuthenticatedDashboardRoute = AuthenticatedDashboardRouteImport.update({
@@ -125,7 +137,9 @@ export interface FileRoutesByFullPath {
   '/admin': typeof AdminRoute
   '/auth': typeof AuthRoute
   '/for-developers': typeof ForDevelopersRoute
+  '/privacy': typeof PrivacyRoute
   '/publishing-requirements': typeof PublishingRequirementsRoute
+  '/terms': typeof TermsRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
   '/favorites': typeof AuthenticatedFavoritesRoute
   '/library': typeof AuthenticatedLibraryRoute
@@ -144,7 +158,9 @@ export interface FileRoutesByTo {
   '/admin': typeof AdminRoute
   '/auth': typeof AuthRoute
   '/for-developers': typeof ForDevelopersRoute
+  '/privacy': typeof PrivacyRoute
   '/publishing-requirements': typeof PublishingRequirementsRoute
+  '/terms': typeof TermsRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
   '/favorites': typeof AuthenticatedFavoritesRoute
   '/library': typeof AuthenticatedLibraryRoute
@@ -165,7 +181,9 @@ export interface FileRoutesById {
   '/admin': typeof AdminRoute
   '/auth': typeof AuthRoute
   '/for-developers': typeof ForDevelopersRoute
+  '/privacy': typeof PrivacyRoute
   '/publishing-requirements': typeof PublishingRequirementsRoute
+  '/terms': typeof TermsRoute
   '/_authenticated/dashboard': typeof AuthenticatedDashboardRoute
   '/_authenticated/favorites': typeof AuthenticatedFavoritesRoute
   '/_authenticated/library': typeof AuthenticatedLibraryRoute
@@ -186,7 +204,9 @@ export interface FileRouteTypes {
     | '/admin'
     | '/auth'
     | '/for-developers'
+    | '/privacy'
     | '/publishing-requirements'
+    | '/terms'
     | '/dashboard'
     | '/favorites'
     | '/library'
@@ -205,7 +225,9 @@ export interface FileRouteTypes {
     | '/admin'
     | '/auth'
     | '/for-developers'
+    | '/privacy'
     | '/publishing-requirements'
+    | '/terms'
     | '/dashboard'
     | '/favorites'
     | '/library'
@@ -225,7 +247,9 @@ export interface FileRouteTypes {
     | '/admin'
     | '/auth'
     | '/for-developers'
+    | '/privacy'
     | '/publishing-requirements'
+    | '/terms'
     | '/_authenticated/dashboard'
     | '/_authenticated/favorites'
     | '/_authenticated/library'
@@ -246,7 +270,9 @@ export interface RootRouteChildren {
   AdminRoute: typeof AdminRoute
   AuthRoute: typeof AuthRoute
   ForDevelopersRoute: typeof ForDevelopersRoute
+  PrivacyRoute: typeof PrivacyRoute
   PublishingRequirementsRoute: typeof PublishingRequirementsRoute
+  TermsRoute: typeof TermsRoute
   AuthCallbackRoute: typeof AuthCallbackRoute
   CategorySlugRoute: typeof CategorySlugRoute
   DeveloperDashboardRoute: typeof DeveloperDashboardRoute
@@ -301,11 +327,25 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ForDevelopersRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/privacy': {
+      id: '/privacy'
+      path: '/privacy'
+      fullPath: '/privacy'
+      preLoaderRoute: typeof PrivacyRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/publishing-requirements': {
       id: '/publishing-requirements'
       path: '/publishing-requirements'
       fullPath: '/publishing-requirements'
       preLoaderRoute: typeof PublishingRequirementsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/terms': {
+      id: '/terms'
+      path: '/terms'
+      fullPath: '/terms'
+      preLoaderRoute: typeof TermsRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/_authenticated/dashboard': {
@@ -410,7 +450,9 @@ const rootRouteChildren: RootRouteChildren = {
   AdminRoute: AdminRoute,
   AuthRoute: AuthRoute,
   ForDevelopersRoute: ForDevelopersRoute,
+  PrivacyRoute: PrivacyRoute,
   PublishingRequirementsRoute: PublishingRequirementsRoute,
+  TermsRoute: TermsRoute,
   AuthCallbackRoute: AuthCallbackRoute,
   CategorySlugRoute: CategorySlugRoute,
   DeveloperDashboardRoute: DeveloperDashboardRoute,

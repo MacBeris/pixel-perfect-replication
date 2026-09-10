@@ -17,9 +17,9 @@ import { SiteFooter } from "@/components/layout/site-footer";
 import { Toaster } from "@/components/ui/sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { SiteAnalyticsTracker } from "@/features/analytics/site-tracker";
+import { GoogleAnalytics } from "@/features/privacy/google-analytics";
+import { PrivacyConsentManager } from "@/features/privacy/privacy-consent";
 import { siteUrl } from "@/lib/site";
-
-const GOOGLE_ANALYTICS_ID = "G-FDFQ9Y3M3D";
 
 function NotFoundComponent() {
   return (
@@ -143,15 +143,6 @@ function RootShell({ children }: { children: ReactNode }) {
     <html lang="en" suppressHydrationWarning>
       <head>
         <HeadContent />
-        <script async src={`https://www.googletagmanager.com/gtag/js?id=${GOOGLE_ANALYTICS_ID}`} />
-        <script
-          dangerouslySetInnerHTML={{
-            __html: `window.dataLayer = window.dataLayer || [];
-function gtag(){dataLayer.push(arguments);}
-gtag('js', new Date());
-gtag('config', '${GOOGLE_ANALYTICS_ID}');`,
-          }}
-        />
       </head>
       <body>
         {children}
@@ -178,6 +169,7 @@ function RootComponent() {
   return (
     <QueryClientProvider client={queryClient}>
       <ThemeProvider>
+        <GoogleAnalytics />
         <SiteAnalyticsTracker />
         <div className="flex min-h-screen flex-col">
           <SiteHeader />
@@ -187,6 +179,7 @@ function RootComponent() {
           </main>
           <SiteFooter />
         </div>
+        <PrivacyConsentManager />
         <Toaster />
       </ThemeProvider>
     </QueryClientProvider>

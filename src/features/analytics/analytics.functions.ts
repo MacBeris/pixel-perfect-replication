@@ -4,8 +4,9 @@ import { z } from "zod";
 const interaction = z.object({
   pluginId: z.string().uuid(),
   type: z.enum(["page_view", "outbound_click"]),
-  visitorId: z.string().uuid(),
+  visitorId: z.string().uuid().optional(),
   accessToken: z.string().min(1).optional(),
+  analyticsConsent: z.boolean(),
 });
 
 async function sha256(value: string) {
@@ -18,6 +19,28 @@ export const recordPluginInteraction = createServerFn({ method: "POST" })
   .validator((value: unknown) => interaction.parse(value))
   .handler(async ({ data }) => {
     const { supabaseAdmin: db } = await import("@/integrations/supabase/client.server");
+    if (!data.analyticsConsent) {
+      if (data.type === "page_view") return { counted: false };
+      const { data: plugin } = await db
+        .from("plugins")
+        .select("external_purchase_url")
+        .eq("id", data.pluginId)
+        .eq("listing_type", "external_listing")
+        .eq("moderation_status", "approved")
+        .is("developer_unpublished_at", null)
+        .is("developer_removed_at", null)
+        .is("source_hidden_at", null)
+        .maybeSingle();
+      let url: string | null = null;
+      try {
+        const parsed = new URL(plugin?.external_purchase_url ?? "");
+        if (parsed.protocol === "https:" && !parsed.username && !parsed.password) url = parsed.href;
+      } catch {
+        // Invalid source URL is returned as unavailable.
+      }
+      return { counted: false, url };
+    }
+    if (!data.visitorId) throw new Error("Analytics visitor ID is required after consent");
     let actor: string | null = null;
     if (data.accessToken) {
       const { data: auth } = await db.auth.getUser(data.accessToken);

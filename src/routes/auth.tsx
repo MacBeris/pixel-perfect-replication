@@ -21,7 +21,7 @@ export const Route = createFileRoute("/auth")({
       {
         name: "description",
         content:
-          "Sign in to ExtendShare to buy plugins, manage your library, or publish extensions as a developer.",
+          "Sign in to ExtendShare to manage favorites, reviews, collections and your developer profile.",
       },
       { property: "og:title", content: "Sign in or create an account — ExtendShare" },
       {
@@ -51,6 +51,27 @@ function AuthPage() {
   const [confirmation, setConfirmation] = useState("");
   const errorRef = useRef<HTMLDivElement>(null);
   const signup = mode === "signup";
+
+  async function continueWithGoogle() {
+    if (pending.current) return;
+    pending.current = true;
+    setLoading(true);
+    setError("");
+    try {
+      const callback = new URL("/auth/callback", window.location.origin);
+      callback.searchParams.set("next", safeDashboardReturn(next));
+      const { error } = await supabase.auth.signInWithOAuth({
+        provider: "google",
+        options: { redirectTo: callback.toString() },
+      });
+      if (error) throw error;
+    } catch (cause) {
+      pending.current = false;
+      setLoading(false);
+      setError(authErrorMessage(cause));
+      requestAnimationFrame(() => errorRef.current?.focus());
+    }
+  }
 
   function edited() {
     setError("");
@@ -156,7 +177,39 @@ function AuthPage() {
               </TabsTrigger>
             </TabsList>
           </Tabs>
-          <form className="mt-6 space-y-5" onSubmit={submit} noValidate aria-busy={loading}>
+          <Button
+            type="button"
+            variant="outline"
+            className="mt-6 h-11 w-full"
+            disabled={loading}
+            onClick={() => void continueWithGoogle()}
+          >
+            <svg aria-hidden="true" viewBox="0 0 24 24" className="mr-2 size-4">
+              <path
+                fill="#4285F4"
+                d="M21.6 12.23c0-.71-.06-1.4-.18-2.07H12v3.92h5.38a4.6 4.6 0 0 1-2 3.02v2.54h3.24c1.9-1.75 2.98-4.33 2.98-7.41Z"
+              />
+              <path
+                fill="#34A853"
+                d="M12 22c2.7 0 4.97-.9 6.62-2.36l-3.24-2.54c-.9.6-2.05.96-3.38.96-2.61 0-4.82-1.76-5.61-4.13H3.04v2.62A10 10 0 0 0 12 22Z"
+              />
+              <path
+                fill="#FBBC05"
+                d="M6.39 13.93A6.02 6.02 0 0 1 6.08 12c0-.67.11-1.32.31-1.93V7.45H3.04A10 10 0 0 0 2 12c0 1.61.39 3.14 1.04 4.55l3.35-2.62Z"
+              />
+              <path
+                fill="#EA4335"
+                d="M12 5.94c1.47 0 2.79.5 3.83 1.5l2.87-2.87A9.63 9.63 0 0 0 12 2a10 10 0 0 0-8.96 5.45l3.35 2.62C7.18 7.7 9.39 5.94 12 5.94Z"
+              />
+            </svg>
+            Continue with Google
+          </Button>
+          <div className="my-5 flex items-center gap-3 text-xs uppercase tracking-wide text-muted-foreground">
+            <span className="h-px flex-1 bg-border" />
+            <span>or use email</span>
+            <span className="h-px flex-1 bg-border" />
+          </div>
+          <form className="space-y-5" onSubmit={submit} noValidate aria-busy={loading}>
             {error && (
               <div
                 ref={errorRef}
@@ -311,6 +364,19 @@ function AuthPage() {
                     ? "Create account"
                     : "Sign in"}
             </Button>
+            {signup && (
+              <p className="text-center text-xs leading-5 text-muted-foreground">
+                By creating an account, you agree to the{" "}
+                <Link to="/terms" className="text-foreground underline underline-offset-4">
+                  Terms of Service
+                </Link>{" "}
+                and acknowledge the{" "}
+                <Link to="/privacy" className="text-foreground underline underline-offset-4">
+                  Privacy Policy
+                </Link>
+                .
+              </p>
+            )}
           </form>
         </div>
         <div className="border-t bg-secondary/20 px-6 py-5 text-center text-sm text-muted-foreground">

@@ -34,6 +34,8 @@ export async function createSitemapResponse(_rawEnv: unknown) {
     { path: "/plugins" },
     { path: "/about" },
     { path: "/for-developers" },
+    { path: "/privacy" },
+    { path: "/terms" },
     ...(platforms.data ?? []).map((item) => ({
       path: `/platform/${item.slug}`,
       updatedAt: item.updated_at,
