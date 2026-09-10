@@ -71,9 +71,9 @@ function PrivacyPolicy() {
       <LegalSection title="3. Google Sign-In and account authentication">
         <p>
           ExtendShare supports account authentication through Supabase Auth, including Google
-          Sign-In. When you choose Google Sign-In, Google and Supabase provide only the
-          basic identity information needed to authenticate and create your account, such as your
-          Google account identifier, email address, name and profile picture.
+          Sign-In. When you choose Google Sign-In, Google and Supabase may provide basic identity
+          information needed to authenticate and create your account, such as your Google account
+          identifier, email address, name and profile picture.
         </p>
         <p>
           We use this information only for sign-in, account operation and displaying the profile
@@ -101,18 +101,21 @@ function PrivacyPolicy() {
           URLs, descriptions, versions, ratings, installation figures and media supplied by those
           sources. Source responses are retained to support accurate normalization, updates and
           auditing. Imported listings remain identified as external and may be claimed by their
-          authors.
+          authors. We process this publicly available information based on our legitimate interest
+          in maintaining a searchable catalog of publicly available plugin information.
         </p>
       </LegalSection>
 
       <LegalSection title="6. Analytics">
         <p>
-          Optional analytics runs only after you select “Accept analytics.” Google Analytics helps
-          us understand aggregated use of the website. ExtendShare's first-party analytics records
-          pseudonymous hashes rather than raw IP addresses, excludes known bots and signed-in
-          administrators, and measures public page views and plugin interactions. Developer
-          analytics presents aggregated information and does not reveal a list of individual
-          visitors.
+          ExtendShare's first-party analytics uses pseudonymous identifiers to measure website
+          usage. The first-party analytics database does not intentionally store raw IP addresses.
+          Infrastructure and security providers may process IP addresses as necessary to deliver
+          and protect the service. Optional analytics, including Google Analytics, is activated only
+          after the user provides the required consent. The first-party analytics excludes known
+          bots and signed-in administrators and measures public page views and plugin interactions.
+          Developer analytics presents aggregated information and does not reveal a list of
+          individual visitors.
         </p>
         <p>
           If you reject optional analytics, Google Analytics, optional public page-view tracking and
@@ -153,24 +156,34 @@ function PrivacyPolicy() {
         </p>
       </LegalSection>
 
-      <LegalSection title="10. Retention and security">
+      <LegalSection title="10. International data transfers">
+        <p>
+          Some service providers used by ExtendShare may process personal data outside the European
+          Economic Area. Where required, such transfers are protected using appropriate safeguards
+          recognised under applicable data protection law.
+        </p>
+      </LegalSection>
+
+      <LegalSection title="11. Retention and security">
         <p>
           Account and content data is generally retained while an account or listing remains active
           and as reasonably needed to provide the service. Some moderation, audit, security and
-          transaction-related records may be retained longer where required to protect users,
-          establish claims or meet legal duties. Imported source data is refreshed or retained for
-          catalog accuracy. We use access controls, Supabase Row Level Security, private file
-          storage, signed download links and server-side authorization checks. No online service can
+          claim-related records may be retained longer where required to protect users, establish
+          claims or meet legal duties. Imported source data is refreshed or retained for catalog
+          accuracy. We use access controls, Supabase Row Level Security, private file storage,
+          signed download links and server-side authorization checks. No online service can
           guarantee absolute security.
         </p>
       </LegalSection>
 
-      <LegalSection title="11. Your rights">
+      <LegalSection title="12. Your rights">
         <p>
           Subject to applicable law, including the GDPR, you may request access, correction,
           deletion, restriction or portability of your personal data, and may object to certain
-          processing or withdraw consent. You may also complain to the competent data protection
-          authority. Send requests from the email associated with your account to{" "}
+          processing or withdraw consent. You may also lodge a complaint with the President of the
+          Personal Data Protection Office (UODO), the Polish supervisory authority, or another
+          competent data protection authority. Send requests from the email associated with your
+          account to{" "}
           <a
             className="text-primary underline underline-offset-4"
             href="mailto:maciejpraktyki@gmail.com"
@@ -182,7 +195,7 @@ function PrivacyPolicy() {
         </p>
       </LegalSection>
 
-      <LegalSection title="12. Changes and contact">
+      <LegalSection title="13. Changes and contact">
         <p>
           This policy may be updated as ExtendShare changes. Material updates will be reflected by a
           new date on this page. Questions can be sent to the contact above. See also the{" "}
