@@ -150,7 +150,9 @@ function TermsOfService() {
           submissions, suspend plugins or block accounts when reasonably necessary to enforce these
           Terms, protect users, respond to legal requests or maintain service integrity. Where
           practical, context and severity will be considered. You may ask about a moderation
-          decision using the contact address above.
+          decision using the contact address above. Moderation decisions are currently made
+          manually. ExtendShare also uses automated technical validation and official-source import
+          checks, but these checks do not replace human moderation decisions about user submissions.
         </p>
       </LegalSection>
 
@@ -166,22 +168,20 @@ function TermsOfService() {
 
       <LegalSection title="13. Limitation of liability">
         <p>
-          To the maximum extent permitted by applicable law, the operator is not liable for
-          indirect, incidental, special or consequential losses arising from third-party plugins,
-          external websites, loss of data, service interruption or use of information from a
-          listing. Where liability cannot be excluded, it is limited to the amount reasonably
-          attributable to the event under applicable law. Because the current service is free, no
-          paid subscription fee is used as a liability measure.
+          To the extent permitted by applicable law, ExtendShare and its operator are not responsible
+          for losses caused by third-party plugins, external websites or services that are outside
+          ExtendShare's reasonable control. Nothing in these Terms excludes or limits liability or
+          consumer rights that cannot legally be excluded or limited under applicable law.
         </p>
       </LegalSection>
 
       <LegalSection title="14. Changes and governing law">
         <p>
           We may update these Terms as the service changes. The updated date will be shown above.
-          Continued use after an update means the revised Terms apply from their effective date.
-          These Terms are governed by applicable Polish law, without limiting mandatory consumer or
-          data-protection rights available under the law of your residence. Disputes should first be
-          raised with the operator in good faith.
+          Where changes are material, users will be informed in an appropriate manner before or when
+          the updated Terms take effect. These Terms are governed by applicable Polish law, without
+          limiting mandatory consumer or data-protection rights available under the law of your
+          residence. Disputes should first be raised with the operator in good faith.
         </p>
       </LegalSection>
     </LegalPage>
