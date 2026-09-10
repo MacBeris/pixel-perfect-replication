@@ -72,9 +72,10 @@ export function AccountOverview({ userId }: { userId: string }) {
   return (
     <div className="space-y-6">
       <Metrics
-        items={["Paid purchases", "Favorites", "Collections", "Reviews"].map(
-          (label, i) => ({ label, value: q.data[i] ?? 0 }),
-        )}
+        items={["Paid purchases", "Favorites", "Collections", "Reviews"].map((label, i) => ({
+          label,
+          value: q.data[i] ?? 0,
+        }))}
       />
       <Panel
         title="Make this space your own"
@@ -106,13 +107,7 @@ export function AccountOverview({ userId }: { userId: string }) {
     </div>
   );
 }
-export function SavedPlugins({
-  userId,
-  tab,
-}: {
-  userId: string;
-  tab: "library" | "favorites";
-}) {
+export function SavedPlugins({ userId, tab }: { userId: string; tab: "library" | "favorites" }) {
   const [page, setPage] = useState(0);
   const action = useAction(userId);
   const q = useQuery({
@@ -148,7 +143,7 @@ export function SavedPlugins({
         {q.data.map((row, i) => (
           <div
             key={`${row.plugin_id}-${i}`}
-            className="flex items-center gap-4 rounded-xl border border-border p-4"
+            className="flex flex-col items-stretch gap-4 rounded-xl border border-border p-4 sm:flex-row sm:items-center"
           >
             {row.plugin?.logo_url && (
               <img alt="" src={row.plugin.logo_url} className="size-12 rounded-lg object-cover" />
@@ -158,7 +153,7 @@ export function SavedPlugins({
                 <Link
                   to="/plugins/$slug"
                   params={{ slug: row.plugin.slug }}
-                  className="font-medium hover:underline"
+                  className="break-words font-medium hover:underline"
                 >
                   {row.plugin.name}
                 </Link>
@@ -173,6 +168,7 @@ export function SavedPlugins({
               <Button
                 variant="outline"
                 size="sm"
+                className="w-full sm:w-auto"
                 disabled={action.isPending}
                 onClick={() =>
                   action.mutate(async () => {
@@ -256,9 +252,9 @@ export function Collections({ userId }: { userId: string }) {
           {q.data.map((c) => (
             <div
               key={c.id}
-              className="flex items-center justify-between gap-3 rounded-lg border border-border p-4"
+              className="flex flex-col items-stretch justify-between gap-3 rounded-lg border border-border p-4 sm:flex-row sm:items-center"
             >
-              <button className="text-left" onClick={() => setSelected(c.id)}>
+              <button className="min-w-0 text-left" onClick={() => setSelected(c.id)}>
                 <span className="font-medium">{c.name}</span>
                 <span className="ml-2 text-xs text-muted-foreground">
                   {c.is_public ? "Public" : "Private"}
@@ -326,7 +322,7 @@ export function Collections({ userId }: { userId: string }) {
             <input type="checkbox" name="is_public" defaultChecked={current?.is_public ?? false} />
             Public collection
           </label>
-          <div className="flex gap-2">
+          <div className="flex flex-wrap gap-2">
             <Button disabled={action.isPending}>Save collection</Button>
             {current && (
               <Button type="button" variant="outline" onClick={() => setSelected(undefined)}>
@@ -384,7 +380,7 @@ function CollectionContents({ userId, collectionId }: { userId: string; collecti
             {q.data.map((row) => (
               <div
                 key={row.plugin_id}
-                className="flex items-center justify-between gap-3 rounded-lg border p-3"
+                className="flex flex-col items-stretch justify-between gap-3 rounded-lg border p-3 min-[390px]:flex-row min-[390px]:items-center"
               >
                 <span>{row.plugin?.name ?? "Plugin unavailable"}</span>
                 <Button
@@ -411,7 +407,7 @@ function CollectionContents({ userId, collectionId }: { userId: string; collecti
         </>
       )}
       <form
-        className="mt-5 flex gap-2"
+        className="mt-5 flex flex-col gap-2 min-[390px]:flex-row"
         onSubmit={(e) => {
           e.preventDefault();
           setSearch(String(new FormData(e.currentTarget).get("search")).trim());
@@ -431,8 +427,11 @@ function CollectionContents({ userId, collectionId }: { userId: string; collecti
       )}
       <div className="mt-3 space-y-2">
         {candidates.data?.map((p) => (
-          <div key={p.id} className="flex items-center justify-between gap-3 p-2">
-            <span>{p.name}</span>
+          <div
+            key={p.id}
+            className="flex flex-col items-stretch justify-between gap-3 p-2 min-[390px]:flex-row min-[390px]:items-center"
+          >
+            <span className="min-w-0 break-words">{p.name}</span>
             <Button
               variant="outline"
               disabled={action.isPending || q.data?.some((r) => r.plugin_id === p.id)}

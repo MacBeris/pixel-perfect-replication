@@ -166,7 +166,7 @@ export function PluginReviews({
                                   type="button"
                                   size="icon"
                                   variant="ghost"
-                                  className="size-8"
+                                  className="size-11 sm:size-8"
                                   aria-label="Edit review"
                                   onClick={() => setEditingId(r.id)}
                                 >
@@ -183,7 +183,7 @@ export function PluginReviews({
                                       type="button"
                                       size="icon"
                                       variant="ghost"
-                                      className="size-8 text-destructive hover:text-destructive"
+                                      className="size-11 text-destructive hover:text-destructive sm:size-8"
                                       aria-label="Delete review"
                                     >
                                       <Trash2 aria-hidden="true" className="size-4" />

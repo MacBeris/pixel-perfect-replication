@@ -17,6 +17,7 @@ import { SiteFooter } from "@/components/layout/site-footer";
 import { Toaster } from "@/components/ui/sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { SiteAnalyticsTracker } from "@/features/analytics/site-tracker";
+import { siteUrl } from "@/lib/site";
 
 const GOOGLE_ANALYTICS_ID = "G-FDFQ9Y3M3D";
 
@@ -92,7 +93,12 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
           "Discover plugins, extensions and add-ons for WordPress, Blender and more. Compare tools and find official downloads on ExtendShare.",
       },
       { property: "og:type", content: "website" },
+      { property: "og:site_name", content: "ExtendShare" },
+      { property: "og:image", content: siteUrl("/extendshare-social-preview.png") },
+      { property: "og:image:alt", content: "ExtendShare — plugins, extensions and add-ons" },
       { name: "twitter:card", content: "summary_large_image" },
+      { name: "twitter:image", content: siteUrl("/extendshare-social-preview.png") },
+      { name: "twitter:image:alt", content: "ExtendShare — plugins, extensions and add-ons" },
     ],
     links: [
       {
@@ -105,7 +111,11 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
         rel: "stylesheet",
         href: "https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=DM+Sans:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap",
       },
-      { rel: "icon", href: "/extendshare-favicon-v2.png", type: "image/png" },
+      { rel: "icon", href: "/favicon.ico", sizes: "any" },
+      { rel: "icon", href: "/favicon-32x32.png", type: "image/png", sizes: "32x32" },
+      { rel: "icon", href: "/favicon-48x48.png", type: "image/png", sizes: "48x48" },
+      { rel: "apple-touch-icon", href: "/apple-touch-icon.png", sizes: "180x180" },
+      { rel: "manifest", href: "/site.webmanifest" },
     ],
   }),
   shellComponent: RootShell,

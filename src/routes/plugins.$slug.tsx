@@ -69,10 +69,11 @@ export const Route = createFileRoute("/plugins/$slug")({
     const platform = plugin.platform?.name ?? "Extension";
     const title = `${plugin.name} – ${platform} Plugin | ExtendShare`;
     const description = pluginDescription(plugin);
-    const image =
+    const pluginImage =
       plugin.plugin_assets.find((asset) => asset.asset_type === "cover")?.public_url ??
       plugin.plugin_assets.find((asset) => asset.asset_type === "screenshot")?.public_url ??
       plugin.logo_url;
+    const image = pluginImage ?? siteUrl("/extendshare-social-preview.png");
     return {
       meta: [
         { title },
@@ -81,10 +82,13 @@ export const Route = createFileRoute("/plugins/$slug")({
         { property: "og:description", content: description },
         { property: "og:type", content: "website" },
         { property: "og:url", content: canonical },
-        ...(image ? [{ property: "og:image", content: image }] : []),
-        { name: "twitter:card", content: image ? "summary_large_image" : "summary" },
+        { property: "og:image", content: image },
+        { property: "og:image:alt", content: `${plugin.name} on ExtendShare` },
+        { name: "twitter:card", content: "summary_large_image" },
         { name: "twitter:title", content: title },
         { name: "twitter:description", content: description },
+        { name: "twitter:image", content: image },
+        { name: "twitter:image:alt", content: `${plugin.name} on ExtendShare` },
       ],
       links: [{ rel: "canonical", href: canonical }],
     };
@@ -152,7 +156,7 @@ function PluginDetail() {
   }
 
   return (
-    <article className="container-page py-14">
+    <article className="container-page py-8 sm:py-14">
       {data.moderation_status === "approved" && <PublicPluginView pluginId={data.id} />}
       <div className="flex flex-wrap items-center gap-2 text-xs text-muted-foreground">
         <Link to="/plugins" className="hover:text-foreground">
@@ -161,7 +165,7 @@ function PluginDetail() {
         <span>/</span>
         <span>{data.platform?.name}</span>
       </div>
-      <div className="mt-5 flex items-center gap-4">
+      <div className="mt-5 flex items-start gap-4">
         {data.logo_url && (
           <img
             src={data.logo_url}
@@ -169,7 +173,9 @@ function PluginDetail() {
             className="size-16 shrink-0 rounded-2xl border object-contain md:size-20"
           />
         )}
-        <h1 className="min-w-0 break-words text-3xl font-semibold md:text-4xl">{data.name}</h1>
+        <h1 className="min-w-0 break-words text-2xl font-semibold sm:text-3xl md:text-4xl">
+          {data.name}
+        </h1>
       </div>
       {data.moderation_status !== "approved" && (
         <p className="mt-2 text-sm text-primary">
@@ -181,7 +187,7 @@ function PluginDetail() {
         <Link
           to="/developers/$slug"
           params={{ slug: data.developer.slug }}
-          className="mt-3 inline-flex items-center gap-2 text-sm text-muted-foreground transition hover:text-foreground"
+          className="mt-3 inline-flex max-w-full items-center gap-2 break-words text-sm text-muted-foreground transition hover:text-foreground"
         >
           {data.developer.avatar_url && (
             <img
@@ -197,7 +203,7 @@ function PluginDetail() {
           href={data.source_author_url ?? data.source_url ?? undefined}
           target="_blank"
           rel="noreferrer"
-          className="mt-3 inline-flex text-sm text-muted-foreground transition hover:text-foreground"
+          className="mt-3 inline-flex max-w-full break-all text-sm text-muted-foreground transition hover:text-foreground"
         >
           by <span className="ml-1 font-medium text-foreground">{data.source_author_name}</span>
         </a>

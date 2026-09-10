@@ -23,10 +23,10 @@ export const Route = createFileRoute("/about")({
 
 function AboutPage() {
   return (
-    <main className="container-page py-14 md:py-20">
+    <main className="container-page py-10 sm:py-14 md:py-20">
       <div className="max-w-3xl">
         <p className="text-sm font-medium text-primary">About ExtendShare</p>
-        <h1 className="mt-3 text-4xl font-semibold tracking-tight md:text-5xl">
+        <h1 className="mt-3 text-3xl font-semibold tracking-tight sm:text-4xl md:text-5xl">
           One place to discover better extensions
         </h1>
         <p className="mt-5 text-lg leading-8 text-muted-foreground">

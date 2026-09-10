@@ -8,15 +8,17 @@ export function PlatformGrid() {
   const { data, isLoading } = useQuery({ queryKey: ["platforms"], queryFn: fetchPlatforms });
 
   return (
-    <section className="container-page py-14">
+    <section className="container-page py-10 sm:py-14">
       <h2 className="text-xl font-semibold md:text-2xl">{t("section.browseByPlatform")}</h2>
       <p className="mt-1 text-sm text-muted-foreground">
         Pick the tool you work in and see what the community built for it.
       </p>
 
-      <div className="mt-6 grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-5">
+      <div className="mt-6 grid grid-cols-1 gap-3 min-[360px]:grid-cols-2 sm:grid-cols-3 lg:grid-cols-5">
         {isLoading
-          ? Array.from({ length: 10 }).map((_, index) => <Skeleton key={index} className="h-20 rounded-xl" />)
+          ? Array.from({ length: 10 }).map((_, index) => (
+              <Skeleton key={index} className="h-20 rounded-xl" />
+            ))
           : (data ?? []).map((platform) => (
               <Link
                 key={platform.id}
@@ -25,7 +27,9 @@ export function PlatformGrid() {
                 className="group flex h-20 flex-col justify-center rounded-xl border border-border bg-card px-4 transition-colors hover:border-border-strong hover:bg-surface"
               >
                 <span className="text-sm font-semibold text-foreground">{platform.name}</span>
-                <span className="mt-1 line-clamp-1 text-xs text-muted-foreground">{platform.description}</span>
+                <span className="mt-1 line-clamp-1 text-xs text-muted-foreground">
+                  {platform.description}
+                </span>
               </Link>
             ))}
       </div>

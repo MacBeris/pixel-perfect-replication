@@ -9,11 +9,13 @@ export function CategoryGrid() {
   const categories = (data ?? []).slice(0, 12);
 
   return (
-    <section className="container-page py-14">
+    <section className="container-page py-10 sm:py-14">
       <h2 className="text-xl font-semibold md:text-2xl">{t("section.featuredCategories")}</h2>
       <div className="mt-6 flex flex-wrap gap-2">
         {isLoading
-          ? Array.from({ length: 10 }).map((_, index) => <Skeleton key={index} className="h-9 w-28 rounded-full" />)
+          ? Array.from({ length: 10 }).map((_, index) => (
+              <Skeleton key={index} className="h-9 w-28 rounded-full" />
+            ))
           : categories.map((category) => (
               <Link
                 key={category.id}

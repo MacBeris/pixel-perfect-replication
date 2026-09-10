@@ -12,14 +12,16 @@ export function Hero() {
   return (
     <section className="relative overflow-hidden border-b border-border">
       <div className="absolute inset-0 grid-backdrop opacity-60" aria-hidden="true" />
-      <div className="container-page relative py-20 text-center md:py-28">
+      <div className="container-page relative py-14 text-center sm:py-20 md:py-28">
         <span className="inline-flex items-center rounded-full border border-border bg-surface px-3 py-1 text-xs text-muted-foreground">
           10 platforms · one marketplace
         </span>
-        <h1 className="mx-auto mt-6 max-w-3xl text-balance-tight text-4xl font-semibold md:text-6xl">
+        <h1 className="mx-auto mt-6 max-w-3xl text-balance-tight text-3xl font-semibold sm:text-4xl md:text-6xl">
           {t("hero.title")}
         </h1>
-        <p className="mx-auto mt-5 max-w-xl text-base text-muted-foreground md:text-lg">{t("hero.subtitle")}</p>
+        <p className="mx-auto mt-5 max-w-xl text-base text-muted-foreground md:text-lg">
+          {t("hero.subtitle")}
+        </p>
 
         <form
           className="mx-auto mt-9 flex max-w-2xl flex-col gap-3 sm:flex-row"
@@ -43,7 +45,7 @@ export function Hero() {
           </Button>
         </form>
 
-        <div className="mt-6 flex items-center justify-center gap-4 text-sm">
+        <div className="mt-6 flex flex-wrap items-center justify-center gap-x-4 gap-y-2 text-sm">
           <Link to="/plugins" className="text-muted-foreground hover:text-foreground">
             Browse the catalog
           </Link>

@@ -47,7 +47,7 @@ export function Failure({ error, retry }: { error: unknown; retry: () => void })
 }
 export function Metrics({ items }: { items: { label: string; value: string | number }[] }) {
   return (
-    <div className="grid grid-cols-2 gap-3 xl:grid-cols-4">
+    <div className="grid grid-cols-1 gap-3 min-[390px]:grid-cols-2 xl:grid-cols-4">
       {items.map((item) => (
         <div key={item.label} className="rounded-xl border border-border bg-card p-5">
           <p className="text-xs text-muted-foreground">{item.label}</p>

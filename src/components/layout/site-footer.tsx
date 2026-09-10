@@ -21,7 +21,7 @@ const columns = [
 export function SiteFooter() {
   return (
     <footer className="border-t border-border bg-surface">
-      <div className="container-page grid gap-10 py-14 md:grid-cols-4">
+      <div className="container-page grid gap-8 py-10 sm:grid-cols-2 sm:py-14 md:grid-cols-4">
         <div className="md:col-span-2">
           <Wordmark />
           <p className="mt-3 max-w-xs text-sm text-muted-foreground">

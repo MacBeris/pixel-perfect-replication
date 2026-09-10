@@ -29,7 +29,7 @@ export function PluginCard({ plugin }: { plugin: PluginListItem }) {
             loading="lazy"
           />
         )}
-        <div className="flex items-start gap-3">
+        <div className="flex min-w-0 items-start gap-3">
           <div className="flex size-11 shrink-0 items-center justify-center overflow-hidden rounded-lg border border-border bg-surface font-display text-sm font-semibold text-muted-foreground">
             {plugin.logo_url ? (
               <img
@@ -42,23 +42,27 @@ export function PluginCard({ plugin }: { plugin: PluginListItem }) {
               plugin.name.slice(0, 2).toUpperCase()
             )}
           </div>
-          <div className="min-w-0">
-            <h3 className="truncate text-sm font-semibold text-foreground">{plugin.name}</h3>
+          <div className="min-w-0 flex-1">
+            <h3 className="line-clamp-2 break-words text-sm font-semibold text-foreground">
+              {plugin.name}
+            </h3>
             <p className="text-xs text-muted-foreground">
               {plugin.platform?.name ?? "Unknown platform"}
             </p>
-            <p className="mt-0.5 truncate text-xs text-muted-foreground">
+            <p className="mt-0.5 line-clamp-2 break-words text-xs text-muted-foreground">
               by {plugin.developer?.name ?? plugin.source_author_name ?? "Unknown developer"}
             </p>
           </div>
-          <span className="ml-auto text-sm font-medium text-foreground">{formatPrice(plugin)}</span>
+          <span className="shrink-0 text-sm font-medium text-foreground">
+            {formatPrice(plugin)}
+          </span>
         </div>
 
         <p className="mt-3 line-clamp-2 text-sm text-muted-foreground">
           {plugin.short_description}
         </p>
 
-        <div className="mt-auto flex items-center gap-3 pt-4 text-xs text-muted-foreground">
+        <div className="mt-auto flex flex-wrap items-center gap-x-3 gap-y-2 pt-4 text-xs text-muted-foreground">
           <span className="inline-flex items-center gap-1">
             <Star className="size-3.5 fill-current text-warning" />
             {visibleRating.toFixed(1)}
@@ -72,7 +76,7 @@ export function PluginCard({ plugin }: { plugin: PluginListItem }) {
               : ""}
           </span>
           {plugin.is_open_source ? (
-            <Badge variant="secondary" className="ml-auto text-[10px]">
+            <Badge variant="secondary" className="sm:ml-auto text-[10px]">
               Open source
             </Badge>
           ) : null}

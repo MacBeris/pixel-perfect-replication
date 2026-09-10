@@ -181,6 +181,7 @@
     color: var(--color-foreground);
     font-family: var(--font-sans);
     -webkit-font-smoothing: antialiased;
+    min-width: 20rem;
   }
 
   h1,
@@ -196,7 +197,11 @@
   margin-inline: auto;
   width: 100%;
   max-width: 80rem;
-  padding-inline: 1.25rem;
+  padding-inline: 1rem;
+
+  @media (width >= 40rem) {
+    padding-inline: 1.25rem;
+  }
 }
 
 @utility text-balance-tight {

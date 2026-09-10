@@ -235,7 +235,9 @@ function AdminPage() {
           <div className="flex items-center gap-2 text-sm text-primary">
             <ShieldCheck className="size-4" /> Administration
           </div>
-          <h1 className="mt-2 text-3xl font-semibold tracking-tight">ExtendShare control center</h1>
+          <h1 className="mt-2 text-2xl font-semibold tracking-tight sm:text-3xl">
+            ExtendShare control center
+          </h1>
           <p className="mt-2 text-sm text-muted-foreground">
             Moderate the marketplace, protect its community and manage its catalog.
           </p>
@@ -245,8 +247,23 @@ function AdminPage() {
         </Button>
       </div>
 
-      <div className="grid gap-8 lg:grid-cols-[230px_minmax(0,1fr)]">
-        <aside className="h-fit rounded-xl border border-border bg-card p-2">
+      <div className="grid gap-6 lg:grid-cols-[230px_minmax(0,1fr)] lg:gap-8">
+        <label className="block text-sm lg:hidden">
+          Admin section
+          <select
+            aria-label="Admin section"
+            className="mt-2 h-11 w-full rounded-md border border-input bg-background px-3 text-sm"
+            value={section}
+            onChange={(event) => setSection(event.target.value as Section)}
+          >
+            {sections.map(({ id, label }) => (
+              <option key={id} value={id}>
+                {label}
+              </option>
+            ))}
+          </select>
+        </label>
+        <aside className="hidden h-fit rounded-xl border border-border bg-card p-2 lg:block">
           <nav className="space-y-1">
             {sections.map(({ id, label, icon: Icon }) => (
               <button

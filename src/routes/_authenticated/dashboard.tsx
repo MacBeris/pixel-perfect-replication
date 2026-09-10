@@ -16,31 +16,28 @@ import { fieldClass } from "@/features/dashboard/ui";
 export const Route = createFileRoute("/_authenticated/dashboard")({
   validateSearch: searchSchema,
   head: () => ({
-    meta: [{ title: "Your dashboard — ExtendShare" }, { name: "robots", content: "noindex,nofollow" }],
+    meta: [
+      { title: "Your dashboard — ExtendShare" },
+      { name: "robots", content: "noindex,nofollow" },
+    ],
   }),
   component: Dashboard,
 });
-const icons = [
-  LayoutDashboard,
-  LibraryBig,
-  Heart,
-  FolderOpen,
-  MessageSquare,
-  Code2,
-  Settings,
-];
+const icons = [LayoutDashboard, LibraryBig, Heart, FolderOpen, MessageSquare, Code2, Settings];
 function Dashboard() {
   const { user } = Route.useRouteContext();
   const search = Route.useSearch();
   const navigate = Route.useNavigate();
   if (!user) return null;
   return (
-    <div className="container-page py-8 lg:py-12">
+    <div className="container-page py-6 sm:py-8 lg:py-12">
       <div className="mb-7">
         <p className="text-xs font-medium uppercase tracking-widest text-muted-foreground">
           Your workspace
         </p>
-        <h1 className="mt-2 text-3xl font-semibold tracking-tight">Account dashboard</h1>
+        <h1 className="mt-2 text-2xl font-semibold tracking-tight sm:text-3xl">
+          Account dashboard
+        </h1>
         <p className="mt-2 text-sm text-muted-foreground">
           Discover, organize and create. All from one account.
         </p>

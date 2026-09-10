@@ -22,8 +22,8 @@ export function PluginSection({ title, description, query, queryKey, viewAllSear
 
   return (
     <section className="container-page py-10">
-      <div className="flex items-end justify-between gap-4">
-        <div>
+      <div className="flex flex-wrap items-end justify-between gap-3">
+        <div className="min-w-0 flex-1">
           <h2 className="text-xl font-semibold md:text-2xl">{title}</h2>
           {description ? <p className="mt-1 text-sm text-muted-foreground">{description}</p> : null}
         </div>
@@ -40,7 +40,9 @@ export function PluginSection({ title, description, query, queryKey, viewAllSear
         {error ? (
           <div className="rounded-xl border border-dashed border-border bg-surface p-8 text-center">
             <p className="text-sm font-medium text-foreground">Plugins could not be loaded.</p>
-            <p className="mt-1 text-sm text-muted-foreground">Check your connection and try again.</p>
+            <p className="mt-1 text-sm text-muted-foreground">
+              Check your connection and try again.
+            </p>
             <Button
               variant="outline"
               size="sm"
@@ -52,7 +54,11 @@ export function PluginSection({ title, description, query, queryKey, viewAllSear
             </Button>
           </div>
         ) : (
-          <PluginGrid plugins={data ?? []} isLoading={isLoading} emptyMessage="No plugins published here yet." />
+          <PluginGrid
+            plugins={data ?? []}
+            isLoading={isLoading}
+            emptyMessage="No plugins published here yet."
+          />
         )}
       </div>
     </section>

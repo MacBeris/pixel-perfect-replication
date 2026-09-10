@@ -12,6 +12,7 @@
     "ingest:verify": "npm run ingest -- --source wordpress --verify && npm run ingest -- --source blender --verify",
     "test:ingest": "node --import tsx --test scripts/ingest/*.test.ts",
     "test:analytics": "node --import tsx --test src/features/analytics/*.test.ts",
+    "test:responsive": "node scripts/responsive-smoke.mjs",
     "lint": "eslint .",
     "format": "prettier --write ."
   },

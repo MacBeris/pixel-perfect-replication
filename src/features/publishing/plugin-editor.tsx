@@ -528,7 +528,7 @@ function EditorForm({
                   <span className="mt-1 text-xs font-medium text-primary">Choose image</span>
                 </label>
               ))}
-              <div className="grid grid-cols-2 gap-3 sm:grid-cols-3">
+              <div className="grid grid-cols-1 gap-3 min-[390px]:grid-cols-2 sm:grid-cols-3">
                 {assets.map((asset) => (
                   <div key={asset.id} className="rounded-lg border p-2">
                     {asset.public_url && (

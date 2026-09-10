@@ -112,7 +112,10 @@ export function DeveloperSection({ userId, search }: { userId: string; search: D
         />
       );
     return (
-      <Panel title="Become a Developer" description="Give your creative work a home on ExtendShare.">
+      <Panel
+        title="Become a Developer"
+        description="Give your creative work a home on ExtendShare."
+      >
         <div className="grid gap-6 md:grid-cols-[1fr_auto]">
           <div>
             <p className="max-w-xl text-sm leading-relaxed text-muted-foreground">
@@ -387,15 +390,17 @@ function DeveloperAnalytics({
                       { label: "ExtendShare reviews", value: d.totals.reviews },
                     ]
                   : [
-                    { label: "Total downloads", value: d.totals.downloads },
-                    { label: "Total views", value: d.totals.views },
-                    { label: "Rating average", value: d.totals.rating ?? "Not rated" },
-                    { label: "Reviews", value: d.totals.reviews },
-                    {
-                      label: "Downloads · 30 days",
-                      value: d.history.available ? d.history.downloads_last_30_days : "Unavailable",
-                    },
-                  ]
+                      { label: "Total downloads", value: d.totals.downloads },
+                      { label: "Total views", value: d.totals.views },
+                      { label: "Rating average", value: d.totals.rating ?? "Not rated" },
+                      { label: "Reviews", value: d.totals.reviews },
+                      {
+                        label: "Downloads · 30 days",
+                        value: d.history.available
+                          ? d.history.downloads_last_30_days
+                          : "Unavailable",
+                      },
+                    ]
                 : [
                     { label: "Total plugins", value: d.totals.plugins },
                     { label: "Published plugins", value: d.totals.published },
@@ -518,7 +523,9 @@ function DeveloperAnalytics({
                         )}
                         <div className="min-w-0 flex-1">
                           <div className="flex flex-wrap items-center gap-2">
-                            <h3 className="truncate text-base font-semibold">{p.name}</h3>
+                            <h3 className="line-clamp-2 break-words text-base font-semibold">
+                              {p.name}
+                            </h3>
                             <PluginStatus plugin={p} />
                           </div>
                           <p className="mt-1 text-sm text-muted-foreground">
@@ -526,7 +533,7 @@ function DeveloperAnalytics({
                           </p>
                         </div>
                       </div>
-                      <div className="mt-5 grid grid-cols-3 gap-3 border-y py-4 text-sm">
+                      <div className="mt-5 grid grid-cols-1 gap-3 border-y py-4 text-sm min-[390px]:grid-cols-3">
                         <Meta
                           label="Distribution"
                           value={p.listing_type === "external_listing" ? "External" : "Hosted"}
@@ -592,6 +599,7 @@ function DeveloperAnalytics({
                             <Button
                               size="icon"
                               variant="ghost"
+                              className="size-11 sm:size-9"
                               aria-label={`More actions for ${p.name}`}
                             >
                               <MoreHorizontal className="size-4" />

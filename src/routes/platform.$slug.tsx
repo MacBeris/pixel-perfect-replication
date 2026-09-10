@@ -52,8 +52,10 @@ function PlatformPage() {
   });
 
   return (
-    <div className="container-page py-14">
-      <h1 className="text-3xl font-semibold md:text-4xl">{platform.name} plugins and extensions</h1>
+    <div className="container-page py-10 sm:py-14">
+      <h1 className="break-words text-3xl font-semibold md:text-4xl">
+        {platform.name} plugins and extensions
+      </h1>
       <p className="mt-2 max-w-2xl text-sm text-muted-foreground">
         {platformCopy[slug] ??
           platform.description ??

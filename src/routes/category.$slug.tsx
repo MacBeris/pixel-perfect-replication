@@ -44,8 +44,8 @@ function CategoryPage() {
   });
 
   return (
-    <div className="container-page py-14">
-      <h1 className="text-3xl font-semibold md:text-4xl">{category.name} plugins</h1>
+    <div className="container-page py-10 sm:py-14">
+      <h1 className="break-words text-3xl font-semibold md:text-4xl">{category.name} plugins</h1>
       <p className="mt-2 max-w-2xl text-sm text-muted-foreground">
         {category.description ?? `Browse plugins and extensions in ${category.name}.`}
       </p>

@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { Link, useNavigate } from "@tanstack/react-router";
+import { Link, useLocation, useNavigate } from "@tanstack/react-router";
 import {
   LibraryBig,
   Heart,
@@ -28,11 +28,17 @@ import { supabase } from "@/integrations/supabase/client";
 import { t } from "@/lib/i18n";
 
 const navLinks = [{ to: "/plugins", label: t("nav.explore") }];
+const mobileNavLinks = [
+  { to: "/plugins", label: t("nav.explore") },
+  { to: "/about", label: "About" },
+  { to: "/for-developers", label: "For developers" },
+] as const;
 
 export function SiteHeader() {
   const [query, setQuery] = useState("");
   const [mobileOpen, setMobileOpen] = useState(false);
   const navigate = useNavigate();
+  const location = useLocation();
   const { isAuthenticated, user, session } = useAuth();
   const [isAdmin, setIsAdmin] = useState(false);
   const userId = session?.user.id;
@@ -57,6 +63,8 @@ export function SiteHeader() {
     };
   }, [userId]);
 
+  useEffect(() => setMobileOpen(false), [location.pathname]);
+
   function submitSearch(event: React.FormEvent) {
     event.preventDefault();
     navigate({ to: "/plugins", search: query ? { q: query } : {} });
@@ -65,7 +73,7 @@ export function SiteHeader() {
 
   return (
     <header className="sticky top-0 z-40 border-b border-border bg-background/80 backdrop-blur-xl">
-      <div className="container-page flex h-16 items-center gap-4">
+      <div className="container-page flex h-16 min-w-0 items-center gap-2 sm:gap-4">
         <Wordmark />
 
         <nav className="hidden items-center gap-1 md:flex">
@@ -93,7 +101,7 @@ export function SiteHeader() {
           </div>
         </form>
 
-        <div className="ml-auto flex items-center gap-2 lg:ml-0">
+        <div className="ml-auto flex shrink-0 items-center gap-1 sm:gap-2 lg:ml-0">
           <Link
             to="/dashboard"
             search={{ tab: "developer" }}
@@ -101,12 +109,19 @@ export function SiteHeader() {
           >
             {t("nav.sell")}
           </Link>
-          <ThemeToggle />
+          <div className="hidden sm:block">
+            <ThemeToggle />
+          </div>
 
           {isAuthenticated ? (
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
-                <Button variant="outline" size="icon" aria-label={t("nav.account")}>
+                <Button
+                  variant="outline"
+                  size="icon"
+                  className="size-11 sm:size-9"
+                  aria-label={t("nav.account")}
+                >
                   <User2 className="size-4" />
                 </Button>
               </DropdownMenuTrigger>
@@ -161,31 +176,59 @@ export function SiteHeader() {
 
           <Sheet open={mobileOpen} onOpenChange={setMobileOpen}>
             <SheetTrigger asChild>
-              <Button variant="ghost" size="icon" className="md:hidden" aria-label="Open menu">
+              <Button
+                variant="ghost"
+                size="icon"
+                className="size-11 md:hidden"
+                aria-label="Open menu"
+              >
                 <Menu className="size-4" />
               </Button>
             </SheetTrigger>
-            <SheetContent side="right" className="w-80">
+            <SheetContent side="right">
               <SheetTitle className="font-display">ExtendShare</SheetTitle>
-              <form onSubmit={submitSearch} className="mt-4">
-                <Input
-                  value={query}
-                  onChange={(event) => setQuery(event.target.value)}
-                  placeholder={t("search.placeholder")}
-                />
+              <form onSubmit={submitSearch} className="mt-6 flex gap-2">
+                <div className="relative min-w-0 flex-1">
+                  <Search className="pointer-events-none absolute left-3 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" />
+                  <Input
+                    value={query}
+                    onChange={(event) => setQuery(event.target.value)}
+                    placeholder={t("search.placeholder")}
+                    className="h-11 pl-9"
+                  />
+                </div>
+                <Button type="submit" size="icon" className="size-11" aria-label="Search">
+                  <Search className="size-4" />
+                </Button>
               </form>
               <nav className="mt-6 flex flex-col gap-1">
-                {navLinks.map((link) => (
+                {mobileNavLinks.map((link) => (
                   <Link
                     key={link.to}
                     to={link.to}
                     onClick={() => setMobileOpen(false)}
-                    className="rounded-md px-3 py-2 text-sm text-muted-foreground hover:bg-secondary hover:text-foreground"
+                    className="flex min-h-11 items-center rounded-md px-3 py-2 text-sm text-muted-foreground hover:bg-secondary hover:text-foreground"
                   >
                     {link.label}
                   </Link>
                 ))}
+                {isAuthenticated && (
+                  <Link
+                    to="/dashboard"
+                    search={{ tab: "overview" }}
+                    onClick={() => setMobileOpen(false)}
+                    className="flex min-h-11 items-center rounded-md px-3 py-2 text-sm text-muted-foreground hover:bg-secondary hover:text-foreground"
+                  >
+                    Dashboard
+                  </Link>
+                )}
               </nav>
+              <div className="mt-6 border-t pt-5 sm:hidden">
+                <p className="mb-3 text-xs font-medium uppercase tracking-wide text-muted-foreground">
+                  Appearance
+                </p>
+                <ThemeToggle />
+              </div>
             </SheetContent>
           </Sheet>
         </div>
