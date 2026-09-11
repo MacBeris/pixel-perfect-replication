@@ -102,7 +102,7 @@ export function PluginFavoriteAction({
         variant="outline"
         className={cn(
           active
-            ? "border-primary/45 bg-primary/10 text-primary hover:bg-primary/15 hover:text-primary"
+            ? "border-red-500/40 bg-red-500/10 text-red-600 hover:bg-red-500/15 hover:text-red-600 dark:text-red-400 dark:hover:text-red-400"
             : "text-muted-foreground hover:text-foreground",
         )}
         aria-pressed={active}
@@ -117,7 +117,7 @@ export function PluginFavoriteAction({
         {mutation.isPending ? (
           <LoaderCircle className="animate-spin" />
         ) : (
-          <Heart className={cn(active && "fill-primary text-primary")} />
+          <Heart className={cn(active && "fill-red-500 text-red-500")} />
         )}
         {compact ? "Favorites" : `${active ? "Remove from" : "Add to"} Favorites`}
       </Button>

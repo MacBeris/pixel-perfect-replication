@@ -61,19 +61,19 @@ export function PluginDistribution({ plugin }: { plugin: Tables<"plugins"> }) {
     },
   });
   const gallery = useMemo(
-    () =>
-      (q.data?.assets ?? []).filter(
-        (a) => a.asset_type === "screenshot" && a.public_url,
-      ),
+    () => (q.data?.assets ?? []).filter((a) => a.asset_type === "screenshot" && a.public_url),
     [q.data?.assets],
   );
   const selected = gallery.find((a) => a.id === selectedImage) ?? gallery[0];
   const selectedIndex = selected ? gallery.findIndex((asset) => asset.id === selected.id) : -1;
-  const showRelative = useCallback((offset: number) => {
-    if (!gallery.length) return;
-    const next = (Math.max(0, selectedIndex) + offset + gallery.length) % gallery.length;
-    setSelectedImage(gallery[next]?.id);
-  }, [gallery, selectedIndex]);
+  const showRelative = useCallback(
+    (offset: number) => {
+      if (!gallery.length) return;
+      const next = (Math.max(0, selectedIndex) + offset + gallery.length) % gallery.length;
+      setSelectedImage(gallery[next]?.id);
+    },
+    [gallery, selectedIndex],
+  );
   useEffect(() => {
     if (!lightboxOpen || gallery.length < 2) return;
     const keydown = (event: KeyboardEvent) => {
@@ -130,21 +130,43 @@ export function PluginDistribution({ plugin }: { plugin: Tables<"plugins"> }) {
       )}
       {selected && (
         <div className="space-y-3">
-          <button
-            type="button"
-            className="group relative block w-full overflow-hidden rounded-xl border bg-secondary/30 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2"
-            aria-label="Open screenshot in full-size viewer"
-            onClick={() => setLightboxOpen(true)}
-          >
-            <img
-              src={selected.public_url ?? ""}
-              alt={selected.alt_text || `${plugin.name} screenshot`}
-              className="aspect-video max-h-[520px] w-full object-contain transition duration-200 group-hover:scale-[1.01]"
-            />
-            <span className="absolute bottom-3 right-3 inline-flex size-11 items-center justify-center rounded-full border bg-background/90 text-foreground opacity-90 shadow-sm transition group-hover:bg-background group-hover:opacity-100">
-              <Expand className="size-5" aria-hidden="true" />
-            </span>
-          </button>
+          <div className="relative">
+            <button
+              type="button"
+              className="group relative block w-full overflow-hidden rounded-xl border bg-secondary/30 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2"
+              aria-label="Open screenshot in full-size viewer"
+              onClick={() => setLightboxOpen(true)}
+            >
+              <img
+                src={selected.public_url ?? ""}
+                alt={selected.alt_text || `${plugin.name} screenshot`}
+                className="aspect-video max-h-[520px] w-full object-contain transition duration-200 group-hover:scale-[1.01]"
+              />
+              <span className="absolute bottom-3 right-3 inline-flex size-11 items-center justify-center rounded-full border bg-background/90 text-foreground opacity-90 shadow-sm transition group-hover:bg-background group-hover:opacity-100">
+                <Expand className="size-5" aria-hidden="true" />
+              </span>
+            </button>
+            {gallery.length > 1 && (
+              <>
+                <button
+                  type="button"
+                  onClick={() => showRelative(-1)}
+                  aria-label="Previous screenshot"
+                  className="absolute left-2 top-1/2 inline-flex size-11 -translate-y-1/2 items-center justify-center rounded-full border bg-background/95 text-foreground shadow-sm transition hover:border-primary/40 hover:bg-accent focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary sm:left-3"
+                >
+                  <ChevronLeft className="size-6" />
+                </button>
+                <button
+                  type="button"
+                  onClick={() => showRelative(1)}
+                  aria-label="Next screenshot"
+                  className="absolute right-2 top-1/2 inline-flex size-11 -translate-y-1/2 items-center justify-center rounded-full border bg-background/95 text-foreground shadow-sm transition hover:border-primary/40 hover:bg-accent focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary sm:right-3"
+                >
+                  <ChevronRight className="size-6" />
+                </button>
+              </>
+            )}
+          </div>
           <div className="flex gap-2 overflow-x-auto p-1" aria-label="Plugin screenshots">
             {gallery.map((asset, i) => (
               <button
@@ -164,10 +186,11 @@ export function PluginDistribution({ plugin }: { plugin: Tables<"plugins"> }) {
             ))}
           </div>
           <Dialog open={lightboxOpen} onOpenChange={setLightboxOpen}>
-            <DialogContent className="max-w-[min(96vw,1200px)] border-white/15 bg-black/95 p-2 text-white sm:p-4">
+            <DialogContent className="max-w-[min(96vw,1200px)] border-border-strong bg-card p-2 text-foreground shadow-elevated sm:p-4">
               <DialogTitle className="sr-only">{plugin.name} screenshot viewer</DialogTitle>
               <DialogDescription className="sr-only">
-                Screenshot {selectedIndex + 1} of {gallery.length}. Use the arrow keys to navigate and Escape to close.
+                Screenshot {selectedIndex + 1} of {gallery.length}. Use the arrow keys to navigate
+                and Escape to close.
               </DialogDescription>
               <div className="relative flex min-h-[50dvh] items-center justify-center">
                 <img
@@ -181,7 +204,7 @@ export function PluginDistribution({ plugin }: { plugin: Tables<"plugins"> }) {
                       type="button"
                       onClick={() => showRelative(-1)}
                       aria-label="Previous screenshot"
-                      className="absolute left-2 inline-flex size-12 items-center justify-center rounded-full bg-black/70 text-white transition hover:bg-black focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white sm:left-4"
+                      className="absolute left-2 inline-flex size-12 items-center justify-center rounded-full border bg-background/95 text-foreground shadow-sm transition hover:border-primary/40 hover:bg-accent focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary sm:left-4"
                     >
                       <ChevronLeft className="size-7" />
                     </button>
@@ -189,14 +212,14 @@ export function PluginDistribution({ plugin }: { plugin: Tables<"plugins"> }) {
                       type="button"
                       onClick={() => showRelative(1)}
                       aria-label="Next screenshot"
-                      className="absolute right-2 inline-flex size-12 items-center justify-center rounded-full bg-black/70 text-white transition hover:bg-black focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white sm:right-4"
+                      className="absolute right-2 inline-flex size-12 items-center justify-center rounded-full border bg-background/95 text-foreground shadow-sm transition hover:border-primary/40 hover:bg-accent focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary sm:right-4"
                     >
                       <ChevronRight className="size-7" />
                     </button>
                   </>
                 )}
               </div>
-              <p className="pb-1 text-center text-xs text-white/70">
+              <p className="pb-1 text-center text-xs text-muted-foreground">
                 {selectedIndex + 1} / {gallery.length}
               </p>
             </DialogContent>
