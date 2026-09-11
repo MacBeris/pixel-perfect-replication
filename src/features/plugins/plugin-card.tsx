@@ -19,7 +19,7 @@ export function PluginCard({ plugin }: { plugin: PluginListItem }) {
   const visibleDownloads =
     plugin.listing_type === "external_listing" ? sourceMetric : plugin.downloads_count;
   return (
-    <article className="group flex h-full flex-col rounded-xl border border-border-strong/80 bg-card/80 p-5 transition-colors duration-200 hover:border-primary/30 hover:bg-card">
+    <article className="group flex h-full flex-col rounded-xl border border-border-strong/80 bg-card/80 p-5 transition-all duration-200 ease-out hover:-translate-y-1 hover:border-primary/55 hover:bg-card hover:shadow-lg focus-within:-translate-y-1 focus-within:border-primary/55 focus-within:bg-card focus-within:shadow-lg">
       <Link to="/plugins/$slug" params={{ slug: plugin.slug }} className="flex flex-1 flex-col">
         {cover && (
           <img
