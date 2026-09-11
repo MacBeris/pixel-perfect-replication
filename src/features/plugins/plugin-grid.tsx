@@ -1,5 +1,6 @@
 import { PluginCard } from "@/features/plugins/plugin-card";
 import { Skeleton } from "@/components/ui/skeleton";
+import { Button } from "@/components/ui/button";
 import type { PluginListItem } from "@/types/catalog";
 
 type Props = {
@@ -33,6 +34,18 @@ export function PluginGrid({ plugins, isLoading, emptyMessage = "Nothing here ye
       {plugins.map((plugin) => (
         <PluginCard key={plugin.id} plugin={plugin} />
       ))}
+    </div>
+  );
+}
+
+export function PluginGridError({ retry, retrying = false }: { retry: () => void; retrying?: boolean }) {
+  return (
+    <div role="alert" className="rounded-xl border border-dashed border-border bg-surface p-8 text-center">
+      <p className="text-sm font-medium text-foreground">Plugins could not be loaded.</p>
+      <p className="mt-1 text-sm text-muted-foreground">Check your connection and try again.</p>
+      <Button variant="outline" size="sm" className="mt-4" disabled={retrying} onClick={retry}>
+        {retrying ? "Retrying…" : "Try again"}
+      </Button>
     </div>
   );
 }

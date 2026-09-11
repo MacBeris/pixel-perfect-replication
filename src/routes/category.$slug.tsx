@@ -1,6 +1,6 @@
 import { createFileRoute, notFound } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
-import { PluginGrid } from "@/features/plugins/plugin-grid";
+import { PluginGrid, PluginGridError } from "@/features/plugins/plugin-grid";
 import { fetchPlugins } from "@/services/catalog";
 import { siteUrl } from "@/lib/site";
 import { getCategorySeo } from "@/features/seo/seo.functions";
@@ -38,7 +38,7 @@ function CategoryPage() {
   const { slug } = Route.useParams();
   const category = Route.useLoaderData();
 
-  const { data, isLoading } = useQuery({
+  const { data, error, isLoading, isFetching, refetch } = useQuery({
     queryKey: ["plugins", "category", slug],
     queryFn: () => fetchPlugins({ categorySlug: slug, limit: 48 }),
   });
@@ -50,7 +50,11 @@ function CategoryPage() {
         {category.description ?? `Browse plugins and extensions in ${category.name}.`}
       </p>
       <div className="mt-8">
-        <PluginGrid plugins={data ?? []} isLoading={isLoading} skeletonCount={8} />
+        {error ? (
+          <PluginGridError retrying={isFetching} retry={() => void refetch()} />
+        ) : (
+          <PluginGrid plugins={data ?? []} isLoading={isLoading} skeletonCount={8} />
+        )}
       </div>
     </div>
   );

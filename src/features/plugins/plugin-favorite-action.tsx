@@ -99,7 +99,12 @@ export function PluginFavoriteAction({
       <Button
         type="button"
         size={compact ? "sm" : "default"}
-        variant={active ? "secondary" : "outline"}
+        variant="outline"
+        className={cn(
+          active
+            ? "border-primary/45 bg-primary/10 text-primary hover:bg-primary/15 hover:text-primary"
+            : "text-muted-foreground hover:text-foreground",
+        )}
         aria-pressed={active}
         aria-label={`${active ? "Remove from" : "Add to"} Favorites`}
         disabled={saved.loading || mutation.isPending}
@@ -112,7 +117,7 @@ export function PluginFavoriteAction({
         {mutation.isPending ? (
           <LoaderCircle className="animate-spin" />
         ) : (
-          <Heart className={cn(active && "fill-current")} />
+          <Heart className={cn(active && "fill-primary text-primary")} />
         )}
         {compact ? "Favorites" : `${active ? "Remove from" : "Add to"} Favorites`}
       </Button>

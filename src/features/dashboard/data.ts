@@ -178,7 +178,8 @@ export function message(error: unknown) {
     : "Something went wrong. Please try again.";
 }
 export function safeDashboardReturn(value: unknown) {
-  return typeof value === "string" && /^\/dashboard(?:\?|$)/.test(value) && !/[\r\n\\]/.test(value)
-    ? value
-    : "/dashboard";
+  if (typeof value !== "string" || /[\r\n\\]/.test(value)) return "/dashboard";
+  if (/^\/dashboard(?:\?|$)/.test(value)) return value;
+  if (/^\/plugins\/[a-z0-9][a-z0-9-]{0,199}\/?$/.test(value)) return value;
+  return "/dashboard";
 }

@@ -1,10 +1,12 @@
-import { useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { z } from "zod";
 import { Button } from "@/components/ui/button";
 import { publishing } from "./client";
 import { message } from "@/features/dashboard/data";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
-import { Link } from "@tanstack/react-router";
+import { Link, useLocation } from "@tanstack/react-router";
+import { ChevronLeft, ChevronRight, Expand } from "lucide-react";
+import { Dialog, DialogContent, DialogDescription, DialogTitle } from "@/components/ui/dialog";
 import { useAuth } from "@/hooks/use-auth";
 import { supabase } from "@/integrations/supabase/client";
 import type { Tables } from "@/integrations/supabase/types";
@@ -14,7 +16,9 @@ import { getAnalyticsConsent } from "@/features/privacy/consent";
 
 export function PluginDistribution({ plugin }: { plugin: Tables<"plugins"> }) {
   const { user } = useAuth();
+  const location = useLocation();
   const [selectedImage, setSelectedImage] = useState<string>();
+  const [lightboxOpen, setLightboxOpen] = useState(false);
   const q = useQuery({
     queryKey: ["account", user?.id ?? "public", "distribution", plugin.id],
     queryFn: async () => {
@@ -56,6 +60,34 @@ export function PluginDistribution({ plugin }: { plugin: Tables<"plugins"> }) {
       };
     },
   });
+  const gallery = useMemo(
+    () =>
+      (q.data?.assets ?? []).filter(
+        (a) => a.asset_type === "screenshot" && a.public_url,
+      ),
+    [q.data?.assets],
+  );
+  const selected = gallery.find((a) => a.id === selectedImage) ?? gallery[0];
+  const selectedIndex = selected ? gallery.findIndex((asset) => asset.id === selected.id) : -1;
+  const showRelative = useCallback((offset: number) => {
+    if (!gallery.length) return;
+    const next = (Math.max(0, selectedIndex) + offset + gallery.length) % gallery.length;
+    setSelectedImage(gallery[next]?.id);
+  }, [gallery, selectedIndex]);
+  useEffect(() => {
+    if (!lightboxOpen || gallery.length < 2) return;
+    const keydown = (event: KeyboardEvent) => {
+      if (event.key === "ArrowLeft") {
+        event.preventDefault();
+        showRelative(-1);
+      } else if (event.key === "ArrowRight") {
+        event.preventDefault();
+        showRelative(1);
+      }
+    };
+    window.addEventListener("keydown", keydown);
+    return () => window.removeEventListener("keydown", keydown);
+  }, [lightboxOpen, gallery.length, showRelative]);
   if (q.isPending)
     return <p className="mt-6 text-sm text-muted-foreground">Loading distribution details…</p>;
   if (q.error)
@@ -65,8 +97,6 @@ export function PluginDistribution({ plugin }: { plugin: Tables<"plugins"> }) {
   const current = q.data.versions.some(
     (v) => v.is_current && v.status === "published" && v.file_verified_at,
   );
-  const gallery = q.data.assets.filter((a) => a.asset_type === "screenshot" && a.public_url);
-  const selected = gallery.find((a) => a.id === selectedImage) ?? gallery[0];
   const test = q.data.owned && q.data.versions.some((v) => v.file_verified_at);
   let url: string | undefined;
   try {
@@ -90,7 +120,9 @@ export function PluginDistribution({ plugin }: { plugin: Tables<"plugins"> }) {
           <DownloadButton pluginId={plugin.id} />
         ) : (
           <Button asChild>
-            <Link to="/auth">Sign in to download ZIP</Link>
+            <Link to="/auth" search={{ next: location.pathname }}>
+              Sign in to download ZIP
+            </Link>
           </Button>
         )
       ) : (
@@ -98,11 +130,21 @@ export function PluginDistribution({ plugin }: { plugin: Tables<"plugins"> }) {
       )}
       {selected && (
         <div className="space-y-3">
-          <img
-            src={selected.public_url ?? ""}
-            alt={selected.alt_text || `${plugin.name} screenshot`}
-            className="aspect-video max-h-[520px] w-full rounded-xl border bg-secondary/30 object-contain"
-          />
+          <button
+            type="button"
+            className="group relative block w-full overflow-hidden rounded-xl border bg-secondary/30 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2"
+            aria-label="Open screenshot in full-size viewer"
+            onClick={() => setLightboxOpen(true)}
+          >
+            <img
+              src={selected.public_url ?? ""}
+              alt={selected.alt_text || `${plugin.name} screenshot`}
+              className="aspect-video max-h-[520px] w-full object-contain transition duration-200 group-hover:scale-[1.01]"
+            />
+            <span className="absolute bottom-3 right-3 inline-flex size-11 items-center justify-center rounded-full border bg-background/90 text-foreground opacity-90 shadow-sm transition group-hover:bg-background group-hover:opacity-100">
+              <Expand className="size-5" aria-hidden="true" />
+            </span>
+          </button>
           <div className="flex gap-2 overflow-x-auto p-1" aria-label="Plugin screenshots">
             {gallery.map((asset, i) => (
               <button
@@ -111,7 +153,7 @@ export function PluginDistribution({ plugin }: { plugin: Tables<"plugins"> }) {
                 aria-label={`Show screenshot ${i + 1}`}
                 aria-pressed={selected.id === asset.id}
                 onClick={() => setSelectedImage(asset.id)}
-                className={`shrink-0 rounded-lg border-2 p-1 ${selected.id === asset.id ? "border-primary" : "border-transparent"}`}
+                className={`shrink-0 rounded-lg border-2 p-1 transition duration-150 hover:-translate-y-0.5 hover:border-primary/60 hover:bg-primary/5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary ${selected.id === asset.id ? "border-primary bg-primary/5" : "border-transparent"}`}
               >
                 <img
                   src={asset.public_url ?? ""}
@@ -121,6 +163,44 @@ export function PluginDistribution({ plugin }: { plugin: Tables<"plugins"> }) {
               </button>
             ))}
           </div>
+          <Dialog open={lightboxOpen} onOpenChange={setLightboxOpen}>
+            <DialogContent className="max-w-[min(96vw,1200px)] border-white/15 bg-black/95 p-2 text-white sm:p-4">
+              <DialogTitle className="sr-only">{plugin.name} screenshot viewer</DialogTitle>
+              <DialogDescription className="sr-only">
+                Screenshot {selectedIndex + 1} of {gallery.length}. Use the arrow keys to navigate and Escape to close.
+              </DialogDescription>
+              <div className="relative flex min-h-[50dvh] items-center justify-center">
+                <img
+                  src={selected.public_url ?? ""}
+                  alt={selected.alt_text || `${plugin.name} screenshot`}
+                  className="max-h-[85dvh] w-full object-contain"
+                />
+                {gallery.length > 1 && (
+                  <>
+                    <button
+                      type="button"
+                      onClick={() => showRelative(-1)}
+                      aria-label="Previous screenshot"
+                      className="absolute left-2 inline-flex size-12 items-center justify-center rounded-full bg-black/70 text-white transition hover:bg-black focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white sm:left-4"
+                    >
+                      <ChevronLeft className="size-7" />
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => showRelative(1)}
+                      aria-label="Next screenshot"
+                      className="absolute right-2 inline-flex size-12 items-center justify-center rounded-full bg-black/70 text-white transition hover:bg-black focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white sm:right-4"
+                    >
+                      <ChevronRight className="size-7" />
+                    </button>
+                  </>
+                )}
+              </div>
+              <p className="pb-1 text-center text-xs text-white/70">
+                {selectedIndex + 1} / {gallery.length}
+              </p>
+            </DialogContent>
+          </Dialog>
         </div>
       )}
     </div>

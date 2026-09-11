@@ -66,6 +66,9 @@ export async function fetchPlugins(params: PluginQuery = {}): Promise<PluginList
     .from("plugins")
     .select(selectClause)
     .eq("moderation_status", "approved")
+    // Cards only consume the cover. Returning every screenshot for every result made
+    // the six home-page catalogue requests unnecessarily large and prone to timing out.
+    .eq("plugin_assets.asset_type", "cover")
     .limit(limit);
 
   if (search && search.trim()) {

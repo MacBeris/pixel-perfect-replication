@@ -11,7 +11,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { PluginGrid } from "@/features/plugins/plugin-grid";
+import { PluginGrid, PluginGridError } from "@/features/plugins/plugin-grid";
 import { fetchPlatforms, fetchPlugins } from "@/services/catalog";
 import type { PluginSort } from "@/types/catalog";
 import { t } from "@/lib/i18n";
@@ -71,7 +71,7 @@ function PluginsPage() {
   const [term, setTerm] = useState(search.q ?? "");
 
   const { data: platforms } = useQuery({ queryKey: ["platforms"], queryFn: fetchPlatforms });
-  const { data, isLoading } = useQuery({
+  const { data, error, isLoading, isFetching, refetch } = useQuery({
     queryKey: ["plugins", "explore", search],
     queryFn: () =>
       fetchPlugins({
@@ -167,12 +167,16 @@ function PluginsPage() {
       </form>
 
       <div className="mt-8">
-        <PluginGrid
-          plugins={data ?? []}
-          isLoading={isLoading}
-          skeletonCount={8}
-          emptyMessage="No plugins match these filters yet."
-        />
+        {error ? (
+          <PluginGridError retrying={isFetching} retry={() => void refetch()} />
+        ) : (
+          <PluginGrid
+            plugins={data ?? []}
+            isLoading={isLoading}
+            skeletonCount={8}
+            emptyMessage="No plugins match these filters yet."
+          />
+        )}
       </div>
     </div>
   );

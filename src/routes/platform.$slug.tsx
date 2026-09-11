@@ -1,6 +1,6 @@
 import { createFileRoute, notFound } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
-import { PluginGrid } from "@/features/plugins/plugin-grid";
+import { PluginGrid, PluginGridError } from "@/features/plugins/plugin-grid";
 import { fetchPlugins } from "@/services/catalog";
 import { siteUrl } from "@/lib/site";
 import { getPlatformSeo } from "@/features/seo/seo.functions";
@@ -46,7 +46,7 @@ function PlatformPage() {
   const { slug } = Route.useParams();
   const platform = Route.useLoaderData();
 
-  const { data, isLoading } = useQuery({
+  const { data, error, isLoading, isFetching, refetch } = useQuery({
     queryKey: ["plugins", "platform", slug],
     queryFn: () => fetchPlugins({ platformSlug: slug, limit: 48 }),
   });
@@ -62,7 +62,11 @@ function PlatformPage() {
           `Browse plugins, extensions and add-ons made for ${platform.name}.`}
       </p>
       <div className="mt-8">
-        <PluginGrid plugins={data ?? []} isLoading={isLoading} skeletonCount={8} />
+        {error ? (
+          <PluginGridError retrying={isFetching} retry={() => void refetch()} />
+        ) : (
+          <PluginGrid plugins={data ?? []} isLoading={isLoading} skeletonCount={8} />
+        )}
       </div>
     </div>
   );
