@@ -3,6 +3,7 @@ import { Link } from "@tanstack/react-router";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
+import { saveReview } from "@/features/reviews/review.functions";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useTheme, type ThemeMode } from "@/lib/theme";
@@ -466,7 +467,7 @@ export function Reviews({ userId }: { userId: string }) {
     queryFn: async () => {
       const { data, error } = await supabase
         .from("reviews")
-        .select("id,title,body,rating,status,created_at,plugin:plugins(name,slug)")
+        .select("id,plugin_id,title,body,rating,status,created_at,plugin:plugins(name,slug)")
         .eq("user_id", userId)
         .order("created_at", { ascending: false })
         .range(page * 20, page * 20 + 19);
@@ -490,18 +491,17 @@ export function Reviews({ userId }: { userId: string }) {
               e.preventDefault();
               const f = new FormData(e.currentTarget);
               action.mutate(async () => {
-                const { error } = await supabase
-                  .from("reviews")
-                  .update({
+                const { data: session } = await supabase.auth.getSession();
+                if (!session.session) throw new Error("Please sign in again.");
+                await saveReview({
+                  data: {
+                    accessToken: session.session.access_token,
+                    pluginId: r.plugin_id,
                     title: String(f.get("title")),
                     body: String(f.get("body")),
                     rating: Number(f.get("rating")),
-                  })
-                  .eq("id", r.id)
-                  .eq("user_id", userId)
-                  .select("id")
-                  .single();
-                if (error) throw error;
+                  },
+                });
               });
             }}
           >
@@ -526,7 +526,7 @@ export function Reviews({ userId }: { userId: string }) {
             </label>
             <label className="block text-sm">
               Title
-              <Input name="title" maxLength={200} defaultValue={r.title ?? ""} />
+              <Input name="title" maxLength={160} defaultValue={r.title ?? ""} />
             </label>
             <label className="block text-sm">
               Review
