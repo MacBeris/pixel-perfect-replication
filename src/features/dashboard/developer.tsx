@@ -273,7 +273,7 @@ function DeveloperAnalytics({
             </p>
           </div>
         </div>
-        <div className="flex flex-wrap gap-2">
+        <div className="flex w-full flex-wrap gap-2 sm:w-auto">
           {plugin ? (
             <>
               {!plugin.developer_removed_at && (
@@ -335,13 +335,23 @@ function DeveloperAnalytics({
             </>
           ) : (
             <>
+              {d.totals.plugins > 0 && (
+                <Button
+                  className="w-full sm:w-auto"
+                  onClick={() => change({ view: "create", plugin: undefined, page: 1 })}
+                >
+                  <Plus className="mr-2 size-4" />
+                  Create plugin
+                </Button>
+              )}
               <Button
                 variant="outline"
+                className="flex-1 sm:flex-none"
                 onClick={() => change({ view: "profile", plugin: undefined, page: 1 })}
               >
                 Edit profile
               </Button>
-              <Button variant="outline" asChild>
+              <Button variant="outline" className="flex-1 sm:flex-none" asChild>
                 <Link to="/developers/$slug" params={{ slug: profile.slug }}>
                   View profile
                   <ArrowUpRight className="ml-2 size-4" />
@@ -361,13 +371,17 @@ function DeveloperAnalytics({
       )}
       {d.totals.plugins === 0 && !search.plugin ? (
         <Panel
-          title="Your developer profile is ready"
-          description="Your profile is active. Create your first plugin and submit it for review."
+          title="Create your first plugin"
+          description="Add your work to ExtendShare, complete its listing and submit it for review."
         >
-          <div className="flex flex-wrap gap-3">
-            <Button onClick={() => change({ view: "create", plugin: undefined })}>
-              <Plus className="mr-2 size-4" />
-              Create your first plugin
+          <div className="flex flex-col gap-3 sm:flex-row sm:flex-wrap">
+            <Button
+              size="lg"
+              className="w-full sm:w-auto"
+              onClick={() => change({ view: "create", plugin: undefined })}
+            >
+              <Plus className="mr-2 size-5" />
+              Create plugin
             </Button>
             <Button variant="outline" onClick={() => change({ view: "profile" })}>
               Complete developer profile
@@ -492,12 +506,6 @@ function DeveloperAnalytics({
               title="Your plugins"
               description="Manage publishing, visibility, edits and the lifecycle of your plugins."
             >
-              <div className="mb-4">
-                <Button onClick={() => change({ view: "create", plugin: undefined })}>
-                  <Plus className="mr-2 size-4" />
-                  Create plugin
-                </Button>
-              </div>
               <div className="grid gap-4 xl:grid-cols-2">
                 {d.plugins.map((p) => (
                   <article
